@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model User {
+  id             String         @id @default(cuid())
+  email          String?        @unique
+  phone          String?
+  password       String?
+  name           String
+  nickname       String?
+  role           String         @default("JOUEUR") // PRESIDENT, ORGA, TRESORIER, JOUEUR
+  points         Float          @default(0) // Total points
+  averagePoints  Float          @default(0) // Current average (total points / total matches)
+  totalMatches   Int            @default(0)
+  yellowCards    Int            @default(0)
+  redCards       Int            @default(0)
+  tops           Int            @default(0)
+  flops          Int            @default(0)
+  createdAt      DateTime       @default(now())
+  
+  registrations  Registration[]
+  poolPlayers    PoolPlayer[]
+
+  // Matches relation
+  team1Player1Matches Match[] @relation("Team1Player1")
+  team1Player2Matches Match[] @relation("Team1Player2")
+  team2Player1Matches Match[] @relation("Team2Player1")
+  team2Player2Matches Match[] @relation("Team2Player2")
+}
+
+model Season {
+  id        String    @id @default(cuid())
+  name      String    // e.g. "2023-2024"
+  startDate DateTime
+  endDate   DateTime?
+  isActive  Boolean   @default(false)
+  sessions  Session[]
+}
+
+model Session {
+  id                String    @id @default(cuid())
+  seasonId          String
+  season            Season    @relation(fields: [seasonId], references: [id])
+  date              DateTime
+  registrationOpen  DateTime?
+  registrationClose DateTime?
+  status            String    @default("PREVUE") // PREVUE, INSCRIPTIONS_OUVERTES, POULES_GENEREES, TERMINEE
+  courts            Int       @default(0)
+  
+  registrations     Registration[]
+  pools             Pool[]
+}
+
+model Registration {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id])
+  status                String   @default("INSCRIT") // INSCRIT, LISTE_ATTENTE, ANNULE
+  isReturningFromInjury Boolean  @default(false)
+  createdAt             DateTime @default(now())
+
+  @@unique([userId, sessionId])
+}
+
+model Pool {
+  id          String   @id @default(cuid())
+  sessionId   String
+  session     Session  @relation(fields: [sessionId], references: [id])
+  courtNumber Int
+  level       Int      // 1 is highest level
+  startTime   String?  // Ex: "18:30" ou "19:00"
+
+  players     PoolPlayer[]
+  matches     Match[]
+}
+
+model PoolPlayer {
+  poolId  String
+  pool    Pool   @relation(fields: [poolId], references: [id])
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+  seed    Int    // 1 to 4 to determine match pairings
+
+  @@unique([poolId, userId])
+}
+
+model Match {
+  id             String  @id @default(cuid())
+  poolId         String
+  pool           Pool    @relation(fields: [poolId], references: [id])
+  order          Int     // 1, 2, 3 (The three matches of the session)
+  
+  team1Player1Id String
+  team1Player1   User    @relation("Team1Player1", fields: [team1Player1Id], references: [id])
+  team1Player2Id String
+  team1Player2   User    @relation("Team1Player2", fields: [team1Player2Id], references: [id])
+  
+  team2Player1Id String
+  team2Player1   User    @relation("Team2Player1", fields: [team2Player1Id], references: [id])
+  team2Player2Id String
+  team2Player2   User    @relation("Team2Player2", fields: [team2Player2Id], references: [id])
+  
+  team1Games     Int?
+  team2Games     Int?
+  winningTeam    Int?    // 1, 2, or 0 for DRAW
+}
