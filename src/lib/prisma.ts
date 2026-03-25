@@ -1,7 +1,14 @@
 import { PrismaClient } from '@prisma/client'
 
+// Fix Neon Postgres Pooler concurrency on Vercel by appending pgbouncer=true
+if (process.env.POSTGRES_PRISMA_URL && process.env.POSTGRES_PRISMA_URL.includes('-pooler.') && !process.env.POSTGRES_PRISMA_URL.includes('pgbouncer=true')) {
+  process.env.POSTGRES_PRISMA_URL += `${process.env.POSTGRES_PRISMA_URL.includes('?') ? '&' : '?'}pgbouncer=true`;
+}
+
 const prismaClientSingleton = () => {
-  return new PrismaClient()
+  return new PrismaClient({
+    ...(process.env.POSTGRES_PRISMA_URL ? { datasources: { db: { url: process.env.POSTGRES_PRISMA_URL } } } : {})
+  })
 }
 
 declare const globalThis: {
