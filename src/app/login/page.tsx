@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import SubmitButton from '@/components/SubmitButton';
 
 export default async function LoginPage({ searchParams }: { searchParams: any }) {
   const sp = await searchParams;
@@ -87,12 +88,12 @@ export default async function LoginPage({ searchParams }: { searchParams: any })
             />
           </div>
           
-          <button
-            type="submit"
+          <SubmitButton
             className="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-md text-sm font-black text-white bg-orange-500 hover:bg-orange-600 transition-all transform hover:scale-[1.02] mt-2 !mt-6"
+            pendingText="Connexion..."
           >
             Se Connecter 👉
-          </button>
+          </SubmitButton>
         </form>
       </div>
     </div>

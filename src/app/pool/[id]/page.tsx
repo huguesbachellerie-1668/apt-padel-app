@@ -2,6 +2,7 @@ import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function PoolPage({ params }: { params: { id: string } }) {
   const { id } = await params;
@@ -181,16 +182,16 @@ export default async function PoolPage({ params }: { params: { id: string } }) {
                       {allMatchesFinished ? (
                           <>
                             <p className="text-green-600 mb-4 text-sm font-bold">Tous les matchs de la poule sont terminés.</p>
-                            <button type="submit" formAction={saveAndRedirect} className="bg-green-500 hover:bg-green-600 text-white font-black py-4 px-10 rounded-2xl shadow-xl transition-transform transform hover:scale-[1.02] text-lg w-full md:w-auto">
+                            <SubmitButton pendingText="Enregistrement..." formAction={saveAndRedirect} className="bg-green-500 hover:bg-green-600 text-white font-black py-4 px-10 rounded-2xl shadow-xl transition-transform transform hover:scale-[1.02] text-lg w-full md:w-auto">
                                 ✅ Scores enregistrés ! Voir les Résultats 👉
-                            </button>
+                            </SubmitButton>
                           </>
                       ) : (
                           <>
                             <p className="text-gray-500 mb-4 text-sm font-medium">Assurez-vous que les scores des {pool.matches.length} matchs sont saisis.</p>
-                            <button type="submit" formAction={saveScores} className="bg-orange-500 hover:bg-orange-600 text-white font-black py-4 px-10 rounded-2xl shadow-xl transition-transform transform hover:scale-[1.02] text-lg w-full md:w-auto">
+                            <SubmitButton pendingText="Sauvegarde..." formAction={saveScores} className="bg-orange-500 hover:bg-orange-600 text-white font-black py-4 px-10 rounded-2xl shadow-xl transition-transform transform hover:scale-[1.02] text-lg w-full md:w-auto">
                                 💾 Enregistrer les scores
-                            </button>
+                            </SubmitButton>
                           </>
                       )}
                   </div>

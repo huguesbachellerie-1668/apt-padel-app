@@ -2,6 +2,7 @@ import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { createSeason, createSession, updateSessionStatus, generatePools, finishSessionAndCalculatePoints, reopenSession, updateSessionCourtsAction } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function AdminDashboard() {
   const user = await getSessionUser();
@@ -41,9 +42,9 @@ export default async function AdminDashboard() {
           <p className="text-gray-600 mb-8">Pour organiser des matchs, vous devez d'abord initialiser une saison active (ex: Saison 2026-2027).</p>
           <form action={createSeason} className="flex flex-col gap-4 max-w-md mx-auto">
             <input name="name" type="text" placeholder="Ex: Saison 2026-2027" className="border-2 border-gray-200 p-3 rounded-xl focus:border-orange-500 focus:outline-none" required />
-            <button type="submit" className="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 shadow-md transition-transform hover:scale-105">
+            <SubmitButton pendingText="Démarrage..." className="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 shadow-md transition-transform hover:scale-105">
               Démarrer la saison
-            </button>
+            </SubmitButton>
           </form>
         </div>
       ) : (
@@ -77,9 +78,9 @@ export default async function AdminDashboard() {
                 <label className="block text-sm font-bold text-blue-900 mb-2">Terrains</label>
                 <input name="courts" type="number" min="1" max="20" defaultValue="1" className="border-2 border-gray-200 p-3 rounded-xl w-full text-gray-700 bg-white focus:border-blue-500 focus:ring-0" required />
               </div>
-              <button type="submit" className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 shadow-md transition-colors whitespace-nowrap">
+              <SubmitButton pendingText="Création..." className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 shadow-md transition-colors whitespace-nowrap">
                 + Créer la session
-              </button>
+              </SubmitButton>
             </form>
 
             <div className="space-y-4">
@@ -110,9 +111,9 @@ export default async function AdminDashboard() {
                   <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                     {session.status === 'PREVUE' && (
                       <form action={updateSessionStatus.bind(null, session.id, 'INSCRIPTIONS_OUVERTES')} className="w-full sm:w-auto">
-                        <button className="w-full bg-green-500 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-sm hover:bg-green-600 transition-colors">
+                        <SubmitButton pendingText="Ouverture..." className="w-full bg-green-500 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-sm hover:bg-green-600 transition-colors">
                           Ouvrir Inscriptions 🟢
-                        </button>
+                        </SubmitButton>
                       </form>
                     )}
                     {session.status === 'INSCRIPTIONS_OUVERTES' && (
@@ -123,31 +124,31 @@ export default async function AdminDashboard() {
                              <label className="text-xs font-bold text-blue-800 block mb-1">Modifier Terrains</label>
                              <input name="courts" type="number" min="1" max="20" defaultValue={session.courts > 0 ? session.courts : 1} className="w-20 p-2 border border-blue-300 rounded-lg text-sm font-bold text-center" />
                            </div>
-                           <button className="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-blue-700 transition-colors h-full">
+                           <SubmitButton pendingText="Sauvegarde..." className="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-blue-700 transition-colors h-full">
                              Sauver 💾
-                           </button>
+                           </SubmitButton>
                         </form>
 
                         <form action={generatePools} className="flex items-center gap-2 bg-orange-50 p-2 rounded-xl border border-orange-200">
                           <input type="hidden" name="sessionId" value={session.id} />
                           <input type="hidden" name="courtsCount" value={session.courts > 0 ? session.courts : 1} />
-                          <button className="w-full bg-orange-500 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-sm hover:bg-orange-600 transition-colors h-full whitespace-nowrap">
+                          <SubmitButton pendingText="Génération..." className="w-full bg-orange-500 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-sm hover:bg-orange-600 transition-colors h-full whitespace-nowrap">
                             Générer les Poules 🎲
-                          </button>
+                          </SubmitButton>
                         </form>
                       </div>
                     )}
                     {session.status === 'POULES_GENEREES' && (
                       <div className="flex flex-col gap-2 w-full sm:w-auto">
                         <form action={reopenSession.bind(null, session.id)}>
-                          <button className="w-full bg-red-500 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-sm hover:bg-red-600 transition-colors">
+                          <SubmitButton pendingText="Recalcul..." className="w-full bg-red-500 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-sm hover:bg-red-600 transition-colors">
                             Recalculer les poules ⏪
-                          </button>
+                          </SubmitButton>
                         </form>
                         <form action={finishSessionAndCalculatePoints.bind(null, session.id)}>
-                          <button className="w-full bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-sm hover:bg-blue-700 transition-colors">
+                          <SubmitButton pendingText="Fermeture..." className="w-full bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-sm hover:bg-blue-700 transition-colors">
                             Terminer session 🏁
-                          </button>
+                          </SubmitButton>
                         </form>
                       </div>
                     )}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { updatePlayer, resetPasswordToDefault } from './actions';
+import SubmitButton from '@/components/SubmitButton';
 
 export default function AdminPlayerList({ players, user }: { players: any[], user: any }) {
   const [search, setSearch] = useState('');
@@ -67,12 +68,12 @@ export default function AdminPlayerList({ players, user }: { players: any[], use
                   <input name="createdAt" type="date" defaultValue={player.createdAt ? new Date(player.createdAt).toISOString().split('T')[0] : ''} disabled={!canEdit} className="w-full p-2.5 border border-gray-200 rounded-lg text-sm bg-white text-gray-700 font-bold focus:outline-none focus:border-blue-400 disabled:bg-gray-50 uppercase" title="Date d'inscription" />
               </div>
               <div className="w-full md:flex-1 flex justify-end gap-2 mt-2 md:mt-0 items-center">
-                  <button formAction={resetPasswordToDefault.bind(null, player.id)} disabled={!canEdit} className="bg-gray-100 text-gray-700 hover:bg-red-100 hover:text-red-700 hover:border-red-200 border border-transparent font-bold py-2 px-3 rounded-xl text-xs shadow-sm transition-all disabled:opacity-50" title="Remettre le mot de passe sur Apt2026!">
+                  <SubmitButton pendingText="⏳" formAction={resetPasswordToDefault.bind(null, player.id)} disabled={!canEdit} className="bg-gray-100 text-gray-700 hover:bg-red-100 hover:text-red-700 hover:border-red-200 border border-transparent font-bold py-2 px-3 rounded-xl text-xs shadow-sm transition-all disabled:opacity-50" title="Remettre le mot de passe sur Apt2026!">
                     Reset Mdp 🔑
-                  </button>
-                  <button type="submit" disabled={!canEdit} className="bg-blue-600 disabled:bg-gray-400 hover:bg-blue-700 text-white font-bold py-2 px-4 md:px-6 rounded-xl text-sm shadow-sm transition-transform hover:scale-105 border-b-4 border-blue-800 active:border-b-0 active:mt-[4px] disabled:border-b-0 disabled:transform-none">
+                  </SubmitButton>
+                  <SubmitButton pendingText="⏳" disabled={!canEdit} className="bg-blue-600 disabled:bg-gray-400 hover:bg-blue-700 text-white font-bold py-2 px-4 md:px-6 rounded-xl text-sm shadow-sm transition-transform hover:scale-105 border-b-4 border-blue-800 active:border-b-0 active:mt-[4px] disabled:border-b-0 disabled:transform-none">
                     Enregistrer ✔️
-                  </button>
+                  </SubmitButton>
               </div>
             </form>
           );

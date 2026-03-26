@@ -4,6 +4,7 @@ import "./globals.css";
 import { getSessionUser } from "@/lib/auth";
 import Link from 'next/link';
 import { cookies } from 'next/headers';
+import SubmitButton from '@/components/SubmitButton';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -44,9 +45,9 @@ export default async function RootLayout({
                     Connecté : <strong className="text-white">{user.nickname || user.name.split(' ')[0]}</strong>
                   </span>
                   <form action={logout}>
-                    <button type="submit" className="text-xs bg-blue-800 hover:bg-orange-500 text-white px-3 py-1.5 rounded-full transition-colors font-medium">
+                    <SubmitButton pendingText="Déconnexion..." className="text-xs bg-blue-800 hover:bg-orange-500 text-white px-3 py-1.5 rounded-full transition-colors font-medium">
                       Déconnexion
-                    </button>
+                    </SubmitButton>
                   </form>
                 </div>
               </div>

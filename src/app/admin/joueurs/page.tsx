@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { createPlayer } from "./actions";
 import AdminPlayerList from "./AdminPlayerList";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function AdminPlayersPage() {
   const user = await getSessionUser();
@@ -56,9 +57,9 @@ export default async function AdminPlayersPage() {
              <label className="text-xs font-bold text-gray-600 block mb-1">Date d'inscription</label>
              <input name="createdAt" type="date" defaultValue={new Date().toISOString().split('T')[0]} className="w-full p-2.5 border-2 border-gray-200 rounded-lg text-sm text-gray-700 bg-white font-bold focus:outline-none" />
           </div>
-          <button type="submit" className="bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md transition-transform hover:scale-105 h-[46px] flex items-center">
+          <SubmitButton pendingText="Création..." className="bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md transition-transform hover:scale-105 h-[46px] flex items-center">
             Créer
-          </button>
+          </SubmitButton>
         </form>
       </div>
 

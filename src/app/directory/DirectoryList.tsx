@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { updateContactInfo } from './actions';
 import Link from 'next/link';
+import SubmitButton from '@/components/SubmitButton';
 
 export default function DirectoryList({ players, user }: { players: any[], user: any }) {
   const [search, setSearch] = useState('');
@@ -92,9 +93,9 @@ export default function DirectoryList({ players, user }: { players: any[], user:
                    <label className="text-xs font-bold text-gray-500 mt-1">Email</label>
                    <input type="email" name="email" defaultValue={player.email || ''} placeholder="ex: jean.dupont@email.com" className="w-full p-2 text-sm border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300" />
                    
-                   <button type="submit" className="w-full mt-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-lg text-sm shadow-sm transition-colors">
+                   <SubmitButton pendingText="Enregistrement..." className="w-full mt-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-lg text-sm shadow-sm transition-colors">
                      Enregistrer
-                   </button>
+                   </SubmitButton>
                 </form>
               </details>
             )}

@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { manualRegisterForSession, manualUnregisterForSession, updatePoolTime } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function SessionDetailsPage({ params }: { params: any }) {
   const p = await params;
@@ -102,7 +103,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                    {isBoard ? (
                      <form action={updatePoolTime.bind(null, pool.id, session.id)} className="flex items-center gap-2">
                        <input type="time" name="startTime" defaultValue={pool.startTime || ''} className="bg-white text-gray-900 rounded px-2 py-1 text-sm font-bold w-24 border-0 focus:ring-2 focus:ring-orange-500" />
-                       <button type="submit" className="bg-orange-500 hover:bg-orange-400 text-white px-3 py-1 rounded text-sm font-bold">OK</button>
+                       <SubmitButton pendingText="..." className="bg-orange-500 hover:bg-orange-400 text-white px-3 py-1 rounded text-sm font-bold">OK</SubmitButton>
                      </form>
                    ) : (
                      <span className="text-sm font-bold text-orange-300">
@@ -152,9 +153,9 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                    <option key={u.id} value={u.id}>{u.name} {u.nickname ? `("${u.nickname}")` : ''}</option>
                  ))}
                </select>
-               <button type="submit" className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-colors whitespace-nowrap">
+               <SubmitButton pendingText="Inscription..." className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-colors whitespace-nowrap">
                  Inscrire
-               </button>
+               </SubmitButton>
              </div>
              <div className="flex items-center gap-2 bg-orange-100 p-2 rounded-xl border border-orange-200 mt-2">
                <input type="checkbox" id="boardInjury" name="isReturningFromInjury" value="true" className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500 cursor-pointer" />
@@ -194,9 +195,9 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                 {isBoard && session.status !== 'TERMINEE' && (
                   <form action={manualUnregisterForSession.bind(null, session.id)}>
                     <input type="hidden" name="userId" value={reg.userId} />
-                    <button type="submit" className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors flex items-center justify-center text-lg" title="Désinscrire ce joueur">
+                    <SubmitButton pendingText="⏳" className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors flex items-center justify-center text-lg" title="Désinscrire ce joueur">
                       🗑️
-                    </button>
+                    </SubmitButton>
                   </form>
                 )}
              </div>

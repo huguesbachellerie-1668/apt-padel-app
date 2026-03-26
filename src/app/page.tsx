@@ -2,6 +2,7 @@ import { getSessionUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { registerForSession, unregisterFromSession } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function Dashboard() {
   const user = await getSessionUser();
@@ -114,9 +115,9 @@ export default async function Dashboard() {
                     ✅ Vous êtes bien inscrit(e) sur la liste !
                   </p>
                   <form action={unregisterFromSession.bind(null, activeSession.id)}>
-                    <button className="text-sm border border-red-200 text-red-600 hover:bg-red-50 bg-white font-bold py-2.5 px-6 rounded-xl transition-colors shadow-sm">
+                    <SubmitButton className="text-sm border border-red-200 text-red-600 hover:bg-red-50 bg-white font-bold py-2.5 px-6 rounded-xl transition-colors shadow-sm">
                       Me désinscrire
-                    </button>
+                    </SubmitButton>
                   </form>
                 </div>
               ) : (
@@ -127,9 +128,9 @@ export default async function Dashboard() {
                       Signaler un "retour de blessure" <br/><span className="text-[11px] text-orange-700 font-medium uppercase tracking-wider block mt-1">Vous descendrez d'une poule calculée pour ce dimanche.</span>
                     </label>
                   </div>
-                  <button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-4 px-4 rounded-xl transition-all shadow-md flex justify-center items-center gap-2 text-lg">
+                  <SubmitButton pendingText="Inscription..." className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-4 px-4 rounded-xl transition-all shadow-md flex justify-center items-center gap-2 text-lg">
                     🎾 M'inscrire pour ce dimanche !
-                  </button>
+                  </SubmitButton>
                 </form>
               )
             )}
