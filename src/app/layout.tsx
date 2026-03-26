@@ -5,6 +5,7 @@ import { getSessionUser } from "@/lib/auth";
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import SubmitButton from '@/components/SubmitButton';
+import NavButton from '@/components/NavButton';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -54,25 +55,13 @@ export default async function RootLayout({
             </div>
             {/* Nav */}
             <nav className="flex flex-wrap justify-around items-center max-w-3xl mx-auto py-3 px-2 text-sm font-medium gap-y-2">
-              <Link href="/" className="px-3 py-2 hover:bg-white/10 rounded-full transition-colors flex flex-col items-center gap-1">
-                <span>🏠</span><span className="text-xs">Accueil</span>
-              </Link>
-              <Link href="/ranking" className="px-3 py-2 hover:bg-white/10 rounded-full transition-colors flex flex-col items-center gap-1">
-                <span>🏆</span><span className="text-xs">Classement</span>
-              </Link>
-              <Link href="/history" className="px-3 py-2 hover:bg-white/10 rounded-full transition-colors flex flex-col items-center gap-1">
-                <span>📅</span><span className="text-xs">Historique</span>
-              </Link>
-              <Link href="/directory" className="px-3 py-2 hover:bg-white/10 rounded-full transition-colors flex flex-col items-center gap-1">
-                <span>👥</span><span className="text-xs">Annuaire</span>
-              </Link>
-              <Link href="/rules" className="px-3 py-2 hover:bg-white/10 rounded-full transition-colors flex flex-col items-center gap-1">
-                <span>📜</span><span className="text-xs">Règlement</span>
-              </Link>
+              <NavButton href="/" icon="🏠" label="Accueil" />
+              <NavButton href="/ranking" icon="🏆" label="Classement" />
+              <NavButton href="/history" icon="📅" label="Historique" />
+              <NavButton href="/directory" icon="👥" label="Annuaire" />
+              <NavButton href="/rules" icon="📜" label="Règlement" />
               {['PRESIDENT', 'ORGA', 'TRESORIER'].includes(user.role) && (
-                <Link href="/admin" className="px-3 py-2 hover:bg-white/10 rounded-full transition-colors flex flex-col items-center gap-1 text-orange-300">
-                  <span>⚙️</span><span className="text-xs">Admin</span>
-                </Link>
+                <NavButton href="/admin" icon="⚙️" label="Admin" className="text-orange-300" />
               )}
             </nav>
           </header>
