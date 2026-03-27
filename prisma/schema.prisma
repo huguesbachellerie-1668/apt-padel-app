@@ -24,6 +24,7 @@ model User {
   tops           Int            @default(0)
   flops          Int            @default(0)
   createdAt      DateTime       @default(now())
+  historicalStats Json?         @default("{}")
   
   registrations  Registration[]
   poolPlayers    PoolPlayer[]

@@ -72,6 +72,8 @@ export async function updatePlayer(formData: FormData) {
   const totalMatches = sessions * 3;
   const averagePoints = sessions > 0 ? (points / sessions) : 0;
   const createdAtStr = formData.get('createdAt') as string;
+  const hist2324Str = formData.get('hist2324') as string;
+  const hist2425Str = formData.get('hist2425') as string;
 
   const targetUser = await prisma.user.findUnique({ where: { id } });
   if (!targetUser) throw new Error('User not found');
@@ -92,6 +94,14 @@ export async function updatePlayer(formData: FormData) {
     averagePoints,
     role: role || targetUser.role
   };
+
+  const currentHistoricalStats = typeof (targetUser as any).historicalStats === 'object' && (targetUser as any).historicalStats !== null ? (targetUser as any).historicalStats : {};
+  let newHistoricalStats: any = { ...currentHistoricalStats };
+  if (hist2324Str && hist2324Str.trim() !== '') newHistoricalStats['2023-2024'] = parseFloat(hist2324Str.trim());
+  if (hist2425Str && hist2425Str.trim() !== '') newHistoricalStats['2024-2025'] = parseFloat(hist2425Str.trim());
+  if (Object.keys(newHistoricalStats).length > 0) {
+      updateData.historicalStats = newHistoricalStats;
+  }
 
   if (createdAtStr) {
      updateData.createdAt = new Date(createdAtStr);

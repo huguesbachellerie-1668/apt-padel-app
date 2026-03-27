@@ -140,13 +140,18 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
                 {player.name}
               </h1>
               {player.nickname && <p className="text-xl text-gray-400 italic font-medium mt-1">"{player.nickname}"</p>}
-              <div className="flex gap-3 mt-3">
-                 <span className="bg-orange-100 text-orange-800 font-bold px-3 py-1 rounded-full text-sm">
+              <div className="flex flex-wrap gap-2 mt-3">
+                 <span className="bg-orange-100 text-orange-800 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-orange-200">
                    {totalSessions} Sessions
                  </span>
-                 <span className="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full text-sm">
-                   Moyenne: {(player.averagePoints || 0).toFixed(2)} pts
+                 <span className="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-blue-200">
+                   Actuelle : {(player.averagePoints || 0).toFixed(2)} pts
                  </span>
+                 {typeof (player as any).historicalStats === 'object' && (player as any).historicalStats !== null && Object.entries((player as any).historicalStats).map(([season, pts]: any) => (
+                    <span key={season} className="bg-gray-50 border border-gray-200 text-gray-600 font-bold px-3 py-1 rounded-full text-sm flex items-center gap-1 shadow-sm" title={`Ancienne moyenne enregistrée pour ${season}`}>
+                      <span className="text-xs opacity-50">📜</span> {season} : {pts.toFixed(2)} pts
+                    </span>
+                 ))}
               </div>
            </div>
         </div>
