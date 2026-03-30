@@ -54,16 +54,12 @@ export default async function RankingPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className={`text-lg font-black tracking-tight uppercase ${isCurrentUser ? 'text-orange-700 hover:text-orange-800' : 'text-gray-900 hover:text-blue-600'} transition-colors`}>
-                        <Link href={`/profile/${player.id}`} title="Voir le profil et les statistiques">
-                          {player.nickname ? player.nickname : player.name}
+                      <div className={`text-lg font-black tracking-tight ${isCurrentUser ? 'text-orange-700 hover:text-orange-800' : 'text-gray-900 hover:text-blue-600'} transition-colors`}>
+                        <Link href={`/profile/${player.id}`} title="Voir le profil et les statistiques" className="flex flex-wrap items-baseline gap-2">
+                          <span className="uppercase">{player.nickname || player.name}</span>
+                          {player.nickname && <span className="text-xs font-medium text-gray-500 normal-case">{player.name}</span>}
                         </Link>
                       </div>
-                      {player.nickname && (
-                        <div className="text-xs text-gray-500 font-medium mt-0.5">
-                          {player.name}
-                        </div>
-                      )}
                       {isCurrentUser && (
                         <div className="mt-1">
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-orange-200 text-orange-800">C'est vous</span>

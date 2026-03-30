@@ -87,7 +87,7 @@ export default async function HistoryPage() {
                   <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${idx === 0 ? 'bg-yellow-100 text-yellow-700' : idx === 1 ? 'bg-gray-200 text-gray-700' : 'bg-orange-100 text-orange-700'}`}>
                     {idx + 1}
                   </span>
-                  <a href={`/profile/${tp.user.id}`} className="hover:text-blue-600 transition-colors truncate max-w-[80px]" title={tp.user.name}>{tp.user.name.split(' ')[0]}</a>
+                  <a href={`/profile/${tp.user.id}`} className="hover:text-blue-600 transition-colors truncate max-w-[80px]" title={tp.user.name}>{tp.user.nickname || tp.user.name.split(' ')[0]}</a>
                 </span>
                 <span className="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md text-xs">{tp.count} sess.</span>
               </div>

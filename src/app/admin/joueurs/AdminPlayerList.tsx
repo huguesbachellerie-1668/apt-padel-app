@@ -39,13 +39,13 @@ export default function AdminPlayerList({ players, user }: { players: any[], use
               <input type="hidden" name="id" value={player.id} />
               
               <div className="flex flex-wrap gap-4 items-start">
-                  <div className="flex-[2] min-w-[200px]">
-                      <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Nom</label>
-                      <input name="name" type="text" defaultValue={player.name} disabled={!canEdit} required className="w-full p-3.5 border-2 border-gray-200 rounded-xl font-bold text-base bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" />
-                  </div>
                   <div className="flex-[1.5] min-w-[150px]">
-                      <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Surnom</label>
-                      <input name="nickname" type="text" defaultValue={player.nickname || ''} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" />
+                      <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5 flex items-center justify-between">Surnom <span>#1</span></label>
+                      <input name="nickname" type="text" defaultValue={player.nickname || ''} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base font-bold text-gray-900 bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" />
+                  </div>
+                  <div className="flex-[2] min-w-[200px]">
+                      <label className="text-xs font-bold text-gray-400 uppercase block mb-1.5 flex items-center justify-between">Prénom Nom <span>#2</span></label>
+                      <input name="name" type="text" defaultValue={player.name} disabled={!canEdit} required className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-600 bg-gray-50 focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" />
                   </div>
                   <div className="flex-[1.5] min-w-[150px]">
                       <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Rôle</label>

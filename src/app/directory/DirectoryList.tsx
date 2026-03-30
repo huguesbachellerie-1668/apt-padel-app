@@ -31,16 +31,16 @@ export default function DirectoryList({ players, user }: { players: any[], user:
           <div key={player.id} className={`bg-white rounded-2xl shadow-sm border p-5 transition-shadow ${player.id === user.id ? 'border-orange-300 ring-2 ring-orange-100' : 'border-gray-100 hover:shadow-md'}`}>
             <div className="flex items-center gap-4 mb-4">
               <Link href={`/profile/${player.id}`} className="shrink-0 w-12 h-12 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center font-bold text-xl shadow-sm border border-blue-200 hover:bg-blue-200 hover:scale-105 transition-all">
-                {player.name.charAt(0)}
+                {(player.nickname || player.name).charAt(0).toUpperCase()}
               </Link>
               <div className="flex-1 px-1">
-                <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                  <Link href={`/profile/${player.id}`} className="hover:text-blue-600 hover:underline transition-colors">
-                    {player.name}
+                <h3 className="font-bold text-gray-900 flex flex-wrap items-center gap-2">
+                  <Link href={`/profile/${player.id}`} className="hover:text-blue-600 hover:underline transition-colors flex items-baseline gap-2">
+                    <span className="text-lg">{player.nickname || player.name}</span>
+                    {player.nickname && <span className="text-sm font-medium text-gray-500">{player.name}</span>}
                   </Link>
                   {player.id === user.id && <span className="text-[10px] bg-orange-500 text-white px-2 py-0.5 rounded-full uppercase cursor-default">Vous</span>}
                 </h3>
-                {player.nickname && <p className="text-sm text-gray-500">"{player.nickname}"</p>}
                 {player.role !== 'JOUEUR' && <span className="inline-block mt-1 px-2 py-0.5 bg-orange-100 text-orange-800 text-xs font-bold rounded">{player.role}</span>}
               </div>
             </div>

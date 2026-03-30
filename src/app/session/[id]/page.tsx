@@ -42,10 +42,12 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
   let availableUsers: any[] = [];
   if (isBoard) {
     const registeredIds = session.registrations.map((r: any) => r.userId);
-    availableUsers = await prisma.user.findMany({
-      where: { id: { notIn: registeredIds } },
-      orderBy: { name: 'asc' }
+    const usersList = await prisma.user.findMany({
+      where: { id: { notIn: registeredIds } }
     });
+    availableUsers = usersList.sort((a, b) => 
+      (a.nickname || a.name).toLowerCase().localeCompare((b.nickname || b.name).toLowerCase())
+    );
   }
 
   return (
@@ -126,8 +128,9 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-800 font-bold flex items-center justify-center flex-shrink-0 text-xs">
                            {pt.seed}
                          </div>
-                         <div className="font-bold text-gray-800 flex-1">
-                           {pt.user.name} {pt.user.nickname ? <span className="text-gray-400 font-normal italic">"{pt.user.nickname}"</span> : ''}
+                         <div className="flex-1 flex items-baseline gap-2">
+                           <span className="font-bold text-gray-800 text-base">{pt.user.nickname || pt.user.name}</span>
+                           {pt.user.nickname && <span className="text-xs font-medium text-gray-500">{pt.user.name}</span>}
                          </div>
                          <div className="text-xs font-bold text-blue-500 bg-blue-100 px-2 py-1 rounded-lg">
                            {(pt.user.averagePoints || 0).toFixed(2)} pts
@@ -159,7 +162,9 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                <select name="userId" required className="flex-1 p-2.5 rounded-xl border border-orange-200 text-sm focus:outline-none">
                  <option value="">-- Sélectionner un joueur --</option>
                  {availableUsers.map((u: any) => (
-                   <option key={u.id} value={u.id}>{u.name} {u.nickname ? `("${u.nickname}")` : ''}</option>
+                   <option key={u.id} value={u.id}>
+                     {u.nickname ? `${u.nickname} (${u.name})` : u.name}
+                   </option>
                  ))}
                </select>
                <SubmitButton pendingText="Inscription..." className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-colors whitespace-nowrap">
@@ -188,12 +193,12 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                   {idx + 1}
                 </div>
                 <div className="flex-shrink-0 w-10 h-10 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center font-bold">
-                  {reg.user.name.charAt(0)}
+                  {(reg.user.nickname || reg.user.name).charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1">
                   <div className="font-bold text-gray-900 flex items-center gap-2">
-                    {reg.user.name}
-                    {reg.user.nickname && <span className="text-sm font-medium text-gray-500 italic">"{reg.user.nickname}"</span>}
+                    <span className="text-lg">{reg.user.nickname || reg.user.name}</span>
+                    {reg.user.nickname && <span className="text-sm font-medium text-gray-500">{reg.user.name}</span>}
                     {reg.userId === user.id && <span className="text-[10px] uppercase font-bold bg-orange-200 text-orange-800 px-2 py-0.5 rounded-full">Vous</span>}
                   </div>
                   <div className="text-xs text-gray-400 mt-0.5 flex gap-2 items-center">

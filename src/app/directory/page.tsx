@@ -8,9 +8,10 @@ export default async function DirectoryPage() {
   const user = await getSessionUser();
   if (!user) redirect("/login");
 
-  const players = await prisma.user.findMany({
-    orderBy: { name: 'asc' }
-  });
+  const playersQuery = await prisma.user.findMany();
+  const players = playersQuery.sort((a, b) => 
+    (a.nickname || a.name).toLowerCase().localeCompare((b.nickname || b.name).toLowerCase())
+  );
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-10">
