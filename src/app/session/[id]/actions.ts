@@ -45,15 +45,28 @@ export async function manualUnregisterForSession(sessionId: string, formData: Fo
   revalidatePath('/admin');
 }
 
-export async function updatePoolTime(poolId: string, sessionId: string, formData: FormData) {
+export async function updatePoolSettings(poolId: string, sessionId: string, formData: FormData) {
   const currUser = await getSessionUser();
   if (!currUser || !['PRESIDENT', 'ORGA', 'TRESORIER'].includes(currUser.role)) throw new Error("Unauthorized");
 
   const startTime = formData.get('startTime') as string;
-  await prisma.pool.update({
-    where: { id: poolId },
-    data: { startTime }
-  });
+  const courtNumberStr = formData.get('courtNumber') as string;
+  
+  const dataToUpdate: any = {};
+  if (startTime !== undefined && startTime !== null) dataToUpdate.startTime = startTime;
+  if (courtNumberStr) {
+    const courtNumber = parseInt(courtNumberStr, 10);
+    if (!isNaN(courtNumber)) {
+      dataToUpdate.courtNumber = courtNumber;
+    }
+  }
+
+  if (Object.keys(dataToUpdate).length > 0) {
+    await prisma.pool.update({
+      where: { id: poolId },
+      data: dataToUpdate
+    });
+  }
 
   revalidatePath(`/session/${sessionId}`);
   revalidatePath(`/pool/${poolId}`);

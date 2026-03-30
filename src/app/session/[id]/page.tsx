@@ -2,7 +2,7 @@ import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { manualRegisterForSession, manualUnregisterForSession, updatePoolTime } from "./actions";
+import { manualRegisterForSession, manualUnregisterForSession, updatePoolSettings } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
 
 export default async function SessionDetailsPage({ params }: { params: any }) {
@@ -98,12 +98,21 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                 <div className="bg-blue-900 px-5 py-3 flex flex-wrap justify-between items-center text-white gap-2">
                    <div className="flex items-center gap-3">
                      <h3 className="font-bold text-lg">Poule #{pool.level}</h3>
-                     <span className="text-sm font-medium bg-blue-800 px-3 py-1 rounded-full border border-blue-700">Terrain {pool.courtNumber}</span>
+                     {!isBoard && (
+                       <span className="text-sm font-medium bg-blue-800 px-3 py-1 rounded-full border border-blue-700">Terrain {pool.courtNumber}</span>
+                     )}
                    </div>
                    {isBoard ? (
-                     <form action={updatePoolTime.bind(null, pool.id, session.id)} className="flex items-center gap-2">
-                       <input type="time" name="startTime" defaultValue={pool.startTime || ''} className="bg-white text-gray-900 rounded px-2 py-1 text-sm font-bold w-24 border-0 focus:ring-2 focus:ring-orange-500" />
-                       <SubmitButton pendingText="..." className="bg-orange-500 hover:bg-orange-400 text-white px-3 py-1 rounded text-sm font-bold">OK</SubmitButton>
+                     <form action={updatePoolSettings.bind(null, pool.id, session.id)} className="flex items-center gap-2 bg-blue-800/50 p-1.5 rounded-xl">
+                       <div className="flex items-center gap-1">
+                         <label className="text-xs font-bold text-blue-300">T.</label>
+                         <input type="number" name="courtNumber" defaultValue={pool.courtNumber} className="bg-white text-gray-900 rounded px-1 min-w-[30px] w-10 py-1 text-xs font-bold border-0 focus:ring-2 focus:ring-orange-500 text-center" />
+                       </div>
+                       <div className="flex items-center gap-1 border-l border-blue-700/50 pl-2">
+                         <label className="text-xs font-bold text-blue-300">H.</label>
+                         <input type="time" name="startTime" defaultValue={pool.startTime || ''} className="bg-white text-gray-900 rounded px-1 py-1 text-xs font-bold w-20 border-0 focus:ring-2 focus:ring-orange-500" />
+                       </div>
+                       <SubmitButton pendingText="..." className="bg-orange-500 hover:bg-orange-400 text-white px-2 py-1 rounded-lg text-xs font-bold ml-1">OK</SubmitButton>
                      </form>
                    ) : (
                      <span className="text-sm font-bold text-orange-300">
