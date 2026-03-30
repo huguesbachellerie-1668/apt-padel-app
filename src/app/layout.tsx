@@ -44,8 +44,11 @@ export default async function RootLayout({
                   <span className="font-black tracking-widest text-lg uppercase hidden sm:block">ATLANTIC PADEL TEAM</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="text-sm text-blue-200 hidden sm:block">
-                    Connecté : <strong className="text-white">{user.nickname || user.name.split(' ')[0]}</strong>
+                  <span className="text-sm text-blue-200 flex items-center gap-1">
+                    <span className="hidden sm:inline">Connecté :</span>
+                    <strong className="text-white max-w-[100px] sm:max-w-none truncate" title={user.nickname || user.name.split(' ')[0]}>
+                      {user.nickname || user.name.split(' ')[0]}
+                    </strong>
                   </span>
                   <form action={logout}>
                     <SubmitButton pendingText="Déconnexion..." className="text-xs bg-blue-800 hover:bg-orange-500 text-white px-3 py-1.5 rounded-full transition-colors font-medium">
