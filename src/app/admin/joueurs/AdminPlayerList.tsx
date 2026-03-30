@@ -35,54 +35,57 @@ export default function AdminPlayerList({ players, user }: { players: any[], use
           const canEdit = user.role === 'PRESIDENT' || !isTargetPresident;
 
           return (
-            <form key={player.id} action={updatePlayer} className={`flex flex-wrap md:flex-nowrap gap-3 items-center p-4 rounded-2xl border transition-colors shadow-sm ${!canEdit ? 'bg-gray-100 border-gray-200 opacity-80' : 'bg-gray-50 hover:bg-blue-50/50 border-gray-100'}`}>
+            <form key={player.id} action={updatePlayer} className={`flex flex-col gap-4 p-5 md:p-6 mb-5 rounded-3xl border transition-all shadow-sm ${!canEdit ? 'bg-gray-50 border-gray-200 opacity-80' : 'bg-white hover:border-blue-300 border-gray-200 hover:shadow-md'}`}>
               <input type="hidden" name="id" value={player.id} />
               
-              <div className="w-full md:w-[22%]">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase md:hidden block mb-1">Nom</label>
-                  <input name="name" type="text" defaultValue={player.name} disabled={!canEdit} required className="w-full p-2.5 border border-gray-200 rounded-lg font-bold text-sm bg-white focus:outline-none focus:border-blue-400 disabled:bg-gray-50" />
+              <div className="flex flex-wrap gap-4 items-start">
+                  <div className="flex-[2] min-w-[200px]">
+                      <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Nom</label>
+                      <input name="name" type="text" defaultValue={player.name} disabled={!canEdit} required className="w-full p-3.5 border-2 border-gray-200 rounded-xl font-bold text-base bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" />
+                  </div>
+                  <div className="flex-[1.5] min-w-[150px]">
+                      <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Surnom</label>
+                      <input name="nickname" type="text" defaultValue={player.nickname || ''} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" />
+                  </div>
+                  <div className="flex-[1.5] min-w-[150px]">
+                      <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Rôle</label>
+                      <select name="role" defaultValue={player.role} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-sm font-bold bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-gray-800 disabled:bg-gray-100 transition-colors">
+                        <option value="JOUEUR">Joueur</option>
+                        <option value="ORGA">Vice-Président</option>
+                        <option value="TRESORIER">Trésorier</option>
+                        {(user.role === 'PRESIDENT' || player.role === 'PRESIDENT') && <option value="PRESIDENT">Président</option>}
+                      </select>
+                  </div>
+                  <div className="w-24">
+                      <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Points</label>
+                      <input name="points" type="number" step="0.01" defaultValue={player.points} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-white font-black text-center text-orange-600 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 disabled:bg-gray-100 transition-colors" title="Points totaux" />
+                  </div>
+                  <div className="w-24">
+                      <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Sessions</label>
+                      <input name="sessions" type="number" defaultValue={Math.floor((player.totalMatches || 0) / 3)} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-white text-center font-bold text-blue-800 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" title="Sessions jouées" />
+                  </div>
+                  <div className="flex-1 min-w-[150px]">
+                      <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Inscription</label>
+                      <input name="createdAt" type="date" defaultValue={player.createdAt ? new Date(player.createdAt).toISOString().split('T')[0] : ''} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-sm font-bold bg-white text-gray-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" title="Date d'inscription" />
+                  </div>
               </div>
-              <div className="w-1/2 md:w-[15%]">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase md:hidden block mb-1">Surnom</label>
-                  <input name="nickname" type="text" defaultValue={player.nickname || ''} disabled={!canEdit} className="w-full p-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-blue-400 disabled:bg-gray-50" />
-              </div>
-              <div className="w-1/2 md:w-[18%]">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase md:hidden block mb-1">Rôle</label>
-                  <select name="role" defaultValue={player.role} disabled={!canEdit} className="w-full p-2.5 border border-gray-200 rounded-lg text-xs font-bold bg-white focus:outline-none focus:border-blue-400 text-gray-700 disabled:bg-gray-50">
-                    <option value="JOUEUR">Joueur</option>
-                    <option value="ORGA">Vice-Président</option>
-                    <option value="TRESORIER">Trésorier</option>
-                    {(user.role === 'PRESIDENT' || player.role === 'PRESIDENT') && <option value="PRESIDENT">Président</option>}
-                  </select>
-              </div>
-              <div className="w-1/4 md:w-[12%]">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase md:hidden block mb-1">Points</label>
-                  <input name="points" type="number" step="0.01" defaultValue={player.points} disabled={!canEdit} className="w-full p-2.5 border border-gray-200 rounded-lg text-sm bg-white font-black text-center text-orange-600 focus:outline-none focus:border-orange-400 disabled:bg-gray-50" title="Points totaux" />
-              </div>
-              <div className="w-1/4 md:w-[12%]">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase md:hidden block mb-1">Sessions</label>
-                  <input name="sessions" type="number" defaultValue={Math.floor((player.totalMatches || 0) / 3)} disabled={!canEdit} className="w-full p-2.5 border border-gray-200 rounded-lg text-sm bg-white text-center font-bold text-blue-800 focus:outline-none focus:border-blue-400 disabled:bg-gray-50" title="Sessions jouées" />
-              </div>
-              <div className="w-1/2 md:w-[16%]">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase md:hidden block mb-1">Inscription</label>
-                  <input name="createdAt" type="date" defaultValue={player.createdAt ? new Date(player.createdAt).toISOString().split('T')[0] : ''} disabled={!canEdit} className="w-full p-2.5 border border-gray-200 rounded-lg text-sm bg-white text-gray-700 font-bold focus:outline-none focus:border-blue-400 disabled:bg-gray-50 uppercase" title="Date d'inscription" />
-              </div>
-              <div className="w-full mt-2 pt-3 border-t border-gray-100 flex flex-wrap md:flex-nowrap justify-between items-end gap-4">
-                  <div className="flex gap-3 w-full md:w-auto">
-                      <div className="flex-1 md:w-28">
-                          <label className="text-[10px] font-bold text-gray-500 uppercase block mb-1">Moyenne 23/24</label>
-                          <input name="hist2324" type="number" step="0.01" defaultValue={(player as any).historicalStats?.['2023-2024'] || ''} disabled={!canEdit} className="w-full p-2 border border-blue-100 rounded-lg text-sm bg-blue-50/50 font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:bg-gray-50" placeholder="Vide" />
+
+              <div className="flex flex-wrap justify-between items-end gap-4 mt-2 pt-5 border-t-2 border-gray-100">
+                  <div className="flex flex-wrap gap-4 w-full md:w-auto">
+                      <div className="w-36">
+                          <label className="text-xs font-bold text-gray-400 uppercase block mb-1.5 flex items-center gap-1">Historique <span className="text-blue-500">23/24</span></label>
+                          <input name="hist2324" type="number" step="0.01" defaultValue={(player as any).historicalStats?.['2023-2024'] || ''} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-blue-50/30 font-bold focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" placeholder="Vide" />
                       </div>
-                      <div className="flex-1 md:w-28">
-                          <label className="text-[10px] font-bold text-gray-500 uppercase block mb-1">Moyenne 24/25</label>
-                          <input name="hist2425" type="number" step="0.01" defaultValue={(player as any).historicalStats?.['2024-2025'] || ''} disabled={!canEdit} className="w-full p-2 border border-blue-100 rounded-lg text-sm bg-blue-50/50 font-bold focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:bg-gray-50" placeholder="Vide" />
+                      <div className="w-36">
+                          <label className="text-xs font-bold text-gray-400 uppercase block mb-1.5 flex items-center gap-1">Historique <span className="text-blue-500">24/25</span></label>
+                          <input name="hist2425" type="number" step="0.01" defaultValue={(player as any).historicalStats?.['2024-2025'] || ''} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-blue-50/30 font-bold focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" placeholder="Vide" />
                       </div>
                   </div>
-                  <div className="w-full md:w-auto flex justify-end gap-2 items-center">
-                      <SubmitButton pendingText="⏳" formAction={resetPasswordToDefault.bind(null, player.id)} disabled={!canEdit} className="bg-gray-100 text-gray-700 hover:bg-red-100 hover:text-red-700 hover:border-red-200 border border-transparent font-bold py-2 px-3 rounded-xl text-xs shadow-sm transition-all disabled:opacity-50" title="Remettre le mot de passe sur Apt2026!">
+                  <div className="w-full md:w-auto flex justify-end gap-3 items-center">
+                      <SubmitButton pendingText="⏳" formAction={resetPasswordToDefault.bind(null, player.id)} disabled={!canEdit} className="bg-white text-gray-700 hover:bg-red-50 hover:text-red-700 hover:border-red-300 border-2 border-gray-200 font-bold py-3.5 px-4 rounded-xl text-sm shadow-sm transition-all disabled:opacity-50" title="Remettre le mot de passe sur Apt2026!">
                         Reset Mdp 🔑
                       </SubmitButton>
-                      <SubmitButton pendingText="⏳" disabled={!canEdit} className="bg-blue-600 disabled:bg-gray-400 hover:bg-blue-700 text-white font-bold py-2 px-4 md:px-6 rounded-xl text-sm shadow-sm transition-transform hover:scale-105 border-b-4 border-blue-800 active:border-b-0 active:mt-[4px] disabled:border-b-0 disabled:transform-none">
+                      <SubmitButton pendingText="⏳" disabled={!canEdit} className="bg-blue-600 disabled:bg-gray-400 hover:bg-blue-700 text-white font-bold py-3.5 px-8 rounded-xl text-sm shadow-md transition-transform hover:scale-105 border-b-4 border-blue-800 active:border-b-0 active:mt-[4px] disabled:border-b-0 disabled:transform-none">
                         Enregistrer ✔️
                       </SubmitButton>
                   </div>
