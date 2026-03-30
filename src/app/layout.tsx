@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { cookies } from 'next/headers';
 import SubmitButton from '@/components/SubmitButton';
 import NavButton from '@/components/NavButton';
+import NextTopLoader from 'nextjs-toploader';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,6 +31,7 @@ export default async function RootLayout({
   return (
     <html lang="fr">
       <body suppressHydrationWarning className={`${inter.className} bg-gray-50 text-gray-900 min-h-screen pb-20`}>
+        <NextTopLoader color="#ea580c" showSpinner={false} height={4} />
         {user && (
           <header className="bg-blue-900 text-white shadow-md rounded-b-3xl">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
