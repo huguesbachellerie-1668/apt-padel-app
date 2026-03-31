@@ -214,7 +214,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                    <form action={deleteCourtReservation.bind(null, session.id)}>
                      <input type="hidden" name="reservationId" value={res.id} />
                      <SubmitButton pendingText="..." className="text-red-500 hover:text-red-700 font-bold bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors">
-                       ✕
+                       🗑️
                      </SubmitButton>
                    </form>
                  </div>

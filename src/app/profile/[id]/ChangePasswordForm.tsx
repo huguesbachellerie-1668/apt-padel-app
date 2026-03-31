@@ -24,7 +24,7 @@ export default function ChangePasswordForm({ userId }: { userId: string }) {
    return (
       <div className="bg-gray-50 p-6 rounded-3xl border border-gray-200 mt-8">
         <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-          <span>🔒</span> Sécurité : Modifier mon mot de passe
+          <span>✏️</span> Sécurité : Éditer mon mot de passe
         </h3>
         
         {status === 'success' && <div className="bg-green-50 text-green-700 p-3 rounded-lg mb-4 text-sm font-bold border border-green-200">Mot de passe réinitialisé avec succès !</div>}

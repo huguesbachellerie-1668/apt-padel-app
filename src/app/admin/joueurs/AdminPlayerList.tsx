@@ -15,7 +15,7 @@ export default function AdminPlayerList({ players, user }: { players: any[], use
   return (
     <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-200 mt-6">
       <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-        <span>✏️</span> Modifier les joueurs existants ({filteredPlayers.length} / {players.length})
+        <span>✏️</span> Éditer les joueurs existants ({filteredPlayers.length} / {players.length})
       </h2>
 
       <div className="relative mb-6">

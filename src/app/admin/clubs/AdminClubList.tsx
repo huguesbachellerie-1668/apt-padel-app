@@ -102,7 +102,7 @@ export default function AdminClubList({ clubs }: { clubs: any[] }) {
                       }}>
                         <input type="hidden" name="id" value={club.id} />
                         <SubmitButton pendingText="⏳" className="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-xl font-bold text-sm transition-colors">
-                          ❌ Supprimer
+                          🗑️ Supprimer
                         </SubmitButton>
                       </form>
                     </div>

@@ -84,7 +84,7 @@ export default function DirectoryList({ players, user }: { players: any[], user:
             {player.id === user.id && (
               <details className="mt-4 pt-4 border-t border-gray-100 group">
                 <summary className="text-sm text-orange-600 font-bold hover:text-orange-700 cursor-pointer list-none text-center outline-none">
-                  ✏️ Modifier mes coordonnées
+                  ✏️ Éditer mes coordonnées
                 </summary>
                 <form action={updateContactInfo} className="mt-3 flex flex-col gap-2 bg-orange-50 p-3 rounded-xl border border-orange-100">
                    <label className="text-xs font-bold text-gray-500">Téléphone</label>
