@@ -21,10 +21,33 @@ export async function createSession(formData: FormData) {
   const seasonId = formData.get('seasonId') as string;
   const courts = parseInt(formData.get('courts') as string) || 0;
   
+  const targetDate = new Date(dateStr);
+  
+  // Set time boundaries for the current day
+  const startOfDay = new Date(targetDate);
+  startOfDay.setHours(0, 0, 0, 0);
+  
+  const endOfDay = new Date(targetDate);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  // Check if a session already exists on this day
+  const existingSession = await prisma.session.findFirst({
+    where: {
+      date: {
+        gte: startOfDay,
+        lte: endOfDay
+      }
+    }
+  });
+
+  if (existingSession) {
+    throw new Error("Impossible de créer la session : une session existe déjà pour cette date. Vous ne pouvez pas avoir deux sessions le même jour.");
+  }
+
   await prisma.session.create({
     data: {
       seasonId,
-      date: new Date(dateStr),
+      date: targetDate,
       status: 'PREVUE',
       courts
     }
