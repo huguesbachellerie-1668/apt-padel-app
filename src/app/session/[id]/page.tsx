@@ -122,10 +122,10 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                      <form action={updatePoolSettings.bind(null, pool.id, session.id)} className="flex items-center gap-2 bg-blue-800/50 p-1.5 rounded-xl flex-wrap">
                        <div className="flex items-center gap-1">
                          <label className="text-xs font-bold text-blue-300">N°</label>
-                         <input type="number" name="courtNumber" defaultValue={pool.courtNumber} title="Niveau/Force de la poule" className="bg-white text-gray-900 rounded px-1 min-w-[30px] w-10 py-1 text-xs font-bold border-0 focus:ring-2 focus:ring-orange-500 text-center" />
+                         <input key={pool.courtNumber} type="number" name="courtNumber" defaultValue={pool.courtNumber} title="Niveau/Force de la poule" className="bg-white text-gray-900 rounded px-1 min-w-[30px] w-10 py-1 text-xs font-bold border-0 focus:ring-2 focus:ring-orange-500 text-center" />
                        </div>
                        <div className="flex items-center gap-1 border-l border-blue-700/50 pl-2">
-                         <select name="reservationId" defaultValue={pool.courtReservationId || ""} className="bg-white text-gray-900 rounded px-1 py-1 text-xs font-bold w-32 border-0 focus:ring-2 focus:ring-orange-500 truncate">
+                         <select key={pool.courtReservationId || 'none'} name="reservationId" defaultValue={pool.courtReservationId || ""} className="bg-white text-gray-900 rounded px-1 py-1 text-xs font-bold w-32 border-0 focus:ring-2 focus:ring-orange-500 truncate">
                            <option value="">A définir...</option>
                            {session.reservations && session.reservations.map((res: any) => (
                              <option key={res.id} value={res.id}>{res.club.name} {res.name} ({res.startTime})</option>

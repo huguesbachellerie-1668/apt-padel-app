@@ -43,6 +43,10 @@ export default function DirectoryList({ players, user }: { players: any[], user:
                 </h3>
                 {player.role !== 'JOUEUR' && <span className="inline-block mt-1 px-2 py-0.5 bg-orange-100 text-orange-800 text-xs font-bold rounded">{player.role}</span>}
               </div>
+
+              <Link href={`/profile/${player.id}`} className="shrink-0 w-12 h-12 bg-white border-2 border-orange-200 text-orange-600 rounded-xl flex items-center justify-center text-2xl shadow-sm hover:bg-orange-50 hover:scale-105 transition-all" title="Voir les statistiques">
+                📊
+              </Link>
             </div>
 
             <div className="grid grid-cols-3 gap-2 mb-4 text-center">
