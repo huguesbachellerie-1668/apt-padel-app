@@ -2,7 +2,7 @@ import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { manualRegisterForSession, manualUnregisterForSession, updatePoolSettings } from "./actions";
+import { manualRegisterForSession, manualUnregisterForSession, updatePoolSettings, createCourtReservation, deleteCourtReservation } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
 
 export default async function SessionDetailsPage({ params }: { params: any }) {
@@ -23,9 +23,14 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
             include: { user: true },
             orderBy: { seed: 'asc' }
           },
-          matches: true
+          matches: true,
+          courtReservation: { include: { club: true } }
         },
         orderBy: { level: 'asc' }
+      },
+      reservations: {
+        include: { club: true },
+        orderBy: { startTime: 'asc' }
       }
     }
   });
@@ -34,6 +39,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
 
   const isBoard = ['PRESIDENT', 'ORGA', 'TRESORIER'].includes(user.role);
   
+  const allClubs = isBoard ? await prisma.club.findMany({ orderBy: { name: 'asc' } }) : [];
   const totalPlaces = session.courts * 4;
   const registeredCount = session.registrations.length;
   const placesLeft = Math.max(0, totalPlaces - registeredCount);
@@ -97,28 +103,40 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
               const allMatchesFinished = pool.matches && pool.matches.length === 3 && pool.matches.every((m: any) => m.team1Games !== null && m.team2Games !== null);
               return (
               <div key={pool.id} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                <div className="bg-blue-900 px-5 py-3 flex flex-wrap justify-between items-center text-white gap-2">
+                 <div className="bg-blue-900 px-5 py-3 flex flex-wrap justify-between items-center text-white gap-2">
                    <div className="flex items-center gap-3">
                      <h3 className="font-bold text-lg">Poule #{pool.level}</h3>
                      {!isBoard && (
-                       <span className="text-sm font-medium bg-blue-800 px-3 py-1 rounded-full border border-blue-700">Terrain {pool.courtNumber}</span>
+                        pool.courtReservation ? (
+                          <span className="text-sm font-medium bg-blue-800 px-3 py-1 rounded-full border border-blue-700">
+                            {pool.courtReservation.club.name} - {pool.courtReservation.name}
+                          </span>
+                        ) : (
+                          <span className="text-sm font-medium bg-blue-800 px-3 py-1 rounded-full border border-blue-700">
+                            Terrain {pool.courtNumber}
+                          </span>
+                        )
                      )}
                    </div>
                    {isBoard ? (
-                     <form action={updatePoolSettings.bind(null, pool.id, session.id)} className="flex items-center gap-2 bg-blue-800/50 p-1.5 rounded-xl">
+                     <form action={updatePoolSettings.bind(null, pool.id, session.id)} className="flex items-center gap-2 bg-blue-800/50 p-1.5 rounded-xl flex-wrap">
                        <div className="flex items-center gap-1">
-                         <label className="text-xs font-bold text-blue-300">T.</label>
-                         <input type="number" name="courtNumber" defaultValue={pool.courtNumber} className="bg-white text-gray-900 rounded px-1 min-w-[30px] w-10 py-1 text-xs font-bold border-0 focus:ring-2 focus:ring-orange-500 text-center" />
+                         <label className="text-xs font-bold text-blue-300">Niv.</label>
+                         <input type="number" name="courtNumber" defaultValue={pool.courtNumber} title="Niveau/Force de la poule" className="bg-white text-gray-900 rounded px-1 min-w-[30px] w-10 py-1 text-xs font-bold border-0 focus:ring-2 focus:ring-orange-500 text-center" />
                        </div>
                        <div className="flex items-center gap-1 border-l border-blue-700/50 pl-2">
-                         <label className="text-xs font-bold text-blue-300">H.</label>
-                         <input type="time" name="startTime" defaultValue={pool.startTime || ''} className="bg-white text-gray-900 rounded px-1 py-1 text-xs font-bold w-20 border-0 focus:ring-2 focus:ring-orange-500" />
+                         <select name="reservationId" defaultValue={pool.courtReservationId || ""} className="bg-white text-gray-900 rounded px-1 py-1 text-xs font-bold w-32 border-0 focus:ring-2 focus:ring-orange-500 truncate">
+                           <option value="">A définir...</option>
+                           {session.reservations && session.reservations.map((res: any) => (
+                             <option key={res.id} value={res.id}>{res.club.name} {res.name} ({res.startTime})</option>
+                           ))}
+                         </select>
                        </div>
                        <SubmitButton pendingText="..." className="bg-orange-500 hover:bg-orange-400 text-white px-2 py-1 rounded-lg text-xs font-bold ml-1">OK</SubmitButton>
                      </form>
                    ) : (
                      <span className="text-sm font-bold text-orange-300">
-                       {pool.startTime ? `🕒 ${pool.startTime}` : '🕒 Horaire à définir'}
+                       {pool.courtReservation ? `🕒 ${pool.courtReservation.startTime}` : '🕒 Horaire à définir'}
                      </span>
                    )}
                 </div>
@@ -175,6 +193,57 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                <input type="checkbox" id="boardInjury" name="isReturningFromInjury" value="true" className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500 cursor-pointer" />
                <label htmlFor="boardInjury" className="text-orange-900 text-sm font-bold cursor-pointer">Appliquer "Retour de blessure" (descend d'une poule)</label>
              </div>
+           </form>
+        </div>
+      )}
+
+      {isBoard && (
+        <div className="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100 mt-6 relative overflow-hidden">
+          <div className="absolute right-0 top-0 opacity-10 text-8xl">🏟️</div>
+           <h3 className="font-bold text-indigo-800 mb-3 relative z-10">Gestion des Terrains (Réservations)</h3>
+           
+           {/* Liste des réservations actuelles */}
+           {session.reservations && session.reservations.length > 0 && (
+             <div className="mb-4 relative z-10 flex flex-col gap-2">
+               {session.reservations.map((res: any) => (
+                 <div key={res.id} className="flex justify-between items-center bg-white p-3 rounded-xl border border-indigo-100 shadow-sm">
+                   <div className="flex flex-col">
+                     <span className="font-bold text-indigo-900">{res.club.name} - {res.name}</span>
+                     <span className="text-xs text-gray-500">{res.club.city} | Heure: <strong className="text-indigo-600">{res.startTime}</strong></span>
+                   </div>
+                   <form action={deleteCourtReservation.bind(null, session.id)}>
+                     <input type="hidden" name="reservationId" value={res.id} />
+                     <SubmitButton pendingText="..." className="text-red-500 hover:text-red-700 font-bold bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors">
+                       ✕
+                     </SubmitButton>
+                   </form>
+                 </div>
+               ))}
+             </div>
+           )}
+
+           {/* Formulaire d'ajout */}
+           <form action={createCourtReservation.bind(null, session.id)} className="flex flex-col md:flex-row items-end gap-3 relative z-10 w-full">
+             <div className="flex-[1.5] w-full flex flex-col gap-1">
+               <label className="text-xs font-bold text-indigo-600 uppercase">Club</label>
+               <select name="clubId" required className="w-full p-2.5 rounded-xl border border-indigo-200 text-sm focus:outline-none focus:border-indigo-500 bg-white">
+                 <option value="">-- Sélectionner un lieu --</option>
+                 {allClubs.map((c: any) => (
+                   <option key={c.id} value={c.id}>{c.name} ({c.city})</option>
+                 ))}
+               </select>
+             </div>
+             <div className="flex-1 w-full flex flex-col gap-1">
+               <label className="text-xs font-bold text-indigo-600 uppercase">Piste</label>
+               <input type="text" name="name" required placeholder="Ex: T1, Piste Centrale" className="w-full p-2.5 rounded-xl border border-indigo-200 text-sm focus:outline-none focus:border-indigo-500 bg-white" />
+             </div>
+             <div className="w-full md:w-28 flex flex-col gap-1">
+               <label className="text-xs font-bold text-indigo-600 uppercase">Heure</label>
+               <input type="time" name="startTime" required className="w-full p-2.5 rounded-xl border border-indigo-200 text-sm font-bold focus:outline-none focus:border-indigo-500 bg-white" />
+             </div>
+             <SubmitButton pendingText="..." className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm transition-colors mt-2 md:mt-0 w-full md:w-auto">
+               Ajouter
+             </SubmitButton>
            </form>
         </div>
       )}

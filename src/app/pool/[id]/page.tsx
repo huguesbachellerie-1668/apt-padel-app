@@ -17,6 +17,9 @@ export default async function PoolPage({ params }: { params: { id: string } }) {
         orderBy: { seed: 'asc' },
         include: { user: true }
       },
+      courtReservation: {
+        include: { club: true }
+      },
       matches: {
         orderBy: { order: 'asc' },
         include: {
@@ -100,10 +103,18 @@ export default async function PoolPage({ params }: { params: { id: string } }) {
       <div className="flex flex-wrap justify-between items-end mb-6 gap-4">
         <div>
           <a href="/" className="text-blue-500 font-bold hover:underline mb-2 inline-block">← Retour à l'accueil</a>
-          <h1 className="text-3xl font-black text-blue-900">🎾 Poule #{pool.level} - Terrain {pool.courtNumber}</h1>
+          <h1 className="text-3xl font-black text-blue-900">
+            🎾 Poule #{pool.level} {pool.courtReservation ? `- ${pool.courtReservation.name}` : `- Terrain ${pool.courtNumber}`}
+          </h1>
           <p className="text-gray-500 mt-2 font-medium flex items-center gap-3">
             <span>Session du {new Date(pool.session.date).toLocaleDateString('fr-FR')}</span>
-            {pool.startTime && (
+            {pool.courtReservation ? (
+              <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-bold border border-orange-200 shadow-sm flex items-center gap-1">
+                🏟️ {pool.courtReservation.club.name} ({pool.courtReservation.club.city})
+                <span className="mx-1">|</span>
+                🕒 {pool.courtReservation.startTime}
+              </span>
+            ) : pool.startTime && (
               <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-bold border border-orange-200 shadow-sm">
                 🕒 {pool.startTime}
               </span>

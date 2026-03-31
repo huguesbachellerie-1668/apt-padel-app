@@ -57,6 +57,7 @@ model Session {
   
   registrations     Registration[]
   pools             Pool[]
+  reservations      CourtReservation[]
 }
 
 model Registration {
@@ -79,6 +80,9 @@ model Pool {
   courtNumber Int
   level       Int      // 1 is highest level
   startTime   String?  // Ex: "18:30" ou "19:00"
+
+  courtReservationId String? @unique
+  courtReservation   CourtReservation? @relation(fields: [courtReservationId], references: [id])
 
   players     PoolPlayer[]
   matches     Match[]
@@ -113,4 +117,27 @@ model Match {
   team1Games     Int?
   team2Games     Int?
   winningTeam    Int?    // 1, 2, or 0 for DRAW
+}
+
+model Club {
+  id      String @id @default(cuid())
+  name    String // e.g. "BIG PADEL"
+  city    String // e.g. "Mérignac (33700)"
+  address String // e.g. "Décathlon Village, 5 Rue Hipparque"
+  
+  reservations CourtReservation[]
+}
+
+model CourtReservation {
+  id        String  @id @default(cuid())
+  sessionId String
+  session   Session @relation(fields: [sessionId], references: [id])
+  
+  clubId    String
+  club      Club    @relation(fields: [clubId], references: [id])
+  
+  name      String  // Ex: "Terrain 1" ou "Piste Centrale"
+  startTime String  // Ex: "18:30"
+  
+  pool      Pool?
 }

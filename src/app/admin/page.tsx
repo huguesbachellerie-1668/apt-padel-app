@@ -25,14 +25,30 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
-          👥 Gestion des Joueurs
-        </h2>
-        <p className="text-gray-500 mb-5 font-medium">Ajouter de nouveaux membres, éditer leurs informations personnelles, changer leurs rôles ou ajuster leur notation.</p>
-        <a href="/admin/joueurs" className="inline-flex bg-gray-800 text-white font-bold py-3 px-6 rounded-2xl hover:bg-gray-900 transition-colors shadow-md border-b-4 border-gray-950 items-center justify-center gap-2">
-          <span>Ouvrir l'annuaire des joueurs 👉</span>
-        </a>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+              👥 Joueurs
+            </h2>
+            <p className="text-gray-500 mb-5 font-medium">Ajouter de nouveaux membres, éditer leurs rôles ou informations.</p>
+          </div>
+          <a href="/admin/joueurs" className="inline-flex bg-gray-800 text-white font-bold py-3 px-6 rounded-2xl hover:bg-gray-900 transition-colors shadow-sm border-b-4 border-gray-950 items-center justify-center gap-2 text-sm w-fit">
+            <span>Ouvrir l'annuaire 👉</span>
+          </a>
+        </div>
+
+        <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+              🏟️ Clubs de Padel
+            </h2>
+            <p className="text-gray-500 mb-5 font-medium">Gérez le dictionnaire des lieux (noms, adresses) pour réserver les terrains plus tard.</p>
+          </div>
+          <a href="/admin/clubs" className="inline-flex bg-indigo-600 text-white font-bold py-3 px-6 rounded-2xl hover:bg-indigo-700 transition-colors shadow-sm border-b-4 border-indigo-800 items-center justify-center gap-2 text-sm w-fit">
+            <span>Gérer les lieux 👉</span>
+          </a>
+        </div>
       </div>
 
       {!activeSeason ? (

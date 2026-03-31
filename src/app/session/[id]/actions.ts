@@ -49,11 +49,13 @@ export async function updatePoolSettings(poolId: string, sessionId: string, form
   const currUser = await getSessionUser();
   if (!currUser || !['PRESIDENT', 'ORGA', 'TRESORIER'].includes(currUser.role)) throw new Error("Unauthorized");
 
-  const startTime = formData.get('startTime') as string;
+  const reservationId = formData.get('reservationId') as string;
   const courtNumberStr = formData.get('courtNumber') as string;
   
   const dataToUpdate: any = {};
-  if (startTime !== undefined && startTime !== null) dataToUpdate.startTime = startTime;
+  if (reservationId !== undefined) {
+    dataToUpdate.courtReservationId = reservationId === "" ? null : reservationId;
+  }
   if (courtNumberStr) {
     const courtNumber = parseInt(courtNumberStr, 10);
     if (!isNaN(courtNumber)) {
@@ -71,4 +73,46 @@ export async function updatePoolSettings(poolId: string, sessionId: string, form
   revalidatePath(`/session/${sessionId}`);
   revalidatePath(`/pool/${poolId}`);
   revalidatePath(`/`);
+}
+
+export async function createCourtReservation(sessionId: string, formData: FormData) {
+  const currUser = await getSessionUser();
+  if (!currUser || !['PRESIDENT', 'ORGA', 'TRESORIER'].includes(currUser.role)) throw new Error("Unauthorized");
+
+  const clubId = formData.get('clubId') as string;
+  const name = formData.get('name') as string;
+  const startTime = formData.get('startTime') as string;
+
+  if (!clubId || !name || !startTime) return;
+
+  await prisma.courtReservation.create({
+    data: {
+      sessionId,
+      clubId,
+      name,
+      startTime
+    }
+  });
+
+  revalidatePath(`/session/${sessionId}`);
+}
+
+export async function deleteCourtReservation(sessionId: string, formData: FormData) {
+  const currUser = await getSessionUser();
+  if (!currUser || !['PRESIDENT', 'ORGA', 'TRESORIER'].includes(currUser.role)) throw new Error("Unauthorized");
+  
+  const reservationId = formData.get('reservationId') as string;
+  if (!reservationId) return;
+
+  // Unlink from pool if any
+  await prisma.pool.updateMany({
+    where: { courtReservationId: reservationId },
+    data: { courtReservationId: null }
+  });
+
+  await prisma.courtReservation.delete({
+    where: { id: reservationId }
+  });
+
+  revalidatePath(`/session/${sessionId}`);
 }
