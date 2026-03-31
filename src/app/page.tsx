@@ -176,7 +176,6 @@ export default async function Dashboard() {
                    <div className="space-y-4 relative z-10 flex flex-col h-full justify-between">
                      <div className="bg-white/10 p-5 border border-white/20 rounded-2xl backdrop-blur-sm">
                         <p className="text-2xl font-black mb-1">Poule #{userPoolPlayer.pool.level}</p>
-                        <p className="text-sm font-medium mt-1 opacity-90 leading-relaxed">Rappel : la saisie des points est à la charge de la Seed 1 de la poule ou du Bureau.</p>
                      </div>
                      <a href={`/pool/${userPoolPlayer.poolId}`} className="block text-center bg-white text-orange-600 font-black py-4 px-6 rounded-xl transition-transform transform hover:scale-105 shadow-md">
                        Saisir ou consulter ma poule 👉
@@ -193,7 +192,7 @@ export default async function Dashboard() {
               <section className="bg-gradient-to-br from-blue-900 to-indigo-900 rounded-3xl shadow-lg p-6 text-white relative overflow-hidden group flex flex-col">
                  <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-cyan-400 opacity-20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
                  <h2 className="text-xl font-black mb-6 flex items-center gap-2 relative z-10">
-                   <span className="text-2xl">🏆</span> Le Palmarès
+                   <span className="text-2xl">🏆</span> Résultats de la Session
                  </h2>
                  <div className="space-y-4 relative z-10 flex flex-col h-full justify-between">
                    <div className="bg-white/10 p-5 border border-white/20 rounded-2xl backdrop-blur-sm flex items-center justify-center text-center flex-1">
@@ -208,7 +207,6 @@ export default async function Dashboard() {
                        </div>
                      ) : (
                        <div className="font-medium text-blue-200">
-                         Les matchs sont encore en cours.<br/>Aidez-nous à valider les premiers scores de la journée.
                        </div>
                      )}
                    </div>
