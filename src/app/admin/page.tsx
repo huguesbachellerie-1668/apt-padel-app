@@ -137,7 +137,7 @@ export default async function AdminDashboard() {
                         <form action={updateSessionCourtsAction} className="flex items-center gap-2 bg-blue-50 p-2 rounded-xl border border-blue-200">
                            <input type="hidden" name="sessionId" value={session.id} />
                            <div>
-                             <label className="text-xs font-bold text-blue-800 block mb-1">✏️ Éditer Terrains</label>
+                             <label className="text-xs font-bold text-blue-800 block mb-1">✏️ Terrains</label>
                              <input name="courts" type="number" min="1" max="20" defaultValue={session.courts > 0 ? session.courts : 1} className="w-20 p-2 border border-blue-300 rounded-lg text-sm font-bold text-center" />
                            </div>
                            <SubmitButton pendingText="Sauvegarde..." className="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-blue-700 transition-colors h-full">
