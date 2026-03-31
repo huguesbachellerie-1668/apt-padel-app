@@ -195,21 +195,20 @@ export default async function Dashboard() {
                    <span className="text-2xl">🏆</span> Résultats de la Session
                  </h2>
                  <div className="space-y-4 relative z-10 flex flex-col h-full justify-between">
-                   <div className="bg-white/10 p-5 border border-white/20 rounded-2xl backdrop-blur-sm flex items-center justify-center text-center flex-1">
-                     {allPoolsFinished ? (
-                       <div className="font-bold text-green-300">
-                         <span className="text-4xl block mb-3">🎉</span>
-                         Tous les scores sont validés !<br/>Le classement final est prêt.
-                       </div>
-                     ) : hasFinishedPool ? (
-                       <div className="font-bold text-blue-200">
-                         Certaines poules se sont terminées.<br/>Les résultats tombent en direct !
-                       </div>
-                     ) : (
-                       <div className="font-medium text-blue-200">
-                       </div>
-                     )}
-                   </div>
+                   {(hasFinishedPool || allPoolsFinished) && (
+                     <div className="bg-white/10 p-5 border border-white/20 rounded-2xl backdrop-blur-sm flex items-center justify-center text-center flex-1">
+                       {allPoolsFinished ? (
+                         <div className="font-bold text-green-300">
+                           <span className="text-4xl block mb-3">🎉</span>
+                           Tous les scores sont validés !<br/>Le classement final est prêt.
+                         </div>
+                       ) : (
+                         <div className="font-bold text-blue-200">
+                           Certaines poules se sont terminées.<br/>Les résultats tombent en direct !
+                         </div>
+                       )}
+                     </div>
+                   )}
                    {(hasFinishedPool || allPoolsFinished) ? (
                      <a href={`/session/${activeSession.id}/results`} className={`block text-center font-black py-4 px-6 rounded-xl transition-transform transform hover:scale-105 shadow-md ${allPoolsFinished ? 'bg-green-500 text-white hover:bg-green-400' : 'bg-white text-indigo-700'}`}>
                        Voir le Classement du Dimanche 👉

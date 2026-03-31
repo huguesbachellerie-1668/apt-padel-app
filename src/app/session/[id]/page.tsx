@@ -121,7 +121,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                    {isBoard ? (
                      <form action={updatePoolSettings.bind(null, pool.id, session.id)} className="flex items-center gap-2 bg-blue-800/50 p-1.5 rounded-xl flex-wrap">
                        <div className="flex items-center gap-1">
-                         <label className="text-xs font-bold text-blue-300">Niv.</label>
+                         <label className="text-xs font-bold text-blue-300">N°</label>
                          <input type="number" name="courtNumber" defaultValue={pool.courtNumber} title="Niveau/Force de la poule" className="bg-white text-gray-900 rounded px-1 min-w-[30px] w-10 py-1 text-xs font-bold border-0 focus:ring-2 focus:ring-orange-500 text-center" />
                        </div>
                        <div className="flex items-center gap-1 border-l border-blue-700/50 pl-2">
