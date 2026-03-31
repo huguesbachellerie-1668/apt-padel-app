@@ -54,32 +54,38 @@ export default async function RankingPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className={`text-lg font-black tracking-tight ${isCurrentUser ? 'text-orange-700 hover:text-orange-800' : 'text-gray-900 hover:text-blue-600'} transition-colors`}>
-                            <Link href={`/profile/${player.id}`} title="Voir le profil et les statistiques" className="flex flex-wrap items-baseline gap-2">
-                              <span className="uppercase">{player.nickname || player.name}</span>
-                              {player.nickname && <span className="text-xs font-medium text-gray-500 normal-case">{player.name}</span>}
-                            </Link>
-                          </div>
-                          {isCurrentUser && (
-                            <div className="mt-1">
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-orange-200 text-orange-800">C'est vous</span>
-                            </div>
-                          )}
-                        </div>
+                      <div className={`text-lg font-black tracking-tight ${isCurrentUser ? 'text-orange-700' : 'text-gray-900'} transition-colors inline-block`}>
                         <Link 
                           href={`/profile/${player.id}`} 
-                          className="ml-3 flex flex-shrink-0 items-center justify-center w-8 h-8 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-full shadow-sm transition-all border border-blue-100 group"
-                          title="Voir les statistiques"
+                          title="Voir le profil et les statistiques" 
+                          className="flex items-center gap-3 group hover:opacity-80 transition-opacity"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:scale-110 transition-transform">
-                            <line x1="18" y1="20" x2="18" y2="10"></line>
-                            <line x1="12" y1="20" x2="12" y2="4"></line>
-                            <line x1="6" y1="20" x2="6" y2="14"></line>
-                          </svg>
+                          <div className="flex flex-wrap items-baseline gap-2">
+                            <span className={`uppercase ${isCurrentUser ? 'group-hover:text-orange-800' : 'group-hover:text-blue-600'} transition-colors`}>
+                              {player.nickname || player.name}
+                            </span>
+                            {player.nickname && (
+                              <span className="text-xs font-medium text-gray-500 normal-case">
+                                {player.name}
+                              </span>
+                            )}
+                          </div>
+                          
+                          {/* Stat Graph Icon */}
+                          <span className="flex-shrink-0 flex items-center justify-center w-8 h-8 bg-blue-50 text-blue-600 rounded-full shadow-sm border border-blue-100 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:scale-110 transition-transform">
+                              <line x1="18" y1="20" x2="18" y2="10"></line>
+                              <line x1="12" y1="20" x2="12" y2="4"></line>
+                              <line x1="6" y1="20" x2="6" y2="14"></line>
+                            </svg>
+                          </span>
                         </Link>
                       </div>
+                      {isCurrentUser && (
+                        <div className="mt-1">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-orange-200 text-orange-800">C'est vous</span>
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-center">
                       <div className="text-xl font-black text-blue-700">{player.averagePoints.toFixed(2)}</div>
