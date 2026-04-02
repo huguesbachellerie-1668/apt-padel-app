@@ -97,11 +97,13 @@ export default async function Dashboard() {
           <section className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 relative overflow-hidden">
             <div className="flex flex-wrap justify-between items-center mb-5 gap-4">
               <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                <span className="text-2xl">📋</span> Inscription & Placements
+                <span className="text-2xl">📋</span> Prochaine Session
               </h2>
-              <span className={`px-3 py-1 text-xs font-bold rounded-full ${activeSession.status === 'INSCRIPTIONS_OUVERTES' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700'}`}>
-                {activeSession.status.replace('_', ' ')}
-              </span>
+              {activeSession.status !== 'POULES_GENEREES' && (
+                <span className={`px-3 py-1 text-xs font-bold rounded-full ${activeSession.status === 'INSCRIPTIONS_OUVERTES' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700'}`}>
+                  {activeSession.status.replace('_', ' ')}
+                </span>
+              )}
             </div>
             
             <p className="text-md text-blue-900 font-black capitalize mb-5 bg-blue-50 p-3 rounded-xl border border-blue-100 inline-block">
@@ -138,15 +140,15 @@ export default async function Dashboard() {
             {activeSession.status === 'POULES_GENEREES' && (
                userPoolPlayer ? (
                  <div className="bg-green-50 text-green-700 p-4 rounded-xl border border-green-200 text-sm font-bold mb-4 flex items-center gap-3">
-                   <span className="text-xl">✅</span> Vous êtes titulaire pour cette session !
+                   <span className="text-xl">✅</span> Inscrit
                  </div>
                ) : userRegistration ? (
                  <div className="bg-orange-50 text-orange-800 p-4 rounded-xl border border-orange-200 text-sm font-bold mb-4 flex items-center gap-3">
                    <span className="text-xl">⏳</span> Vous êtes sur liste d'attente.
                  </div>
                ) : (
-                 <div className="bg-gray-50 text-gray-500 p-4 rounded-xl border border-gray-200 text-sm font-bold mb-4">
-                   Vous n'avez pas participé aux inscriptions de cette session.
+                 <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-200 text-sm font-bold mb-4 flex items-center gap-3">
+                   <span className="text-xl">⛔</span> S'inscrire
                  </div>
                )
             )}
@@ -158,7 +160,7 @@ export default async function Dashboard() {
             )}
             
             <a href={`/session/${activeSession.id}`} className="block text-center text-sm font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 py-3 rounded-xl transition-colors border border-transparent">
-               🔎  Voir la composition des poules, inscrits complets & horaires 👉
+               🔎  Voir la Session 👉
             </a>
           </section>
 
@@ -178,7 +180,7 @@ export default async function Dashboard() {
                         <p className="text-2xl font-black mb-1">Poule #{userPoolPlayer.pool.level}</p>
                      </div>
                      <a href={`/pool/${userPoolPlayer.poolId}`} className="block text-center bg-white text-orange-600 font-black py-4 px-6 rounded-xl transition-transform transform hover:scale-105 shadow-md">
-                       Saisir ou consulter ma poule 👉
+                       Voir Ma Poule 👉
                      </a>
                    </div>
                  ) : (
