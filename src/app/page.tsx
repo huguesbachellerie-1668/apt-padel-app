@@ -148,7 +148,7 @@ export default async function Dashboard() {
                  </div>
                ) : (
                  <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-200 text-sm font-bold mb-4 flex items-center gap-3">
-                   <span className="text-xl">⛔</span> S'inscrire
+                   <span className="text-xl">⛔</span> Non Inscrit
                  </div>
                )
             )}
