@@ -28,9 +28,20 @@ export async function unregisterFromSession(sessionId: string) {
   const user = await getSessionUser();
   if (!user) return;
 
+  const session = await prisma.session.findUnique({ where: { id: sessionId } });
+
+  if (session?.status === 'POULES_GENEREES') {
+    await prisma.session.update({
+      where: { id: sessionId },
+      data: { status: 'POULES_EN_ATTENTE' }
+    });
+  }
+
   await prisma.registration.deleteMany({
     where: { userId: user.id, sessionId }
   });
   
   revalidatePath('/');
+  revalidatePath('/admin');
+  revalidatePath(`/session/${sessionId}`);
 }

@@ -10,7 +10,7 @@ export default async function Dashboard() {
 
   // Get active session if any
   const activeSession = await prisma.session.findFirst({
-    where: { status: { in: ['PREVUE', 'INSCRIPTIONS_OUVERTES', 'POULES_GENEREES'] } },
+    where: { status: { in: ['PREVUE', 'INSCRIPTIONS_OUVERTES', 'POULES_GENEREES', 'POULES_EN_ATTENTE'] } },
     orderBy: { date: 'asc' },
     include: {
       pools: {
@@ -33,11 +33,13 @@ export default async function Dashboard() {
     userRegistration = await prisma.registration.findFirst({
       where: { userId: user.id, sessionId: activeSession.id }
     });
-    if (activeSession.status !== 'PREVUE') {
-      userPoolPlayer = await prisma.poolPlayer.findFirst({
-        where: { userId: user.id, pool: { sessionId: activeSession.id } },
-        include: { pool: true }
-      });
+    if (activeSession.status === 'POULES_GENEREES' || activeSession.status === 'POULES_EN_ATTENTE') {
+      if (userRegistration) {
+        userPoolPlayer = await prisma.poolPlayer.findFirst({
+          where: { userId: user.id, pool: { sessionId: activeSession.id } },
+          include: { pool: true }
+        });
+      }
     }
   }
 
@@ -100,8 +102,8 @@ export default async function Dashboard() {
                 <span className="text-2xl">📋</span> Prochaine Session
               </h2>
               {activeSession.status !== 'POULES_GENEREES' && (
-                <span className={`px-3 py-1 text-xs font-bold rounded-full ${activeSession.status === 'INSCRIPTIONS_OUVERTES' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700'}`}>
-                  {activeSession.status.replace('_', ' ')}
+                <span className={`px-3 py-1 text-xs font-bold rounded-full ${activeSession.status === 'INSCRIPTIONS_OUVERTES' ? 'bg-orange-500 text-white' : activeSession.status === 'POULES_EN_ATTENTE' ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-200 text-gray-700'}`}>
+                  {activeSession.status.replace(/_/g, ' ')}
                 </span>
               )}
             </div>
@@ -137,14 +139,28 @@ export default async function Dashboard() {
               )
             )}
 
-            {activeSession.status === 'POULES_GENEREES' && (
+            {(activeSession.status === 'POULES_GENEREES' || activeSession.status === 'POULES_EN_ATTENTE') && (
                userPoolPlayer ? (
-                 <div className="bg-green-50 text-green-700 p-4 rounded-xl border border-green-200 text-sm font-bold mb-4 flex items-center gap-3">
-                   <span className="text-xl">✅</span> Inscrit
+                 <div className="bg-green-50 text-green-700 p-4 rounded-xl border border-green-200 text-sm font-bold mb-4 flex items-center justify-between gap-3">
+                   <div className="flex items-center gap-3">
+                     <span className="text-xl">✅</span> Inscrit
+                   </div>
+                   <form action={unregisterFromSession.bind(null, activeSession.id)}>
+                     <SubmitButton className="text-xs border border-red-200 text-red-600 bg-white hover:bg-red-50 py-1.5 px-3 rounded-lg font-bold transition-colors">
+                       Me désinscrire
+                     </SubmitButton>
+                   </form>
                  </div>
                ) : userRegistration ? (
-                 <div className="bg-orange-50 text-orange-800 p-4 rounded-xl border border-orange-200 text-sm font-bold mb-4 flex items-center gap-3">
-                   <span className="text-xl">⏳</span> Vous êtes sur liste d'attente.
+                 <div className="bg-orange-50 text-orange-800 p-4 rounded-xl border border-orange-200 text-sm font-bold mb-4 flex items-center justify-between gap-3">
+                   <div className="flex items-center gap-3">
+                     <span className="text-xl">⏳</span> Vous êtes sur liste d'attente.
+                   </div>
+                   <form action={unregisterFromSession.bind(null, activeSession.id)}>
+                     <SubmitButton className="text-xs border border-red-200 text-red-600 bg-white hover:bg-red-50 py-1.5 px-3 rounded-lg font-bold transition-colors">
+                       Me désinscrire
+                     </SubmitButton>
+                   </form>
                  </div>
                ) : (
                  <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-200 text-sm font-bold mb-4 flex items-center gap-3">
@@ -223,6 +239,16 @@ export default async function Dashboard() {
                  </div>
               </section>
 
+            </div>
+          )}
+
+          {/* Obsolete Pools Message */}
+          {activeSession.status === 'POULES_EN_ATTENTE' && (
+            <div className="bg-red-50 border-2 border-red-500 rounded-3xl p-8 text-center text-red-700 shadow-sm relative overflow-hidden">
+               <div className="text-4xl mb-4 animate-bounce">🚨</div>
+               <h2 className="text-2xl font-black mb-2">NOUVELLES POULES EN ATTENTE</h2>
+               <p className="font-bold mb-1">Un ou plusieurs joueurs se sont désinscrits à la dernière minute.</p>
+               <p className="text-red-600">Les anciennes poules sont devenues obsolètes et seront recalculées par l'équipe d'organisation au plus vite.</p>
             </div>
           )}
         </div>

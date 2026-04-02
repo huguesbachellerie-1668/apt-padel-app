@@ -105,6 +105,7 @@ export default async function AdminDashboard() {
                   session.status === 'PREVUE' ? 'border-gray-200 bg-gray-50' : 
                   session.status === 'INSCRIPTIONS_OUVERTES' ? 'border-green-400 bg-green-50 shadow-md transform scale-[1.01]' : 
                   session.status === 'POULES_GENEREES' ? 'border-orange-400 bg-orange-50' : 
+                  session.status === 'POULES_EN_ATTENTE' ? 'border-red-400 bg-red-50 shadow-md animate-pulse' : 
                   'border-gray-100 opacity-70'
                 }`}>
                   <div>
@@ -117,6 +118,7 @@ export default async function AdminDashboard() {
                         session.status === 'PREVUE' ? 'bg-gray-200 text-gray-700' : 
                         session.status === 'INSCRIPTIONS_OUVERTES' ? 'bg-green-500 text-white animate-pulse' : 
                         session.status === 'POULES_GENEREES' ? 'bg-orange-500 text-white' : 
+                        session.status === 'POULES_EN_ATTENTE' ? 'bg-red-600 text-white animate-pulse' : 
                         'bg-blue-100 text-blue-800'
                       }`}>
                         {session.status.replace('_', ' ')}
@@ -164,6 +166,17 @@ export default async function AdminDashboard() {
                         <form action={finishSessionAndCalculatePoints.bind(null, session.id)}>
                           <SubmitButton pendingText="Fermeture..." className="w-full bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-sm hover:bg-blue-700 transition-colors">
                             Terminer session 🏁
+                          </SubmitButton>
+                        </form>
+                      </div>
+                    )}
+                    {session.status === 'POULES_EN_ATTENTE' && (
+                      <div className="flex flex-col gap-2 w-full sm:w-auto">
+                        <form action={generatePools} className="flex items-center gap-2 bg-red-100 p-2 rounded-xl border border-red-300">
+                          <input type="hidden" name="sessionId" value={session.id} />
+                          <input type="hidden" name="courtsCount" value={session.courts > 0 ? session.courts : 1} />
+                          <SubmitButton pendingText="Recalcul..." className="w-full bg-red-600 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-sm hover:bg-red-700 transition-colors h-full whitespace-nowrap">
+                            Recalculer les Poules 🎲
                           </SubmitButton>
                         </form>
                       </div>

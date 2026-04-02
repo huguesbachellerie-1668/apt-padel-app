@@ -93,6 +93,15 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
         )}
       </div>
 
+      {session.status === 'POULES_EN_ATTENTE' && (
+        <div className="mt-8 bg-red-50 border-2 border-red-500 rounded-3xl p-8 text-center text-red-700 shadow-sm relative overflow-hidden">
+           <div className="text-4xl mb-4 animate-bounce">🚨</div>
+           <h2 className="text-2xl font-black mb-2">NOUVELLES POULES EN ATTENTE</h2>
+           <p className="font-bold mb-1">Un ou plusieurs joueurs se sont désinscrits à la dernière minute.</p>
+           <p className="text-red-600">Les anciennes poules sont obsolètes. Elles seront recalculées par l'équipe d'organisation au plus vite.</p>
+        </div>
+      )}
+
       {(session.status === 'POULES_GENEREES' || session.status === 'TERMINEE') && session.pools && session.pools.length > 0 && (
         <div className="mt-8">
           <h2 className="text-2xl font-black text-blue-900 flex items-center gap-3 mb-6">
