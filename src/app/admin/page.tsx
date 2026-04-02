@@ -159,8 +159,8 @@ export default async function AdminDashboard() {
                     {session.status === 'POULES_GENEREES' && (
                       <div className="flex flex-col gap-2 w-full sm:w-auto">
                         <form action={reopenSession.bind(null, session.id)}>
-                          <SubmitButton pendingText="Recalcul..." className="w-full bg-red-500 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-sm hover:bg-red-600 transition-colors">
-                            Recalculer les poules ⏪
+                          <SubmitButton pendingText="Annulation..." className="w-full bg-red-500 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-sm hover:bg-red-600 transition-colors">
+                            Annuler les Poules ⏪
                           </SubmitButton>
                         </form>
                         <form action={finishSessionAndCalculatePoints.bind(null, session.id)}>
