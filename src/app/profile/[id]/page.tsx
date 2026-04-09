@@ -50,7 +50,7 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
   let totalGamesWon = 0;
   let bestPoolReached = Infinity;
 
-  const teammateStats = new Map<string, { user: any, totalPoints: number, matchesPlayed: number }>();
+  const teammateStats = new Map<string, { user: any, totalPoints: number, matchesPlayed: number, winsTogether: number }>();
   const opponentStats = new Map<string, { user: any, lossesAgainst: number, matchesAgainst: number }>();
 
   for (const pp of poolPlayers) {
@@ -86,9 +86,10 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
           : (match.team2Player1Id === player.id ? match.team2Player2 : match.team2Player1);
       
       if (myTeammateUser) {
-          const existingT = teammateStats.get(myTeammateUser.id) || { user: myTeammateUser, totalPoints: 0, matchesPlayed: 0 };
+          const existingT = teammateStats.get(myTeammateUser.id) || { user: myTeammateUser, totalPoints: 0, matchesPlayed: 0, winsTogether: 0 };
           existingT.matchesPlayed++;
           existingT.totalPoints += pointsEarnedInMatch;
+          if (myGames > theirGames) existingT.winsTogether++;
           teammateStats.set(myTeammateUser.id, existingT);
       }
 
@@ -108,22 +109,21 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
 
   const winRate = totalMatchesPlayed > 0 ? Math.round((wins / totalMatchesPlayed) * 100) : 0;
   
-  // Calculate Best Teammate (min 3 matches to be significant if possible, else just highest avg)
+  // Calculate Best Teammate (highest volume of wins together, tie broken by total points earned)
   const bestTeammates = Array.from(teammateStats.values())
     .sort((a,b) => {
-        const avgA = a.totalPoints / a.matchesPlayed;
-        const avgB = b.totalPoints / b.matchesPlayed;
-        if (Math.abs(avgA - avgB) < 0.1) return b.matchesPlayed - a.matchesPlayed; // tie breaker on matches played
-        return avgB - avgA;
+        if (b.winsTogether !== a.winsTogether) return b.winsTogether - a.winsTogether;
+        if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+        return b.matchesPlayed - a.matchesPlayed;
     });
   const bestTeammate = bestTeammates[0];
 
-  // Calculate Nemesis (highest losses against, tie broken by win rate against them)
+  // Calculate Nemesis (highest absolute losses against, tie broken by number of matches played against them)
   const nemeses = Array.from(opponentStats.values())
     .filter(o => o.lossesAgainst > 0)
     .sort((a,b) => {
         if (b.lossesAgainst !== a.lossesAgainst) return b.lossesAgainst - a.lossesAgainst;
-        return (b.lossesAgainst / b.matchesAgainst) - (a.lossesAgainst / a.matchesAgainst);
+        return b.matchesAgainst - a.matchesAgainst;
     });
   const nemesis = nemeses[0];
 
@@ -203,9 +203,9 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
                   {bestTeammate.user.name}
                 </Link>
                 <p className="text-green-600 font-medium mt-2">
-                  <strong className="text-green-800">{(bestTeammate.totalPoints / bestTeammate.matchesPlayed).toFixed(1)} pts</strong> gagnés en moyenne par match.
+                  <strong className="text-green-800">{bestTeammate.winsTogether} victoires</strong> remportées ensemble !
                 </p>
-                <p className="text-xs text-green-500/80 mt-1 uppercase tracking-wider font-bold">Associés {bestTeammate.matchesPlayed} fois</p>
+                <p className="text-xs text-green-500/80 mt-1 uppercase tracking-wider font-bold">Joué {bestTeammate.matchesPlayed} matchs en équipe</p>
               </div>
             ) : (
               <div className="text-gray-400 text-sm italic">Pas encore assez de matchs joués.</div>
