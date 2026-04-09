@@ -17,7 +17,9 @@ export async function createSeason(formData: FormData) {
 }
 
 export async function createSession(formData: FormData) {
-  const dateStr = formData.get('date') as string;
+  const datePart = formData.get('date_part') as string;
+  const timePart = formData.get('time_part') as string;
+  const dateStr = `${datePart}T${timePart}`;
   const seasonId = formData.get('seasonId') as string;
   const courts = parseInt(formData.get('courts') as string) || 0;
   

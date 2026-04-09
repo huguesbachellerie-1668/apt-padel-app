@@ -86,9 +86,15 @@ export default async function AdminDashboard() {
             
             <form action={createSession} className="flex flex-wrap gap-4 mb-8 bg-blue-50/50 p-6 rounded-2xl border border-blue-100 items-end">
               <input type="hidden" name="seasonId" value={activeSeason.id} />
-              <div className="flex-1 min-w-[250px]">
-                <label className="block text-sm font-bold text-blue-900 mb-2">Planifier la prochaine session</label>
-                <input name="date" type="datetime-local" className="border-2 border-gray-200 p-3 rounded-xl w-full text-gray-700 bg-white focus:border-blue-500 focus:ring-0" required />
+              <div className="flex-1 flex flex-col sm:flex-row gap-4 min-w-[250px] bg-white p-3 rounded-2xl border border-blue-200/50 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]">
+                <div className="flex-1">
+                  <label className="text-xs font-black text-blue-600 uppercase tracking-widest block mb-2 px-1">📅 Date</label>
+                  <input name="date_part" type="date" className="border-2 border-gray-100 bg-gray-50 p-2.5 rounded-xl w-full text-gray-800 font-bold focus:bg-white focus:border-blue-500 transition-colors" required />
+                </div>
+                <div className="flex-1">
+                  <label className="text-xs font-black text-blue-600 uppercase tracking-widest block mb-2 px-1">🕒 Heure</label>
+                  <input name="time_part" type="time" defaultValue="18:30" className="border-2 border-gray-100 bg-gray-50 p-2.5 rounded-xl w-full text-gray-800 font-bold focus:bg-white focus:border-blue-500 transition-colors" required />
+                </div>
               </div>
               <div className="w-[140px]">
                 <label className="block text-sm font-bold text-blue-900 mb-2">Terrains</label>
