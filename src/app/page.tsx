@@ -71,11 +71,11 @@ export default async function Dashboard() {
           </div>
           <div className="bg-blue-50 rounded-2xl p-4 flex flex-col items-center justify-center border border-blue-100">
             <span className="text-sm text-blue-600 font-semibold mb-1">Moyenne</span>
-            <span className="text-3xl font-black text-blue-900">{user.averagePoints.toFixed(2)}</span>
+            <span className="text-3xl font-black text-blue-900">{user.averagePoints.toFixed(2).replace('.', ',')}</span>
           </div>
           <div className="bg-orange-50 rounded-2xl p-4 flex flex-col items-center justify-center border border-orange-100">
-            <span className="text-sm text-orange-600 font-semibold mb-1">Points totaux</span>
-            <span className="text-3xl font-black text-orange-900">{Math.floor(user.points)}</span>
+            <span className="text-sm text-orange-600 font-semibold mb-1">Sessions jouées</span>
+            <span className="text-3xl font-black text-orange-900">{Math.floor(user.totalMatches / 3)}</span>
           </div>
           <div className="bg-green-50 rounded-2xl p-4 flex flex-col items-center justify-center border border-green-100">
             <span className="text-sm text-green-600 font-semibold mb-1">TOP (Invaincu)</span>
@@ -85,10 +85,10 @@ export default async function Dashboard() {
             <span className="text-sm text-red-600 font-semibold mb-1">FLOP (3 Défaites)</span>
             <span className="text-3xl font-black text-red-700">{user.flops}</span>
           </div>
-          <div className="bg-gray-50 rounded-2xl p-4 flex flex-col items-center justify-center border border-gray-200">
-            <span className="text-sm text-gray-600 font-semibold mb-1">Inscrit depuis</span>
-            <span className="text-xl font-black text-gray-800 tracking-tight capitalize">{registeredAt}</span>
-          </div>
+          <a href={`/profile/${user.id}`} className="bg-gray-800 rounded-2xl p-4 flex flex-col items-center justify-center shadow-md transform transition-transform hover:scale-105 border border-gray-900">
+            <span className="text-2xl mb-1">👤</span>
+            <span className="text-xs text-white uppercase font-black tracking-widest text-center mt-1">Stats Complètes</span>
+          </a>
         </div>
       </section>
 

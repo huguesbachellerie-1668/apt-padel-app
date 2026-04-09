@@ -152,6 +152,9 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
                       <span className="text-xs opacity-50">📜</span> {season} : {pts.toFixed(2)} pts
                     </span>
                  ))}
+                 <span className="bg-purple-50 text-purple-800 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-purple-200">
+                    Membre depuis {new Date(player.createdAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
+                 </span>
               </div>
            </div>
         </div>
