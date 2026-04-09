@@ -136,7 +136,7 @@ export default async function PoolPage({ params }: { params: { id: string } }) {
                           <div className="flex items-center gap-3">
                               <span className="w-6 h-6 bg-blue-800 text-white rounded-full flex items-center justify-center text-xs">{p.seed}</span>
                               <span className={p.userId === user.id ? 'text-orange-600 font-black' : 'text-gray-800'}>
-                                  {p.user.name} {p.userId === user.id && "(Vous)"}
+                                  {p.user.nickname || p.user.name.split(' ')[0]} {p.userId === user.id && "(Vous)"}
                               </span>
                           </div>
                           <span className="text-blue-500 text-sm font-bold bg-blue-100 px-2 py-1 rounded">{p.user.averagePoints.toFixed(2)} pts</span>
@@ -165,7 +165,7 @@ export default async function PoolPage({ params }: { params: { id: string } }) {
                           
                           <div className="flex-1 text-center md:text-right">
                               <div className="font-black text-xl text-blue-900 bg-blue-50 px-4 py-2 rounded-xl inline-block border border-blue-100">
-                                {m.team1Player1.name.split(' ')[0]} <span className="text-gray-400">&</span> {m.team1Player2.name.split(' ')[0]}
+                                {m.team1Player1.nickname || m.team1Player1.name.split(' ')[0]} <span className="text-gray-400">&</span> {m.team1Player2.nickname || m.team1Player2.name.split(' ')[0]}
                               </div>
                           </div>
                           
@@ -185,7 +185,7 @@ export default async function PoolPage({ params }: { params: { id: string } }) {
 
                           <div className="flex-1 text-center md:text-left">
                               <div className="font-black text-xl text-green-900 bg-green-50 px-4 py-2 rounded-xl inline-block border border-green-100">
-                                {m.team2Player1.name.split(' ')[0]} <span className="text-gray-400">&</span> {m.team2Player2.name.split(' ')[0]}
+                                {m.team2Player1.nickname || m.team2Player1.name.split(' ')[0]} <span className="text-gray-400">&</span> {m.team2Player2.nickname || m.team2Player2.name.split(' ')[0]}
                               </div>
                           </div>
                       </div>
