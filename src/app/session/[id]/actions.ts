@@ -116,3 +116,50 @@ export async function deleteCourtReservation(sessionId: string, formData: FormDa
 
   revalidatePath(`/session/${sessionId}`);
 }
+
+export async function swapRegistrationOrder(sessionId: string, formData: FormData) {
+  const currUser = await getSessionUser();
+  if (!currUser || !['PRESIDENT', 'ORGA', 'TRESORIER'].includes(currUser.role)) throw new Error("Unauthorized");
+
+  const userId = formData.get('userId') as string;
+  const direction = formData.get('direction') as string; // 'up' or 'down'
+  
+  if (!userId || !direction) return;
+
+  const registrations = await prisma.registration.findMany({
+    where: { sessionId },
+    orderBy: { createdAt: 'asc' }
+  });
+
+  const currentIndex = registrations.findIndex(r => r.userId === userId);
+  if (currentIndex === -1) return;
+
+  const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+  
+  if (targetIndex >= 0 && targetIndex < registrations.length) {
+    const currentReg = registrations[currentIndex];
+    const targetReg = registrations[targetIndex];
+
+    let newCurrentCreatedAt = new Date(targetReg.createdAt.getTime());
+    let newTargetCreatedAt = new Date(currentReg.createdAt.getTime());
+
+    // Anti-collision au cas où les dates seraient identiques à la milliseconde près
+    if (newCurrentCreatedAt.getTime() === newTargetCreatedAt.getTime()) {
+       if (direction === 'up') newCurrentCreatedAt = new Date(newCurrentCreatedAt.getTime() - 1000);
+       else newCurrentCreatedAt = new Date(newCurrentCreatedAt.getTime() + 1000);
+    }
+
+    await prisma.$transaction([
+      prisma.registration.update({
+        where: { id: currentReg.id },
+        data: { createdAt: newCurrentCreatedAt }
+      }),
+      prisma.registration.update({
+        where: { id: targetReg.id },
+        data: { createdAt: newTargetCreatedAt }
+      })
+    ]);
+  }
+
+  revalidatePath(`/session/${sessionId}`);
+}

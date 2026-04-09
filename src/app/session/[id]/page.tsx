@@ -2,7 +2,7 @@ import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { manualRegisterForSession, manualUnregisterForSession, updatePoolSettings, createCourtReservation, deleteCourtReservation } from "./actions";
+import { manualRegisterForSession, manualUnregisterForSession, updatePoolSettings, createCourtReservation, deleteCourtReservation, swapRegistrationOrder } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
 
 export default async function SessionDetailsPage({ params }: { params: any }) {
@@ -235,12 +235,32 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                   </div>
                 </div>
                 {isBoard && session.status !== 'TERMINEE' && (
-                  <form action={manualUnregisterForSession.bind(null, session.id)}>
-                    <input type="hidden" name="userId" value={reg.userId} />
-                    <SubmitButton pendingText="⏳" className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors flex items-center justify-center text-lg" title="Désinscrire ce joueur">
-                      🗑️
-                    </SubmitButton>
-                  </form>
+                  <div className="flex items-center gap-2">
+                    {idx > 0 && (
+                      <form action={swapRegistrationOrder.bind(null, session.id)}>
+                        <input type="hidden" name="userId" value={reg.userId} />
+                        <input type="hidden" name="direction" value="up" />
+                        <SubmitButton pendingText="⏳" className="text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-600 hover:text-white p-2 text-sm rounded-lg transition-colors flex items-center justify-center shadow-sm" title="Monter ce joueur">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 15l7-7 7 7"></path></svg>
+                        </SubmitButton>
+                      </form>
+                    )}
+                    {idx < session.registrations.length - 1 && (
+                      <form action={swapRegistrationOrder.bind(null, session.id)}>
+                        <input type="hidden" name="userId" value={reg.userId} />
+                        <input type="hidden" name="direction" value="down" />
+                        <SubmitButton pendingText="⏳" className="text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-600 hover:text-white p-2 text-sm rounded-lg transition-colors flex items-center justify-center shadow-sm" title="Descendre ce joueur">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                        </SubmitButton>
+                      </form>
+                    )}
+                    <form action={manualUnregisterForSession.bind(null, session.id)}>
+                      <input type="hidden" name="userId" value={reg.userId} />
+                      <SubmitButton pendingText="⏳" className="text-red-500 bg-red-50 border border-red-200 hover:bg-red-600 hover:text-white p-2 ml-2 text-sm rounded-lg transition-colors flex items-center justify-center shadow-sm" title="Désinscrire ce joueur">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                      </SubmitButton>
+                    </form>
+                  </div>
                 )}
              </div>
            ))}
@@ -269,8 +289,8 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                    </div>
                    <form action={deleteCourtReservation.bind(null, session.id)}>
                      <input type="hidden" name="reservationId" value={res.id} />
-                     <SubmitButton pendingText="..." className="text-red-500 hover:text-red-700 font-bold bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors">
-                       🗑️
+                     <SubmitButton pendingText="..." className="text-red-500 hover:text-white font-bold bg-red-50 hover:bg-red-500 p-2 rounded-lg transition-colors shadow-sm">
+                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                      </SubmitButton>
                    </form>
                  </div>
