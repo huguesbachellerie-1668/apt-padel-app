@@ -14,6 +14,9 @@ export default async function AdminDashboard() {
     orderBy: { date: 'desc' }
   }) : [];
 
+  const activeSessions = sessions.filter(s => s.status !== 'TERMINEE');
+  const closedSessions = sessions.filter(s => s.status === 'TERMINEE');
+
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-10">
       <div className="flex justify-between items-end mb-6">
@@ -106,7 +109,7 @@ export default async function AdminDashboard() {
             </form>
 
             <div className="space-y-4">
-              {sessions.map(session => (
+              {activeSessions.map(session => (
                 <div key={session.id} className={`border-2 rounded-2xl p-6 flex flex-col sm:flex-row gap-4 justify-between items-center transition-all ${
                   session.status === 'PREVUE' ? 'border-gray-200 bg-gray-50' : 
                   session.status === 'INSCRIPTIONS_OUVERTES' ? 'border-green-400 bg-green-50 shadow-md transform scale-[1.01]' : 
@@ -190,15 +193,44 @@ export default async function AdminDashboard() {
                   </div>
                 </div>
               ))}
-              {sessions.length === 0 && (
+              {activeSessions.length === 0 && (
                 <div className="text-center py-10 text-gray-500 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
                   <div className="text-4xl mb-3">🕸️</div>
-                  <p className="font-medium">Aucune session n'est encore prévue.</p>
+                  <p className="font-medium">Aucune session en cours ou prévue.</p>
                   <p className="text-sm">Utilisez le formulaire ci-dessus pour planifier le prochain dimanche !</p>
                 </div>
               )}
             </div>
           </div>
+
+          {closedSessions.length > 0 && (
+          <div className="bg-gray-50 p-8 rounded-3xl shadow-sm border border-gray-200 opacity-90 hover:opacity-100 transition-opacity">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-gray-700 flex items-center gap-2">
+                🗄️ Sessions clôturées
+              </h2>
+              <a href="/history" className="text-sm font-bold text-indigo-700 hover:text-indigo-900 bg-indigo-100 hover:bg-indigo-200 border border-indigo-200 py-2 px-4 rounded-xl transition-colors">
+                 Historique du Club 👉
+              </a>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {closedSessions.map(session => (
+                <div key={session.id} className="border-2 border-gray-200 bg-white rounded-2xl p-5 flex flex-col sm:flex-row gap-4 justify-between items-center opacity-80 hover:opacity-100 transition-opacity shadow-sm">
+                  <div>
+                    <div className="font-black text-lg text-gray-800">
+                      {new Date(session.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                    </div>
+                    <div className="text-xs text-gray-500 font-bold bg-gray-100 px-2 py-0.5 rounded inline-block mt-1">Session {session.status.toLowerCase()}</div>
+                  </div>
+                  <a href={`/session/${session.id}/results`} className="text-blue-700 font-bold bg-blue-50 px-4 py-2 rounded-xl text-sm border border-blue-100 hover:bg-blue-100 transition-colors shadow-sm">
+                     Résultats 🏆
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+          )}
         </div>
       )}
     </div>
