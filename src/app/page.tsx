@@ -196,12 +196,18 @@ export default async function Dashboard() {
                  </h2>
                  {userPoolPlayer ? (
                    <div className="space-y-4 relative z-10 flex flex-col h-full justify-between">
-                     <div className="bg-white/10 p-5 border border-white/20 rounded-2xl backdrop-blur-sm">
-                        <p className="text-2xl font-black mb-1">Poule #{userPoolPlayer.pool.level}</p>
+                     <div className="bg-white/10 p-5 border border-white/20 rounded-2xl backdrop-blur-sm flex flex-col gap-1">
+                        <p className="text-3xl font-black text-white mb-2">Poule #{userPoolPlayer.pool.level}</p>
                         {userPoolPlayer.pool.courtReservation && (
-                          <div className="text-sm font-bold text-orange-200 mt-2 flex items-center gap-2">
-                             <span className="bg-black/20 px-2 py-1 rounded shadow-sm inline-flex items-center gap-1">📍 {userPoolPlayer.pool.courtReservation.name}</span>
-                             <span className="bg-black/20 px-2 py-1 rounded shadow-sm inline-flex items-center gap-1">⏰ {userPoolPlayer.pool.courtReservation.startTime}</span>
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-1">
+                             <div className="bg-white text-orange-600 px-4 py-3 rounded-xl shadow-md flex items-center justify-center gap-2 text-xl font-black">
+                               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5h16M4 19h16M4 5v14M20 5v14M12 5v14M4 12h16"></path></svg> 
+                               {userPoolPlayer.pool.courtReservation.name}
+                             </div>
+                             <div className="bg-white text-orange-600 px-4 py-3 rounded-xl shadow-md flex items-center justify-center gap-2 text-xl font-black">
+                               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 
+                               {userPoolPlayer.pool.courtReservation.startTime}
+                             </div>
                           </div>
                         )}
                      </div>

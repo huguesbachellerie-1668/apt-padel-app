@@ -103,8 +103,12 @@ export default async function PoolPage({ params }: { params: { id: string } }) {
       <div className="flex flex-wrap justify-between items-end mb-6 gap-4">
         <div>
           <a href="/" className="text-blue-500 font-bold hover:underline mb-2 inline-block">← Retour à l'accueil</a>
-          <h1 className="text-3xl font-black text-blue-900">
-            🎾 Poule #{pool.level} {pool.courtReservation ? `- ${pool.courtReservation.name}` : `- Terrain ${pool.courtNumber}`}
+          <h1 className="text-3xl font-black text-blue-900 flex flex-wrap items-center gap-3">
+            <span>🎾 Poule #{pool.level}</span>
+            <span className="text-xl bg-blue-100 text-blue-800 px-4 py-1.5 rounded-xl shadow-sm border border-blue-200 flex items-center gap-2">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5h16M4 19h16M4 5v14M20 5v14M12 5v14M4 12h16"></path></svg>
+              {pool.courtReservation ? pool.courtReservation.name : `Terrain ${pool.courtNumber}`}
+            </span>
           </h1>
           <p className="text-gray-500 mt-2 font-medium flex items-center gap-3">
             <span>Session du {new Date(pool.session.date).toLocaleDateString('fr-FR')}</span>

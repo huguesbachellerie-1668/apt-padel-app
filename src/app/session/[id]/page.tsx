@@ -117,11 +117,13 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                      <h3 className="font-bold text-lg">Poule #{pool.level}</h3>
                      {!isBoard && (
                         pool.courtReservation ? (
-                          <span className="text-sm font-medium bg-blue-800 px-3 py-1 rounded-full border border-blue-700">
+                          <span className="text-sm font-medium bg-blue-800 px-3 py-1 rounded-full border border-blue-700 flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5h16M4 19h16M4 5v14M20 5v14M12 5v14M4 12h16"></path></svg>
                             {pool.courtReservation.club.name} - {pool.courtReservation.name}
                           </span>
                         ) : (
-                          <span className="text-sm font-medium bg-blue-800 px-3 py-1 rounded-full border border-blue-700">
+                          <span className="text-sm font-medium bg-blue-800 px-3 py-1 rounded-full border border-blue-700 flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5h16M4 19h16M4 5v14M20 5v14M12 5v14M4 12h16"></path></svg>
                             Terrain {pool.courtNumber}
                           </span>
                         )

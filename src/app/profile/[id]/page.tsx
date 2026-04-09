@@ -251,7 +251,7 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
                     </div>
                     <div>
                       <div className="font-bold text-gray-900 text-lg capitalize">{new Date(pp.pool.session.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                      <div className="text-sm text-gray-500 font-medium">Seed {pp.seed} sur le Terrain {pp.pool.courtNumber}</div>
+                      <div className="text-sm text-gray-500 font-medium flex items-center gap-1">Seed {pp.seed} | <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5h16M4 19h16M4 5v14M20 5v14M12 5v14M4 12h16"></path></svg> Terrain {pp.pool.courtNumber}</div>
                     </div>
                   </div>
                   <div className="text-orange-500 font-black text-2xl group-hover:scale-110 transition-transform">
