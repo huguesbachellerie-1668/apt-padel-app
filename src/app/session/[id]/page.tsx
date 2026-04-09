@@ -183,7 +183,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
       {isBoard && (
         <div className="bg-orange-50/50 p-5 rounded-2xl border border-orange-100 mt-6 relative overflow-hidden">
           <div className="absolute right-0 top-0 opacity-10 text-8xl">👑</div>
-           <h3 className="font-bold text-orange-800 mb-3 relative z-10">Interface Board : Inscription manuelle</h3>
+           <h3 className="font-bold text-orange-800 mb-3 relative z-10">Gestion des inscriptions</h3>
            <form action={manualRegisterForSession.bind(null, session.id)} className="flex items-end gap-3 relative z-10 w-full md:w-2/3">
              <div className="flex gap-3">
                <select name="userId" required className="flex-1 p-2.5 rounded-xl border border-orange-200 text-sm focus:outline-none">
@@ -205,6 +205,53 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
            </form>
         </div>
       )}
+
+
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm mt-6">
+         <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
+           <h2 className="font-bold text-gray-800 text-lg flex items-center justify-between">
+             <span>Liste des Inscrits ({registeredCount})</span>
+           </h2>
+           <p className="text-xs text-gray-500 mt-1">L'ordre prioritaire sera appliqué lors de la fermeture des inscriptions par le Board</p>
+         </div>
+         <div className="divide-y divide-gray-100">
+           {session.registrations.map((reg: any, idx: number) => (
+             <div key={reg.id} className={`flex items-center gap-4 p-4 ${reg.userId === user.id ? 'bg-orange-50/30' : ''}`}>
+                <div className="flex-shrink-0 w-8 text-center font-black text-gray-400">
+                  {idx + 1}
+                </div>
+                <div className="flex-shrink-0 w-10 h-10 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center font-bold">
+                  {(reg.user.nickname || reg.user.name).charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1">
+                  <div className="font-bold text-gray-900 flex items-center gap-2">
+                    <span className="text-lg">{reg.user.nickname || reg.user.name}</span>
+                    {reg.user.nickname && <span className="text-sm font-medium text-gray-500">{reg.user.name}</span>}
+                    {reg.userId === user.id && <span className="text-[10px] uppercase font-bold bg-orange-200 text-orange-800 px-2 py-0.5 rounded-full">Vous</span>}
+                  </div>
+                  <div className="text-xs text-gray-400 mt-0.5 flex gap-2 items-center">
+                    <span>Inscrit le {new Date(reg.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).replace(':', 'h')}</span>
+                    {reg.isReturningFromInjury && <span className="text-orange-600 font-bold flex items-center bg-orange-50 px-1 py-0.5 rounded">🩺 Blessure</span>}
+                  </div>
+                </div>
+                {isBoard && session.status !== 'TERMINEE' && (
+                  <form action={manualUnregisterForSession.bind(null, session.id)}>
+                    <input type="hidden" name="userId" value={reg.userId} />
+                    <SubmitButton pendingText="⏳" className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors flex items-center justify-center text-lg" title="Désinscrire ce joueur">
+                      🗑️
+                    </SubmitButton>
+                  </form>
+                )}
+             </div>
+           ))}
+           
+           {registeredCount === 0 && (
+             <div className="p-8 text-center text-gray-500 font-medium">
+               Aucun inscrit pour le moment.
+             </div>
+           )}
+         </div>
+      </div>
 
       {isBoard && (
         <div className="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100 mt-6 relative overflow-hidden">
@@ -256,52 +303,6 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
            </form>
         </div>
       )}
-
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm mt-6">
-         <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
-           <h2 className="font-bold text-gray-800 text-lg flex items-center justify-between">
-             <span>Liste des Inscrits ({registeredCount})</span>
-           </h2>
-           <p className="text-xs text-gray-500 mt-1">L'ordre prioritaire sera appliqué lors de la fermeture des inscriptions par le Board</p>
-         </div>
-         <div className="divide-y divide-gray-100">
-           {session.registrations.map((reg: any, idx: number) => (
-             <div key={reg.id} className={`flex items-center gap-4 p-4 ${reg.userId === user.id ? 'bg-orange-50/30' : ''}`}>
-                <div className="flex-shrink-0 w-8 text-center font-black text-gray-400">
-                  {idx + 1}
-                </div>
-                <div className="flex-shrink-0 w-10 h-10 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center font-bold">
-                  {(reg.user.nickname || reg.user.name).charAt(0).toUpperCase()}
-                </div>
-                <div className="flex-1">
-                  <div className="font-bold text-gray-900 flex items-center gap-2">
-                    <span className="text-lg">{reg.user.nickname || reg.user.name}</span>
-                    {reg.user.nickname && <span className="text-sm font-medium text-gray-500">{reg.user.name}</span>}
-                    {reg.userId === user.id && <span className="text-[10px] uppercase font-bold bg-orange-200 text-orange-800 px-2 py-0.5 rounded-full">Vous</span>}
-                  </div>
-                  <div className="text-xs text-gray-400 mt-0.5 flex gap-2 items-center">
-                    <span>Inscrit le {new Date(reg.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).replace(':', 'h')}</span>
-                    {reg.isReturningFromInjury && <span className="text-orange-600 font-bold flex items-center bg-orange-50 px-1 py-0.5 rounded">🩺 Blessure</span>}
-                  </div>
-                </div>
-                {isBoard && session.status !== 'TERMINEE' && (
-                  <form action={manualUnregisterForSession.bind(null, session.id)}>
-                    <input type="hidden" name="userId" value={reg.userId} />
-                    <SubmitButton pendingText="⏳" className="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors flex items-center justify-center text-lg" title="Désinscrire ce joueur">
-                      🗑️
-                    </SubmitButton>
-                  </form>
-                )}
-             </div>
-           ))}
-           
-           {registeredCount === 0 && (
-             <div className="p-8 text-center text-gray-500 font-medium">
-               Aucun inscrit pour le moment.
-             </div>
-           )}
-         </div>
-      </div>
     </div>
   )
 }

@@ -175,7 +175,7 @@ export default async function Dashboard() {
               </div>
             )}
             
-            <a href={`/session/${activeSession.id}`} className="block text-center text-sm font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 py-3 rounded-xl transition-colors border border-transparent">
+            <a href={`/session/${activeSession.id}`} className="block text-center text-lg font-black text-white bg-blue-600 hover:bg-blue-700 shadow-md py-4 rounded-xl transition-transform transform hover:scale-[1.02]">
                🔎  Voir la Session 👉
             </a>
           </section>

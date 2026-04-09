@@ -80,6 +80,14 @@ export default function AdminPlayerList({ players, user }: { players: any[], use
                           <label className="text-xs font-bold text-gray-400 uppercase block mb-1.5 flex items-center gap-1">Historique <span className="text-blue-500">24/25</span></label>
                           <input name="hist2425" type="number" step="0.01" defaultValue={(player as any).historicalStats?.['2024-2025'] || ''} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-blue-50/30 font-bold focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" placeholder="Vide" />
                       </div>
+                      <div className="w-24">
+                          <label className="text-xs font-bold text-yellow-600 uppercase block mb-1.5 flex items-center gap-1" title="Cartons Jaunes">🟨 Jaunes</label>
+                          <input name="yellowCards" type="number" min="0" defaultValue={player.yellowCards || 0} disabled={!canEdit} className="w-full p-3.5 border-2 border-yellow-200 rounded-xl text-base bg-yellow-50/30 font-bold text-center focus:bg-white focus:outline-none focus:border-yellow-500 focus:ring-2 focus:ring-yellow-100 disabled:bg-gray-100 transition-colors" />
+                      </div>
+                      <div className="w-24">
+                          <label className="text-xs font-bold text-red-600 uppercase block mb-1.5 flex items-center gap-1" title="Cartons Rouges">🟥 Rouges</label>
+                          <input name="redCards" type="number" min="0" defaultValue={player.redCards || 0} disabled={!canEdit} className="w-full p-3.5 border-2 border-red-200 rounded-xl text-base bg-red-50/30 font-bold text-center focus:bg-white focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 disabled:bg-gray-100 transition-colors" />
+                      </div>
                   </div>
                   <div className="w-full md:w-auto flex justify-end gap-3 items-center">
                       <SubmitButton pendingText="⏳" formAction={resetPasswordToDefault.bind(null, player.id)} disabled={!canEdit} className="bg-white text-gray-700 hover:bg-red-50 hover:text-red-700 hover:border-red-300 border-2 border-gray-200 font-bold py-3.5 px-4 rounded-xl text-sm shadow-sm transition-all disabled:opacity-50" title="Remettre le mot de passe sur Apt2026!">

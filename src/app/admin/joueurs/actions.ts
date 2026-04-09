@@ -74,6 +74,8 @@ export async function updatePlayer(formData: FormData) {
   const createdAtStr = formData.get('createdAt') as string;
   const hist2324Str = formData.get('hist2324') as string;
   const hist2425Str = formData.get('hist2425') as string;
+  const yellowCards = parseInt(formData.get('yellowCards') as string) || 0;
+  const redCards = parseInt(formData.get('redCards') as string) || 0;
 
   const targetUser = await prisma.user.findUnique({ where: { id } });
   if (!targetUser) throw new Error('User not found');
@@ -92,6 +94,8 @@ export async function updatePlayer(formData: FormData) {
     points,
     totalMatches,
     averagePoints,
+    yellowCards,
+    redCards,
     role: role || targetUser.role
   };
 
