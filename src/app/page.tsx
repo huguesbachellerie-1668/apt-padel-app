@@ -37,7 +37,11 @@ export default async function Dashboard() {
       if (userRegistration) {
         userPoolPlayer = await prisma.poolPlayer.findFirst({
           where: { userId: user.id, pool: { sessionId: activeSession.id } },
-          include: { pool: true }
+          include: { 
+            pool: {
+              include: { courtReservation: true }
+            } 
+          }
         });
       }
     }
@@ -194,6 +198,12 @@ export default async function Dashboard() {
                    <div className="space-y-4 relative z-10 flex flex-col h-full justify-between">
                      <div className="bg-white/10 p-5 border border-white/20 rounded-2xl backdrop-blur-sm">
                         <p className="text-2xl font-black mb-1">Poule #{userPoolPlayer.pool.level}</p>
+                        {userPoolPlayer.pool.courtReservation && (
+                          <div className="text-sm font-bold text-orange-200 mt-2 flex items-center gap-2">
+                             <span className="bg-black/20 px-2 py-1 rounded shadow-sm inline-flex items-center gap-1">📍 {userPoolPlayer.pool.courtReservation.name}</span>
+                             <span className="bg-black/20 px-2 py-1 rounded shadow-sm inline-flex items-center gap-1">⏰ {userPoolPlayer.pool.courtReservation.startTime}</span>
+                          </div>
+                        )}
                      </div>
                      <a href={`/pool/${userPoolPlayer.poolId}`} className="block text-center bg-white text-orange-600 font-black py-4 px-6 rounded-xl transition-transform transform hover:scale-105 shadow-md">
                        Voir Ma Poule 👉
