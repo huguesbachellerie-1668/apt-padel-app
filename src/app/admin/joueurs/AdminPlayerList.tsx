@@ -56,11 +56,11 @@ export default function AdminPlayerList({ players, user }: { players: any[], use
                         {(user.role === 'PRESIDENT' || player.role === 'PRESIDENT') && <option value="PRESIDENT">Président</option>}
                       </select>
                   </div>
-                  <div className="w-24">
+                  <div className="w-32">
                       <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Points</label>
-                      <input name="points" type="number" step="0.01" defaultValue={player.points} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-white font-black text-center text-orange-600 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 disabled:bg-gray-100 transition-colors" title="Points totaux" />
+                      <input name="points" type="number" step="any" defaultValue={player.points} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-white font-black text-center text-orange-600 focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 disabled:bg-gray-100 transition-colors" title="Points totaux" />
                   </div>
-                  <div className="w-24">
+                  <div className="w-32">
                       <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Sessions</label>
                       <input name="sessions" type="number" defaultValue={Math.floor((player.totalMatches || 0) / 3)} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-white text-center font-bold text-blue-800 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" title="Sessions jouées" />
                   </div>
@@ -72,13 +72,13 @@ export default function AdminPlayerList({ players, user }: { players: any[], use
 
               <div className="flex flex-wrap justify-between items-end gap-4 mt-2 pt-5 border-t-2 border-gray-100">
                   <div className="flex flex-wrap gap-4 w-full md:w-auto">
-                      <div className="w-36">
+                      <div className="w-40">
                           <label className="text-xs font-bold text-gray-400 uppercase block mb-1.5 flex items-center gap-1">Historique <span className="text-blue-500">23/24</span></label>
-                          <input name="hist2324" type="number" step="0.01" defaultValue={(player as any).historicalStats?.['2023-2024'] || ''} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-blue-50/30 font-bold focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" placeholder="Vide" />
+                          <input name="hist2324" type="number" step="any" defaultValue={(player as any).historicalStats?.['2023-2024'] || ''} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-blue-50/30 font-bold focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" placeholder="Vide" />
                       </div>
-                      <div className="w-36">
+                      <div className="w-40">
                           <label className="text-xs font-bold text-gray-400 uppercase block mb-1.5 flex items-center gap-1">Historique <span className="text-blue-500">24/25</span></label>
-                          <input name="hist2425" type="number" step="0.01" defaultValue={(player as any).historicalStats?.['2024-2025'] || ''} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-blue-50/30 font-bold focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" placeholder="Vide" />
+                          <input name="hist2425" type="number" step="any" defaultValue={(player as any).historicalStats?.['2024-2025'] || ''} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-blue-50/30 font-bold focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" placeholder="Vide" />
                       </div>
                       <div className="w-24">
                           <label className="text-xs font-bold text-yellow-600 uppercase block mb-1.5 flex items-center gap-1" title="Cartons Jaunes">🟨 Jaunes</label>
