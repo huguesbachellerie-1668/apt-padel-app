@@ -132,7 +132,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                    {isBoard ? (
                      <form action={updatePoolSettings.bind(null, pool.id, session.id)} className="flex items-center gap-2 bg-blue-800/50 p-1.5 rounded-xl flex-wrap">
                        <div className="flex items-center gap-1 pl-2">
-                         <select key={pool.courtReservationId || 'none'} name="reservationId" defaultValue={pool.courtReservationId || ""} className="bg-white text-gray-900 rounded px-1 py-1 text-xs font-bold w-32 border-0 focus:ring-2 focus:ring-orange-500 truncate">
+                         <select key={pool.courtReservationId || 'none'} name="reservationId" defaultValue={pool.courtReservationId || ""} className="bg-white text-gray-900 rounded px-2 py-1 text-xs font-bold w-64 border-0 focus:ring-2 focus:ring-orange-500 truncate">
                            <option value="">A définir...</option>
                            {session.reservations && session.reservations.map((res: any) => (
                              <option key={res.id} value={res.id}>{res.club.name} {res.name} ({res.startTime})</option>
