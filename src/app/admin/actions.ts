@@ -86,9 +86,38 @@ export async function generatePools(formData: FormData) {
   if (actualPoolsCount < 1) return;
 
   const maxPlayers = actualPoolsCount * 4;
-  const selectedRegistrations = registrations.slice(0, maxPlayers);
-  const selectedUsers = selectedRegistrations.map((r: any) => r.user).sort((a: any, b: any) => b.averagePoints - a.averagePoints);
+  // --- Priorité 1: Ont joué la session précédente
+  const lastSession = await prisma.session.findFirst({
+    where: { status: 'TERMINEE' },
+    orderBy: { date: 'desc' },
+    include: { pools: { include: { players: true } } }
+  });
+  const lastSessionUserIds = new Set<string>();
+  if (lastSession) {
+    lastSession.pools.forEach((p: any) => p.players.forEach((pp: any) => lastSessionUserIds.add(pp.userId)));
+  }
 
+  // --- Step 8: Tri des sélectionnés
+  const sortedRegs = [...registrations].sort((a, b) => {
+    const aLast = lastSessionUserIds.has(a.userId) ? 1 : 0;
+    const bLast = lastSessionUserIds.has(b.userId) ? 1 : 0;
+    if (aLast !== bLast) return bLast - aLast;
+
+    const aMem = (a.user.totalMatches && a.user.totalMatches > 0) ? 1 : 0;
+    const bMem = (b.user.totalMatches && b.user.totalMatches > 0) ? 1 : 0;
+    if (aMem !== bMem) return bMem - aMem;
+
+    return a.createdAt.getTime() - b.createdAt.getTime();
+  });
+
+  const selectedRegistrations = sortedRegs.slice(0, maxPlayers);
+  const N = maxPlayers;
+
+  // --- Tri par points généraux (Initial Point Seed)
+  const electedUsers = selectedRegistrations.map((r: any) => r.user).sort((a: any, b: any) => b.points - a.points);
+  const userToReg = new Map(selectedRegistrations.map(r => [r.userId, r]));
+
+  // --- Clear previous pools
   const poolsToDelete = await prisma.pool.findMany({ where: { sessionId } });
   const poolIds = poolsToDelete.map(p => p.id);
   if (poolIds.length > 0) {
@@ -97,107 +126,106 @@ export async function generatePools(formData: FormData) {
     await prisma.pool.deleteMany({ where: { sessionId } });
   }
 
-  const maxMovement = actualPoolsCount <= 5 ? 2 : actualPoolsCount <= 9 ? 3 : 4;
-  const userLastPools = new Map<string, number>();
+  // --- Step 11: Top-Down Cascade
+  const finalUsers = [...electedUsers];
+  const movedUserIds = new Set<string>();
 
-  for (const user of selectedUsers) {
-    const lastPoolPlayer = await prisma.poolPlayer.findFirst({
-      where: { 
-        userId: user.id,
-        pool: { session: { status: 'TERMINEE' } }
-      },
-      orderBy: { pool: { session: { date: 'desc' } } },
-      include: { pool: true }
-    });
-    if (lastPoolPlayer) {
-      userLastPools.set(user.id, lastPoolPlayer.pool.level);
+  let hasMoved = true;
+  while (hasMoved) {
+    hasMoved = false;
+    for (let i = 0; i < N; i++) {
+       const u = finalUsers[i];
+       if (movedUserIds.has(u.id)) continue;
+       
+       const theoreticalLevel = Math.ceil(((i + 1) * 10) / N);
+       const dbLevel = u.lastCalculatedLevel;
+
+       if (dbLevel !== null && dbLevel !== undefined && dbLevel !== 0) {
+         const minLevelAllowed = Math.max(1, dbLevel - 3);
+         const maxLevelAllowed = Math.min(10, dbLevel + 3);
+
+         if (theoreticalLevel < minLevelAllowed) { // Trop haut -> doit descendre
+           const targetPlace = Math.floor(((minLevelAllowed - 1) * N) / 10) + 1;
+           const targetIndex = Math.min(N - 1, targetPlace - 1);
+           if (targetIndex > i) {
+             finalUsers.splice(i, 1);
+             finalUsers.splice(targetIndex, 0, u);
+             movedUserIds.add(u.id);
+             hasMoved = true;
+             break; 
+           }
+         } 
+         else if (theoreticalLevel > maxLevelAllowed) { // Trop bas -> doit monter
+           const targetPlace = Math.max(1, Math.floor((maxLevelAllowed * N) / 10)); // Pire place pour le maxLevel autorisé
+           const targetIndex = Math.max(0, targetPlace - 1);
+           if (targetIndex < i) {
+             finalUsers.splice(i, 1);
+             finalUsers.splice(targetIndex, 0, u);
+             movedUserIds.add(u.id);
+             hasMoved = true;
+             break;
+           }
+         }
+       }
     }
   }
 
-  let remainingPlayers = [...selectedUsers];
-  const poolsData = [];
+  // --- Injury logic (Retour Blessure)
+  for (const u of [...finalUsers]) {
+     const reg = userToReg.get(u.id);
+     if (reg && reg.isReturningFromInjury) {
+        const currentIndex = finalUsers.findIndex(fu => fu.id === u.id);
+        if (currentIndex === -1) continue;
+        const currentPool = Math.floor(currentIndex / 4);
+        if (currentPool < actualPoolsCount - 1) {
+           const targetPool = currentPool + 1;
+           let targetIndex = targetPool * 4;
+           
+           while (targetIndex < finalUsers.length) {
+              const occUser = finalUsers[targetIndex];
+              const occDbLvl = occUser.lastCalculatedLevel;
+              if (occDbLvl !== null && occDbLvl !== undefined && occDbLvl !== 0) {
+                  const occMaxLvl = Math.min(10, occDbLvl + 3);
+                  const occThLvlIfPushed = Math.ceil(((targetIndex + 2) * 10) / N); 
+                  if (occThLvlIfPushed > occMaxLvl) {
+                     targetIndex++; // Le joueur est plafonné, on cherche la place d'après
+                     continue;
+                  }
+              }
+              break; 
+           }
+           if (targetIndex < finalUsers.length) {
+              const removedUser = finalUsers.splice(currentIndex, 1)[0];
+              finalUsers.splice(targetIndex - 1, 0, removedUser);
+           }
+        }
+     }
+  }
 
+  // --- Save to DB
   for (let level = 1; level <= actualPoolsCount; level++) {
-    const poolUsers: any[] = [];
-
-    const mustPlaceHere = remainingPlayers.filter(p => {
-      const lastLevel = userLastPools.get(p.id);
-      if (lastLevel === undefined) return false;
-      const allowedMax = Math.min(actualPoolsCount, lastLevel + maxMovement);
-      return allowedMax === level; 
-    });
-
-    for (const p of mustPlaceHere) {
-      if (poolUsers.length < 4) {
-        poolUsers.push(p);
-        remainingPlayers = remainingPlayers.filter(rp => rp.id !== p.id);
-      }
-    }
-
-    for (const p of remainingPlayers) {
-      if (poolUsers.length >= 4) break;
-      const lastLevel = userLastPools.get(p.id);
-      if (lastLevel !== undefined) {
-         const allowedMin = Math.max(1, lastLevel - maxMovement);
-         if (level < allowedMin) continue;
-      }
-      poolUsers.push(p);
-    }
-    remainingPlayers = remainingPlayers.filter(rp => !poolUsers.find(pp => pp.id === rp.id));
-
-    if (poolUsers.length < 4) {
-      for (const p of remainingPlayers) {
-         if (poolUsers.length >= 4) break;
-         poolUsers.push(p);
-      }
-      remainingPlayers = remainingPlayers.filter(rp => !poolUsers.find(pp => pp.id === rp.id));
-    }
-
-    poolsData.push({ level, players: poolUsers });
-  }
-
-  // --- Article 22: Injury Swap Logic ---
-  const injuryRegistrations = registrations.filter(r => r.isReturningFromInjury);
-  for (const reg of injuryRegistrations) {
-    let playerPoolIndex = -1;
-    let playerIndexInPool = -1;
-    for (let i = 0; i < poolsData.length; i++) {
-      const pIdx = poolsData[i].players.findIndex(p => p.id === reg.userId);
-      if (pIdx !== -1) {
-        playerPoolIndex = i;
-        playerIndexInPool = pIdx;
-        break;
-      }
-    }
-
-    if (playerPoolIndex !== -1 && playerPoolIndex < poolsData.length - 1) {
-      const targetPoolIndex = playerPoolIndex + 1;
-      const playerToDrop = poolsData[playerPoolIndex].players[playerIndexInPool];
-      const playerToRise = poolsData[targetPoolIndex].players[0]; 
-
-      // Swap
-      poolsData[playerPoolIndex].players[playerIndexInPool] = playerToRise;
-      poolsData[targetPoolIndex].players[0] = playerToDrop;
-      
-      // Re-sort pools to keep competitive integrity (highest point = seed 1)
-      poolsData[playerPoolIndex].players.sort((a,b) => b.averagePoints - a.averagePoints);
-      poolsData[targetPoolIndex].players.sort((a,b) => b.averagePoints - a.averagePoints);
-    }
-  }
-
-  // --- Save to DB ---
-  for (const poolData of poolsData) {
+    const poolUsers = finalUsers.slice((level - 1) * 4, level * 4);
+    
     const pool = await prisma.pool.create({
-      data: { sessionId, courtNumber: poolData.level, level: poolData.level }
+      data: { sessionId, courtNumber: level, level: level }
     });
 
-    await Promise.all(poolData.players.map((u: any, idx: number) =>
-      prisma.poolPlayer.create({
-        data: { poolId: pool.id, userId: u.id, seed: idx + 1 }
-      })
-    ));
+    await Promise.all(poolUsers.map(async (u: any, idx: number) => {
+      const placeInSession = ((level - 1) * 4) + idx + 1;
+      const thLevel = Math.ceil((placeInSession * 10) / N);
+      
+      // Update DB Level
+      await prisma.user.update({
+        where: { id: u.id },
+        data: { lastCalculatedLevel: thLevel }
+      });
 
-    const pU = poolData.players;
+      return prisma.poolPlayer.create({
+        data: { poolId: pool.id, userId: u.id, seed: idx + 1 }
+      });
+    }));
+
+    const pU = poolUsers;
     await prisma.match.create({ data: { poolId: pool.id, order: 1, team1Player1Id: pU[0].id, team1Player2Id: pU[3].id, team2Player1Id: pU[1].id, team2Player2Id: pU[2].id } });
     await prisma.match.create({ data: { poolId: pool.id, order: 2, team1Player1Id: pU[0].id, team1Player2Id: pU[2].id, team2Player1Id: pU[1].id, team2Player2Id: pU[3].id } });
     await prisma.match.create({ data: { poolId: pool.id, order: 3, team1Player1Id: pU[0].id, team1Player2Id: pU[1].id, team2Player1Id: pU[2].id, team2Player2Id: pU[3].id } });
