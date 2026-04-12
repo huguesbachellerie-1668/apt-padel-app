@@ -48,8 +48,20 @@ export default async function AdminDashboard() {
             </h2>
             <p className="text-gray-500 mb-5 font-medium">Gérez le dictionnaire des lieux (noms, adresses) pour réserver les terrains plus tard.</p>
           </div>
-          <a href="/admin/clubs" className="inline-flex bg-indigo-600 text-white font-bold py-3 px-6 rounded-2xl hover:bg-indigo-700 transition-colors shadow-sm border-b-4 border-indigo-800 items-center justify-center gap-2 text-sm w-fit">
-            <span>Gérer les lieux 👉</span>
+          <a href="/admin/clubs" className="inline-flex bg-gray-800 text-white font-bold py-3 px-6 rounded-2xl hover:bg-gray-900 transition-colors shadow-sm border-b-4 border-gray-950 items-center justify-center gap-2 text-sm w-fit">
+            <span>Gérer les Clubs 👉</span>
+          </a>
+        </div>
+
+        <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-orange-100 flex flex-col justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+              📢 Communication
+            </h2>
+            <p className="text-gray-500 mb-5 font-medium">Pilotez la page Le Club : publiez des News, présentez vos Sponsors ou la Boutique.</p>
+          </div>
+          <a href="/admin/communication" className="inline-flex bg-orange-600 text-white font-bold py-3 px-6 rounded-2xl hover:bg-orange-700 transition-colors shadow-sm border-b-4 border-orange-800 active:border-b-0 active:mt-[4px] items-center justify-center gap-2 text-sm w-fit">
+            <span>Gérer la vitrine 👉</span>
           </a>
         </div>
       </div>

@@ -142,3 +142,28 @@ model CourtReservation {
   
   pool      Pool?
 }
+
+model News {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  date      DateTime @default(now())
+  isActive  Boolean  @default(true)
+}
+
+model Sponsor {
+  id        String   @id @default(cuid())
+  name      String
+  logoUrl   String?
+  website   String?
+  isActive  Boolean  @default(true)
+}
+
+model Goodie {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+}
