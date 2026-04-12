@@ -119,7 +119,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                         pool.courtReservation ? (
                           <span className="text-sm font-medium bg-blue-800 px-3 py-1 rounded-full border border-blue-700 flex items-center gap-1">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5h16M4 19h16M4 5v14M20 5v14M12 5v14M4 12h16"></path></svg>
-                            {pool.courtReservation.club.name} - {pool.courtReservation.name}
+                            {pool.courtReservation.club.name} Terrain {pool.courtReservation.name}
                           </span>
                         ) : (
                           <span className="text-sm font-medium bg-blue-800 px-3 py-1 rounded-full border border-blue-700 flex items-center gap-1">
@@ -135,7 +135,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                          <select key={pool.courtReservationId || 'none'} name="reservationId" defaultValue={pool.courtReservationId || ""} className="bg-white text-gray-900 rounded px-2 py-1 text-xs font-bold w-64 border-0 focus:ring-2 focus:ring-orange-500 truncate">
                            <option value="">A définir...</option>
                            {session.reservations && session.reservations.map((res: any) => (
-                             <option key={res.id} value={res.id}>{res.club.name} {res.name} ({res.startTime})</option>
+                             <option key={res.id} value={res.id}>{res.club.name} Terrain {res.name} ({res.startTime})</option>
                            ))}
                          </select>
                        </div>
