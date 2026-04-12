@@ -39,9 +39,7 @@ export default async function LoginPage({ searchParams }: { searchParams: any })
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="max-w-md w-full p-8 bg-white rounded-3xl shadow-xl border-t-8 border-orange-500">
         <div className="flex justify-center mb-6">
-          <div className="w-20 h-20 bg-blue-900 rounded-full flex items-center justify-center text-white text-2xl font-black shadow-inner">
-            APT
-          </div>
+          <img src="/logo.png" alt="Logo de l'APT Padel Club" className="w-28 h-auto object-contain drop-shadow-md" />
         </div>
         <h1 className="text-2xl font-bold text-center text-blue-900 mb-2">Atlantic Padel Team</h1>
         <p className="text-center text-gray-500 text-xs mb-8">Connectez-vous pour accéder à votre espace joueur</p>
