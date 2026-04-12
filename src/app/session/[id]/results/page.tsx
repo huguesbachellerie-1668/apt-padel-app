@@ -169,9 +169,9 @@ export default async function SessionResultsPage({ params }: { params: any }) {
                             {m.team1Player1.nickname || m.team1Player1.name.split(' ')[0]} / {m.team1Player2.nickname || m.team1Player2.name.split(' ')[0]}
                           </div>
                           <div className="px-4 font-black flex items-center gap-2 shrink-0">
-                            <span className={m.team1Games > m.team2Games ? 'text-orange-500' : 'text-gray-800'}>{m.team1Games}</span>
+                            <span className={m.team1Games > m.team2Games ? 'text-green-500' : m.team1Games < m.team2Games ? 'text-red-500' : 'text-orange-500'}>{m.team1Games}</span>
                             <span className="text-gray-300">-</span>
-                            <span className={m.team2Games > m.team1Games ? 'text-green-500' : 'text-gray-800'}>{m.team2Games}</span>
+                            <span className={m.team2Games > m.team1Games ? 'text-green-500' : m.team2Games < m.team1Games ? 'text-red-500' : 'text-orange-500'}>{m.team2Games}</span>
                           </div>
                           <div className="flex-1 text-left font-medium text-gray-700">
                             {m.team2Player1.nickname || m.team2Player1.name.split(' ')[0]} / {m.team2Player2.nickname || m.team2Player2.name.split(' ')[0]}
