@@ -164,7 +164,7 @@ export default async function PoolPage({ params }: { params: { id: string } }) {
                           <input type="hidden" name={`m${m.order}_id`} value={m.id} />
                           
                           <div className="flex-1 text-center md:text-right">
-                              <div className="font-black text-xl text-blue-900 bg-blue-50 px-4 py-2 rounded-xl inline-block border border-blue-100">
+                              <div className="font-black text-xl text-orange-900 bg-orange-50 px-4 py-2 rounded-xl inline-block border border-orange-200 shadow-sm">
                                 {m.team1Player1.nickname || m.team1Player1.name.split(' ')[0]} <span className="text-gray-400">&</span> {m.team1Player2.nickname || m.team1Player2.name.split(' ')[0]}
                               </div>
                           </div>
@@ -173,7 +173,7 @@ export default async function PoolPage({ params }: { params: { id: string } }) {
                               <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-2xl border border-gray-200">
                                   <input type="number" name={`m${m.order}_t1`} defaultValue={m.team1Games ?? ''} min="0" max="20" placeholder="Jeux" required className="w-20 h-14 border-2 border-orange-300 rounded-xl text-center font-black text-2xl text-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-200" />
                                   <span className="font-black text-gray-400 text-2xl">-</span>
-                                  <input type="number" name={`m${m.order}_t2`} defaultValue={m.team2Games ?? ''} min="0" max="20" placeholder="Jeux" required className="w-20 h-14 border-2 border-orange-300 rounded-xl text-center font-black text-2xl text-green-600 focus:outline-none focus:ring-4 focus:ring-orange-200" />
+                                  <input type="number" name={`m${m.order}_t2`} defaultValue={m.team2Games ?? ''} min="0" max="20" placeholder="Jeux" required className="w-20 h-14 border-2 border-green-300 rounded-xl text-center font-black text-2xl text-green-600 focus:outline-none focus:ring-4 focus:ring-green-200" />
                               </div>
                           ) : (
                               <div className="flex items-center gap-6 font-black text-4xl">

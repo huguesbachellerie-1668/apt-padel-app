@@ -79,6 +79,8 @@ export default async function SessionResultsPage({ params }: { params: any }) {
             const standings = pool.players.map((pt: any) => {
               let sessionPoints = 0;
               let wins = 0;
+              let draws = 0;
+              let losses = 0;
               let gamesWon = 0;
               
               for (const match of pool.matches) {
@@ -98,12 +100,12 @@ export default async function SessionResultsPage({ params }: { params: any }) {
                 if (myGames > theirGames) {
                   sessionPoints += 30; wins++;
                 } else if (myGames === theirGames) {
-                  sessionPoints += 20; 
+                  sessionPoints += 20; draws++;
                 } else {
-                  sessionPoints += 10;
+                  sessionPoints += 10; losses++;
                 }
               }
-              return { player: pt.user, wins, gamesWon, sessionPoints };
+              return { player: pt.user, wins, draws, losses, gamesWon, sessionPoints };
             });
 
             standings.sort((a: any, b: any) => b.sessionPoints - a.sessionPoints);
@@ -128,6 +130,8 @@ export default async function SessionResultsPage({ params }: { params: any }) {
                           <tr>
                             <th className="px-4 py-3 rounded-l-xl">Joueur</th>
                             <th className="px-4 py-3 text-center">V</th>
+                            <th className="px-4 py-3 text-center">N</th>
+                            <th className="px-4 py-3 text-center">D</th>
                             <th className="px-4 py-3 text-center">Jeux</th>
                             <th className="px-4 py-3 text-center">Points</th>
                             <th className="px-4 py-3 text-right rounded-r-xl">Moy.</th>
@@ -140,9 +144,11 @@ export default async function SessionResultsPage({ params }: { params: any }) {
                                 <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${idx === 0 ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-500'}`}>
                                   {idx + 1}
                                 </span>
-                                {s.player.name.split(' ')[0]}
+                                {s.player.nickname || s.player.name.split(' ')[0]}
                               </td>
                               <td className="px-4 py-3 text-center font-bold text-green-600">{s.wins}</td>
+                              <td className="px-4 py-3 text-center font-bold text-yellow-600">{s.draws}</td>
+                              <td className="px-4 py-3 text-center font-bold text-red-500">{s.losses}</td>
                               <td className="px-4 py-3 text-center text-gray-500 font-medium">{s.gamesWon}</td>
                               <td className="px-4 py-3 text-center font-bold text-indigo-600">+{s.sessionPoints}</td>
                               <td className="px-4 py-3 text-right font-black text-blue-600 bg-blue-50/30 rounded-r-xl">{(s.sessionPoints / 3).toFixed(2)}</td>
@@ -160,7 +166,7 @@ export default async function SessionResultsPage({ params }: { params: any }) {
                       {pool.matches.map((m: any) => ( // assuming matches are naturally complete if pool is here
                         <div key={m.id} className="bg-gray-50 p-3 rounded-xl border border-gray-100 flex items-center justify-between text-sm">
                           <div className="flex-1 text-right font-medium text-gray-700">
-                            {m.team1Player1.name.split(' ')[0]} / {m.team1Player2.name.split(' ')[0]}
+                            {m.team1Player1.nickname || m.team1Player1.name.split(' ')[0]} / {m.team1Player2.nickname || m.team1Player2.name.split(' ')[0]}
                           </div>
                           <div className="px-4 font-black flex items-center gap-2 shrink-0">
                             <span className={m.team1Games > m.team2Games ? 'text-orange-500' : 'text-gray-800'}>{m.team1Games}</span>
@@ -168,7 +174,7 @@ export default async function SessionResultsPage({ params }: { params: any }) {
                             <span className={m.team2Games > m.team1Games ? 'text-green-500' : 'text-gray-800'}>{m.team2Games}</span>
                           </div>
                           <div className="flex-1 text-left font-medium text-gray-700">
-                            {m.team2Player1.name.split(' ')[0]} / {m.team2Player2.name.split(' ')[0]}
+                            {m.team2Player1.nickname || m.team2Player1.name.split(' ')[0]} / {m.team2Player2.nickname || m.team2Player2.name.split(' ')[0]}
                           </div>
                         </div>
                       ))}
