@@ -4,6 +4,7 @@ import "./globals.css";
 import { getSessionUser } from "@/lib/auth";
 import Link from 'next/link';
 import { cookies } from 'next/headers';
+import prisma from "@/lib/prisma";
 import SubmitButton from '@/components/SubmitButton';
 import NavButton from '@/components/NavButton';
 import NextTopLoader from 'nextjs-toploader';
@@ -21,6 +22,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await getSessionUser();
+  const sponsors = await prisma.sponsor.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } });
 
   async function logout() {
     'use server';
@@ -64,7 +66,7 @@ export default async function RootLayout({
               <NavButton href="/ranking" icon="🏆" label="Classement" />
               <NavButton href="/history" icon="📅" label="Historique" />
               <NavButton href="/directory" icon="👥" label="Annuaire" />
-              <NavButton href="/rules" icon="📜" label="Règlement" />
+              <NavButton href="/rules" icon="📜" label="APT" />
               {['PRESIDENT', 'ORGA', 'TRESORIER'].includes(user.role) && (
                 <NavButton href="/admin" icon="⚙️" label="Admin" className="text-orange-300" />
               )}
@@ -74,6 +76,34 @@ export default async function RootLayout({
         
         <main className="max-w-5xl mx-auto mt-6 px-4">
           {children}
+
+          {/* Footer Sponsors */}
+          {user && sponsors.length > 0 && (
+             <footer className="mt-16 pt-8 pb-8 border-t border-gray-200">
+               <div className="flex items-center gap-4 mb-6">
+                 <div className="flex-1 h-px bg-gray-200"></div>
+                 <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Nos Fiers Partenaires</h2>
+                 <div className="flex-1 h-px bg-gray-200"></div>
+               </div>
+               
+               <div className="flex flex-wrap justify-center gap-8">
+                 {sponsors.map((sp: any) => (
+                    <div key={sp.id} className="flex flex-col justify-center items-center hover:scale-105 transition-transform opacity-80 hover:opacity-100">
+                       {sp.logoUrl ? (
+                         <img src={sp.logoUrl} alt={sp.name} className="h-8 w-auto object-contain mb-1" />
+                       ) : (
+                         <span className="text-2xl mb-1 opacity-50">🤝</span>
+                       )}
+                       {sp.website ? (
+                         <a href={sp.website} target="_blank" className="font-bold text-gray-500 hover:text-blue-600 text-[10px] uppercase">{sp.name}</a>
+                       ) : (
+                         <span className="font-bold text-gray-400 text-[10px] uppercase">{sp.name}</span>
+                       )}
+                    </div>
+                 ))}
+               </div>
+             </footer>
+          )}
         </main>
       </body>
     </html>

@@ -21,7 +21,7 @@ export default async function RulesPage() {
       <div className="flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-black text-blue-900 flex items-center gap-3">
-            <span className="text-4xl">👋</span> Vie du Club & Règlement
+            <span className="text-4xl">👋</span> Vie de l'APT & Règlement
           </h1>
           <p className="text-gray-500 mt-2 font-medium">Toutes les informations, actus et règles de l'Atlantic Padel Team</p>
         </div>
@@ -47,7 +47,7 @@ export default async function RulesPage() {
 
       <div className="bg-gradient-to-br from-blue-50 to-white rounded-3xl p-6 md:p-8 border border-blue-100 shadow-sm flex flex-col md:flex-row gap-6 justify-between items-center">
          <div className="text-center md:text-left min-w-[150px]">
-            <h2 className="font-black text-blue-900 text-lg mb-1">Le Club</h2>
+            <h2 className="font-black text-blue-900 text-lg mb-1">L'APT</h2>
             <p className="text-sm text-gray-700 leading-relaxed">
               Créé le : <strong>1er Sept. 2018</strong><br />
               Communauté : <strong>{totalPlayers} joueurs</strong>
@@ -120,33 +120,6 @@ export default async function RulesPage() {
           </div>
         </div>
       </div>
-
-      {sponsors.length > 0 && (
-         <div className="space-y-5 pt-8 mb-6">
-           <div className="flex items-center gap-4">
-             <div className="flex-1 h-px bg-gray-200"></div>
-             <h2 className="text-sm font-black uppercase tracking-widest text-gray-400">Nos Fiers Partenaires</h2>
-             <div className="flex-1 h-px bg-gray-200"></div>
-           </div>
-           
-           <div className="flex flex-wrap justify-center gap-4">
-             {sponsors.map((sp: any) => (
-                <div key={sp.id} className="bg-white px-6 py-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center items-center hover:scale-105 transition-transform">
-                   {sp.logoUrl ? (
-                     <img src={sp.logoUrl} alt={sp.name} className="h-10 w-auto object-contain drop-shadow-sm mb-2" />
-                   ) : (
-                     <span className="text-2xl mb-1 mt-1">🤝</span>
-                   )}
-                   {sp.website ? (
-                     <a href={sp.website} target="_blank" className="font-bold text-gray-800 hover:text-blue-600 text-sm">{sp.name}</a>
-                   ) : (
-                     <span className="font-bold text-gray-800 text-sm">{sp.name}</span>
-                   )}
-                </div>
-             ))}
-           </div>
-         </div>
-      )}
     </div>
   );
 }
