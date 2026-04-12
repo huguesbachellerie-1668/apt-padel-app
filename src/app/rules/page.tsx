@@ -75,8 +75,13 @@ export default async function RulesPage() {
              {goodies.map((gd: any) => (
                 <div key={gd.id} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition-shadow">
                    <div>
-                     <div className="w-14 h-14 bg-green-50 border-4 border-green-100 text-green-700 rounded-full flex items-center justify-center font-black text-lg mb-5">
-                       {gd.price}€
+                     <div className="flex justify-between items-start mb-5">
+                       <div className="w-14 h-14 bg-green-50 border-4 border-green-100 text-green-700 rounded-full flex items-center justify-center font-black text-lg shrink-0">
+                         {gd.price}€
+                       </div>
+                       {gd.imageUrl && (
+                         <img src={gd.imageUrl} alt={gd.name} className="h-20 w-20 object-contain drop-shadow-sm ml-4" />
+                       )}
                      </div>
                      <h3 className="font-black text-gray-900 text-lg leading-tight mb-2">{gd.name}</h3>
                      {gd.description && <p className="text-sm text-gray-500">{gd.description}</p>}

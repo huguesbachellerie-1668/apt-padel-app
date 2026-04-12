@@ -68,6 +68,7 @@ export default async function CommunicationAdmin() {
             <form action={createSponsor} className="bg-orange-50 p-4 md:p-5 rounded-2xl mb-6 flex flex-col gap-3 border border-orange-100">
               <input type="text" name="name" placeholder="Nom du Sponsor" required className="p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-500" />
               <input type="url" name="website" placeholder="Site web (https://... - optionnel)" className="p-3 rounded-xl border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-500" />
+              <input type="text" name="logoUrl" placeholder="Chemin du logo (ex: /nike.png) ou url d'image." className="p-3 rounded-xl border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-500" />
               <SubmitButton pendingText="Ajout..." className="bg-orange-500 text-white font-bold py-3 mt-1 rounded-xl shadow-sm hover:bg-orange-600 hover:-translate-y-0.5 transition-transform border-b-4 border-orange-700 active:border-b-0 active:mt-[5px]">Ajouter le Partenaire</SubmitButton>
             </form>
             
@@ -104,6 +105,7 @@ export default async function CommunicationAdmin() {
                  <input type="number" step="0.5" name="price" placeholder="Prix (€)" required className="p-3 rounded-xl border border-gray-300 w-1/3 focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-500" />
                  <input type="text" name="description" placeholder="Description courte" className="p-3 rounded-xl border border-gray-300 w-2/3 text-sm focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-500" />
               </div>
+              <input type="text" name="imageUrl" placeholder="Chemin de l'image (ex: /tshirt.png) ou url web" className="p-3 rounded-xl border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-500" />
               <SubmitButton pendingText="Ajout..." className="bg-green-600 text-white font-bold py-3 mt-1 rounded-xl shadow-sm hover:bg-green-700 hover:-translate-y-0.5 transition-transform border-b-4 border-green-800 active:border-b-0 active:mt-[5px]">Mettre en Vitrine</SubmitButton>
             </form>
             
