@@ -79,7 +79,7 @@ export default async function RootLayout({
 
           {/* Footer Sponsors */}
           {user && sponsors.length > 0 && (
-             <footer className="mt-16 pt-8 pb-8 border-t border-gray-200">
+             <footer className="mt-16 pt-4 pb-8">
                <div className="flex items-center gap-4 mb-6">
                  <div className="flex-1 h-px bg-gray-200"></div>
                  <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Nos Fiers Partenaires</h2>
