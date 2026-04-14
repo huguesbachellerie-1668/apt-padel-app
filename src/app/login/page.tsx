@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import SubmitButton from '@/components/SubmitButton';
+import PasswordInput from '@/components/PasswordInput';
 
 export default async function LoginPage({ searchParams }: { searchParams: any }) {
   const sp = await searchParams;
@@ -76,14 +77,7 @@ export default async function LoginPage({ searchParams }: { searchParams: any })
                </label>
                <span className="text-[10px] text-gray-400 italic">Oubli ? Demandez au bureau.</span>
             </div>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="••••••••"
-              className="w-full border border-gray-300 rounded-xl shadow-sm focus:border-orange-500 focus:ring-orange-500 p-3 bg-gray-50 text-gray-900 font-medium"
-              required
-            />
+            <PasswordInput />
           </div>
           
           <SubmitButton
