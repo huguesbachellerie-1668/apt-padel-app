@@ -101,21 +101,42 @@ export default async function RulesPage() {
         <div className="bg-white shadow-sm rounded-3xl overflow-hidden border border-gray-100 p-6 md:p-8">
           <div className="prose prose-blue max-w-none text-gray-700 text-sm md:text-base">
             <ol className="list-decimal pl-5 space-y-4 marker:font-bold marker:text-blue-500">
-              <li>L'APT (Atlantic Padel Team) est constitué d'un board et de joueurs qui acceptent le présent règlement.</li>
-              <li>Le board de l'APT est constitué de 3 personnes : 1 président fondateur (Bacho), 1 vice-président à l'organisation (Benoît), et 1 trésorier aux réservations (Paco).</li>
-              <li>Le but premier du club est de prendre du plaisir à jouer au Padel avec des adversaires de niveaux équivalents.</li>
-              <li><strong className="text-yellow-600">Cartons jaunes :</strong> Tout geste déplacé, insulte, retard ou mauvais comportement sera sanctionné d'un carton jaune. Si annulation après le vendredi 20h = Carton jaune. Si retard +15min sans raison = Carton jaune. Annulation dernière minute = Carton jaune + 3 défaites pénales (30 points comptabilisés).</li>
-              <li><strong className="text-red-600">Cartons rouges :</strong> Deux cartons jaunes entraînent un carton rouge, synonyme d'exclusion d'un mois de l'APT. Deux cartons rouges entraînent une exclusion définitive du club. (Remise à zéro en fin de saison). En cas de manque de place sur une session, un volontaire peut se désister et annuler un de ses cartons jaunes reçus.</li>
-              <li>La saison s'étend de Septembre à fin Juin (avec flexibilité accordée par le board). Lors de la session hebdomadaire, 4 joueurs de force équivalente sont assignés par terrain.</li>
-              <li>Format de jeu : 3 matchs de 25 minutes contre chaque binôme possible de la poule. Dès 25 min écoulées, suppression de l'avantage : <strong>Point en Or</strong> décisif (No-Ad). L'équipe en tête à la fin du chrono remporte le match.</li>
-              <li>Une victoire rapporte <strong>30 points</strong>, un nul <strong>20 points</strong>, une défaite <strong>10 points</strong>. Le nombre de jeux marqués est ajouté au score, puis divisé par 3 pour obtenir la moyenne de points de la session.</li>
-              <li>Calcul de la Moyenne Historique : En début de saison, les résultats de la saison passée comptent jusqu'à la 4ème nouvelle session jouée. Pour le classement de fin d'année, participation minimum de 10 sessions requise.</li>
+              <li>L’APT (Asso Padel Team) est constitué d’1 board et de joueurs qui acceptent le règlement suivant.</li>
+              <li>Le board de l’APT est constitué de 3 personnes : 1 président fondateur = Bacho, 1 vice-président qui gère l’organisation de l’APT = Benoît, 1 trésorier qui gère les réservations et inscriptions aux sessions = Paco.</li>
+              <li>Le but du jeu est de prendre du plaisir à jouer au Padel avec des adversaires de niveaux équivalent.</li>
+              <li><strong className="text-yellow-600">Cartons jaunes :</strong> Tout gestes déplacés, insultes, mauvais comportement sera sanctionné d’un carton jaune.</li>
+              <li>Deux cartons jaunes entraîne un <strong className="text-red-600">carton rouge</strong>, synonyme d’exclusion d’un mois de l’APT.</li>
+              <li>Deux cartons rouges entraînera une exclusion définitive</li>
+              <li>Les cartons jaunes ou rouges sont remis à 0 a la fin de la saison</li>
+              <li>Les matchs se déroulent de Septembre à fin juin de l’année suivante (il peut y avoir quelques jours de dépassement du calendrier après validation du board).</li>
+              <li>Les matchs se jouent lors d’une session hebdomadaire maximum. Une session équivaut à une journée de rencontre entre les joueurs inscrits.</li>
+              <li>Lors d’une session, un terrain est attribué à 4 joueurs, regroupés dans une poule.</li>
+              <li>Les poules sont constituées de 4 joueurs de niveaux de points équivalents. Lors de la session, chaque joueur participe à 3 matchs de 25 minutes, à chaque match, il fait équipe avec un joueur différent de sa poule.</li>
+              <li>Une fois les 25 minutes passées, les joueurs finissent le jeu avant de passer au match suivant.</li>
+              <li><strong>Point en or :</strong> lorsque les 25 minutes sont écoulées, la regle de l’avantage est supprimée sur le jeu en cours : en cas d’égalité 40A, la 1ere equipe qui gagne le point remporte le jeu.</li>
+              <li>Chaque joueur a un nombre de points calculé à la fin de chaque session. Les poules sont établies en fonction des points de chaque joueur.</li>
+              <li>Le système de points est défini comme suit : une victoire = <strong>30 points</strong>, un match nul = <strong>20 points</strong>, une défaite = <strong>10 points</strong>. À ce total, on rajoute le nombre de jeux marqués par le joueur au cours de ses matchs.</li>
+              <li>L’équipe qui remporte le 1er set remporte le match, quelque soient les résultats suivants. Si le set n’est pas terminé avant la fin des 25 minutes, l’équipe qui a le plus de jeux remporte le match, et en cas d’égalité c’est un match nul.</li>
+              <li>En début de saison, les scores de l'année précédente sont conservés pendant 3 sessions pour consolider la moyenne des points de chaque joueur. A la 4eme session du joueur, les scores de l’année précédente sont retirés de la moyenne de points du joueur pour ne conserver que les sessions de la saison en cours.</li>
+              <li>En fin de saison, apparaîtront dans le classement final uniquement les joueurs qui ont participé à au moins 10 sessions dans la saison.</li>
+              <li>Lors de chaque session, les équipes sont constituées ainsi : le 1er et le 4eme de la poule contre le 2eme et le 3eme. Deuxième match le 1er et le 3eme de la poule contre le 2eme et le 4eme. Dernier match : le 1er et le 2eme contre le 3eme et le 4eme. A l’issue de ce troisième match, on compte les points.</li>
               <li><strong>Plafonnement des variations :</strong> La montée ou descente d'un joueur d'une session à l'autre est plafonnée à 3 poules (à la hausse ou à la baisse) selon le niveau calculé lors de sa dernière participation.</li>
-              <li><strong>Sélection :</strong> La priorité d'inscription se fait d'abord sur la continuité (présence dimanche dernier), puis pour les habitués, puis pour les petits nouveaux.</li>
-              <li>Un joueur déclarant un retour de blessure est exceptionnellement rétrogradé d'une poule de facilité pour sa reprise.</li>
-              <li>Arbitrage : Balle remontante sur le coin = Bonne. Balle descendante = Faute (litige = on remet). Si blessure en cours de jeu = Abandon (10 pts + jeux) et victoire (30 pts + 6 jeux) pour l'adversaire.</li>
-              <li>Résultats : Le meilleur au classement de sa poule est responsable de la transmission ou de la saisie des scores.</li>
-              <li>Tout cas non traité dans ces lignes pourra être jugé et mis à jour souverainement par le Président.</li>
+              <li>Lors des inscriptions à la prochaine session, priorité est donnée aux joueurs qui viennent d’effectuer la dernière session, puis aux joueurs inscrits à l’APT, puis inscriptions des nouveaux arrivants 48 heures avant la date de la session (vendredi soir 20h max quand la session est le dimanche soir). Exception pour la 1ère session de la saison, l’ordre de priorité est déterminé par le nombre de présence des joueurs aux sessions de l’année précédente.</li>
+              <li>Suite à un retour de blessure un joueur peut demander à jouer dans la poule inférieure pour la première session de son retour,</li>
+              <li>Si un joueur veut s’inscrire à l’avance, il informe le board (sur l’appli ou le whatsapp) et entrera dans les inscriptions selon l’ordre etabli au paragraphe précédent.</li>
+              <li>En cas d’annulation d’un joueur après vendredi 20h00, quelque soit la raison, il se verra attribuer un carton jaune sauf si il trouve un remplaçant.</li>
+              <li>Si par manque de joueurs, il faut annuler un terrain, les derniers inscrits seront dé-sélectionnés de la session.</li>
+              <li>Si il n’y a pas assez de terrains par rapport au nombre de joueurs inscrits, un joueur peut se désister et annuler un de ses cartons jaunes déjà reçus.</li>
+              <li>Si un joueur a plus d’1/4 d’heure de retard a son match (sans raison valable) = carton jaune.</li>
+              <li>Si un joueur annule au dernier moment (à 1/4 d’heure du début de son match) =&gt; carton jaune + 3 défaites (=30 points) comptabilisés pour le classement APT.</li>
+              <li>Si la balle fait un coin, si elle remonte, elle est bonne. Si elle descend, la balle est faute. Si vraiment litige, à remettre.</li>
+              <li>Si blessure d’un joueur pendant son match : le match est considéré comme perdu pour les 2 joueurs de l’équipe du blessé. Elle marque 10 points + les jeux marqués, et l’équipe adverse marque 30 points + 6 jeux. Les matchs suivants sont annulés et la moyenne de points est ajustée en conséquence.</li>
+              <li>Dans chaque poule, le joueur le mieux classé doit transmettre au board les scores des 3 matchs, et est garant des résultats.</li>
+              <li>Tous les cas non traités ou points de règlements manquants pourront être rajoutés et mis à jour par le Président avec ou sans concertation.</li>
+              <li>L’application web de l’APT est : <a href="https://apt-padel-app.vercel.app/rules" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">https://apt-padel-app.vercel.app/rules</a></li>
+              <li>Le Mot de passe par défaut de l’application : <strong>Apt2026!</strong></li>
+              <li>En cas d’oubli de votre mdp, contactez le bureau pour réinitialiser le mdp.</li>
+              <li>Une bière est offerte à chaque joueur APT par session, par le club Big Padel, lorsque l'on réserve plus de 4 terrains. Si un joueur ne prends pas sa bière, il doit la donner à Bacho, Benoit ou Paco. Sinon carton jaune 😉</li>
             </ol>
           </div>
         </div>
