@@ -37,7 +37,7 @@ export default function ProfileSettingsModal({ user }: { user: any }) {
     <>
       <button 
         onClick={() => setIsOpen(true)} 
-        className="ml-2 w-8 h-8 rounded-full bg-blue-800 hover:bg-orange-500 text-white flex items-center justify-center transition-colors shadow-sm"
+        className="ml-2 w-8 h-8 rounded-full bg-orange-500 hover:bg-white hover:text-orange-600 text-white flex items-center justify-center transition-colors shadow-sm border border-orange-400"
         title="Mon Profil"
       >
         <span className="text-xl leading-none" style={{ position: 'relative', top: '-1px' }}>👤</span>
