@@ -101,7 +101,7 @@ export default async function RulesPage() {
         <div className="bg-white shadow-sm rounded-3xl overflow-hidden border border-gray-100 p-6 md:p-8">
           <div className="prose prose-blue max-w-none text-gray-700 text-sm md:text-base">
             <ol className="list-decimal pl-5 space-y-4 marker:font-bold marker:text-blue-500">
-              <li>L’APT (Asso Padel Team) est constitué d’1 board et de joueurs qui acceptent le règlement suivant.</li>
+              <li>L’APT (Atlantic Padel Team) est constitué d’1 board et de joueurs qui acceptent le règlement suivant.</li>
               <li>Le board de l’APT est constitué de 3 personnes : 1 président fondateur = Bacho, 1 vice-président qui gère l’organisation de l’APT = Benoît, 1 trésorier qui gère les réservations et inscriptions aux sessions = Paco.</li>
               <li>Le but du jeu est de prendre du plaisir à jouer au Padel avec des adversaires de niveaux équivalent.</li>
               <li><strong className="text-yellow-600">Cartons jaunes :</strong> Tout gestes déplacés, insultes, mauvais comportement sera sanctionné d’un carton jaune.</li>
