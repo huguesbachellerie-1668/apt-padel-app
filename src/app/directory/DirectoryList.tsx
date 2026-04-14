@@ -55,8 +55,8 @@ export default function DirectoryList({ players, user }: { players: any[], user:
                 <div className="text-[10px] font-bold text-blue-600 uppercase">Sessions</div>
               </div>
               <div className="bg-orange-50 p-2 rounded-xl border border-orange-100">
-                <div className="text-xl font-black text-orange-900">{player.points?.toFixed(0) || 0}</div>
-                <div className="text-[10px] font-bold text-orange-600 uppercase">Points</div>
+                <div className="text-xl font-black text-orange-900">{(player.averagePoints || 0).toFixed(2)}</div>
+                <div className="text-[10px] font-bold text-orange-600 uppercase">Moyenne</div>
               </div>
               <div className="bg-green-50 p-2 rounded-xl border border-green-100">
                 <div className="text-sm font-black text-green-900 flex items-center justify-center h-[28px]">
@@ -85,24 +85,7 @@ export default function DirectoryList({ players, user }: { players: any[], user:
               </div>
             </div>
             
-            {player.id === user.id && (
-              <details className="mt-4 pt-4 border-t border-gray-100 group">
-                <summary className="text-sm text-orange-600 font-bold hover:text-orange-700 cursor-pointer list-none text-center outline-none">
-                  ✏️ Mes coordonnées
-                </summary>
-                <form action={updateContactInfo} className="mt-3 flex flex-col gap-2 bg-orange-50 p-3 rounded-xl border border-orange-100">
-                   <label className="text-xs font-bold text-gray-500">Téléphone</label>
-                   <input type="tel" name="phone" defaultValue={player.phone || ''} placeholder="ex: 06 12 34 56 78" className="w-full p-2 text-sm border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300" />
-                   
-                   <label className="text-xs font-bold text-gray-500 mt-1">Email</label>
-                   <input type="email" name="email" defaultValue={player.email || ''} placeholder="ex: jean.dupont@email.com" className="w-full p-2 text-sm border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300" />
-                   
-                   <SubmitButton pendingText="Enregistrement..." className="w-full mt-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-lg text-sm shadow-sm transition-colors">
-                     Enregistrer
-                   </SubmitButton>
-                </form>
-              </details>
-            )}
+            
           </div>
         ))}
       </div>

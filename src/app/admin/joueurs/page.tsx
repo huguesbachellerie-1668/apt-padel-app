@@ -37,6 +37,14 @@ export default async function AdminPlayersPage() {
              <label className="text-xs font-bold text-gray-600 block mb-1">Surnom</label>
              <input name="nickname" type="text" className="w-full p-2.5 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none" />
           </div>
+          <div className="flex-1 min-w-[150px]">
+             <label className="text-xs font-bold text-gray-600 block mb-1">Email <span className="text-gray-400 font-normal">(Optionnel)</span></label>
+             <input name="email" type="email" placeholder="Généré par défaut" className="w-full p-2.5 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-sm" />
+          </div>
+          <div className="w-32 min-w-[120px]">
+             <label className="text-xs font-bold text-gray-600 block mb-1">Téléphone</label>
+             <input name="phone" type="tel" className="w-full p-2.5 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none text-sm" />
+          </div>
           <div className="w-28">
              <label className="text-xs font-bold text-gray-600 block mb-1">Rôle</label>
              <select name="role" className="w-full p-2.5 border-2 border-gray-200 rounded-lg text-sm font-bold text-gray-700 focus:outline-none bg-white">

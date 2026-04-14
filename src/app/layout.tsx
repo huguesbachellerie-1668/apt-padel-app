@@ -8,6 +8,7 @@ import prisma from "@/lib/prisma";
 import SubmitButton from '@/components/SubmitButton';
 import NavButton from '@/components/NavButton';
 import NextTopLoader from 'nextjs-toploader';
+import ProfileSettingsModal from '@/components/ProfileSettingsModal';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -51,6 +52,7 @@ export default async function RootLayout({
                     <strong className="text-white max-w-[100px] sm:max-w-none truncate" title={user.nickname || user.name.split(' ')[0]}>
                       {user.nickname || user.name.split(' ')[0]}
                     </strong>
+                    <ProfileSettingsModal user={user} />
                   </span>
                   <form action={logout}>
                     <SubmitButton pendingText="Déconnexion..." className="text-xs bg-blue-800 hover:bg-orange-500 text-white px-3 py-1.5 rounded-full transition-colors font-medium">

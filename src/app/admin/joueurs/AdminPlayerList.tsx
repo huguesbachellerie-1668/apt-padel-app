@@ -47,6 +47,14 @@ export default function AdminPlayerList({ players, user }: { players: any[], use
                       <label className="text-xs font-bold text-gray-400 uppercase block mb-1.5 flex items-center justify-between">Prénom Nom <span>#2</span></label>
                       <input name="name" type="text" defaultValue={player.name} disabled={!canEdit} required className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-600 bg-gray-50 focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" />
                   </div>
+                  <div className="flex-[2] min-w-[200px]">
+                      <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Email</label>
+                      <input name="email" type="email" defaultValue={player.email || ''} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-600 bg-gray-50 focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" placeholder="Ex: joueur@apt.fr" />
+                  </div>
+                  <div className="flex-[1.5] min-w-[150px]">
+                      <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Téléphone</label>
+                      <input name="phone" type="tel" defaultValue={player.phone || ''} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-sm font-medium text-gray-600 bg-gray-50 focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" placeholder="06..." />
+                  </div>
                   <div className="flex-[1.5] min-w-[150px]">
                       <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Rôle</label>
                       <select name="role" defaultValue={player.role} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-sm font-bold bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-gray-800 disabled:bg-gray-100 transition-colors">

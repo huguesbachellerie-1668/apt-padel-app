@@ -18,13 +18,15 @@ export async function createPlayer(formData: FormData) {
   const totalMatches = sessions * 3;
   const averagePoints = sessions > 0 ? (points / sessions) : 0;
   const createdAtStr = formData.get('createdAt') as string;
+  const emailInput = formData.get('email') as string;
+  const phone = formData.get('phone') as string;
 
   if (role === 'PRESIDENT' && sessionUser.role !== 'PRESIDENT') {
     role = 'JOUEUR'; 
   }
 
   const cleanName = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '.');
-  const email = `${cleanName}.${Math.floor(Math.random() * 1000)}@apt.fr`;
+  const email = emailInput || `${cleanName}.${Math.floor(Math.random() * 1000)}@apt.fr`;
   const defaultPasswordHash = await bcrypt.hash('Apt2026!', 10);
 
   await prisma.user.create({
@@ -36,6 +38,7 @@ export async function createPlayer(formData: FormData) {
       averagePoints,
       role,
       email,
+      phone,
       password: defaultPasswordHash,
       createdAt: createdAtStr ? new Date(createdAtStr) : new Date()
     }
@@ -76,6 +79,8 @@ export async function updatePlayer(formData: FormData) {
   const hist2425Str = formData.get('hist2425') as string;
   const yellowCards = parseInt(formData.get('yellowCards') as string) || 0;
   const redCards = parseInt(formData.get('redCards') as string) || 0;
+  const emailInput = formData.get('email') as string;
+  const phoneInput = formData.get('phone') as string;
 
   const targetUser = await prisma.user.findUnique({ where: { id } });
   if (!targetUser) throw new Error('User not found');
@@ -98,6 +103,9 @@ export async function updatePlayer(formData: FormData) {
     redCards,
     role: role || targetUser.role
   };
+  
+  if (emailInput) updateData.email = emailInput;
+  if (phoneInput !== null) updateData.phone = phoneInput;
 
   const currentHistoricalStats = typeof (targetUser as any).historicalStats === 'object' && (targetUser as any).historicalStats !== null ? (targetUser as any).historicalStats : {};
   let newHistoricalStats: any = { ...currentHistoricalStats };

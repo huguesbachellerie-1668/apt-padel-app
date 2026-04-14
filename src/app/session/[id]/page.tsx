@@ -300,7 +300,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
            <form action={createCourtReservation.bind(null, session.id)} className="flex flex-col md:flex-row items-end gap-3 relative z-10 w-full">
              <div className="flex-[1.5] w-full flex flex-col gap-1">
                <label className="text-xs font-bold text-indigo-600 uppercase">Club</label>
-               <select name="clubId" required className="w-full p-2.5 rounded-xl border border-indigo-200 text-sm focus:outline-none focus:border-indigo-500 bg-white">
+               <select name="clubId" required className="w-full p-2.5 rounded-xl border border-indigo-200 text-sm focus:outline-none focus:border-indigo-500 bg-white text-gray-900">
                  <option value="">-- Sélectionner un lieu --</option>
                  {allClubs.map((c: any) => (
                    <option key={c.id} value={c.id}>{c.name} ({c.city})</option>
@@ -309,11 +309,11 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
              </div>
              <div className="flex-1 w-full flex flex-col gap-1">
                <label className="text-xs font-bold text-indigo-600 uppercase">Piste</label>
-               <input type="text" name="name" required placeholder="Ex: T1, Piste Centrale" className="w-full p-2.5 rounded-xl border border-indigo-200 text-sm focus:outline-none focus:border-indigo-500 bg-white" />
+               <input type="text" name="name" required placeholder="Ex: T1, Piste Centrale" className="w-full p-2.5 rounded-xl border border-indigo-200 text-sm focus:outline-none focus:border-indigo-500 bg-white text-gray-900" />
              </div>
              <div className="w-full md:w-28 flex flex-col gap-1">
                <label className="text-xs font-bold text-indigo-600 uppercase">Heure</label>
-               <input type="time" name="startTime" required className="w-full p-2.5 rounded-xl border border-indigo-200 text-sm font-bold focus:outline-none focus:border-indigo-500 bg-white" />
+               <input type="time" name="startTime" required className="w-full p-2.5 rounded-xl border border-indigo-200 text-sm font-bold focus:outline-none focus:border-indigo-500 bg-white text-gray-900" />
              </div>
              <SubmitButton pendingText="..." className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm transition-colors mt-2 md:mt-0 w-full md:w-auto">
                Ajouter
