@@ -2,7 +2,6 @@ import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import ChangePasswordForm from './ChangePasswordForm';
 
 export default async function PlayerProfilePage({ params }: { params: any }) {
   const p = await params;
@@ -263,9 +262,6 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
         )}
       </div>
 
-      {currentUser.id === player.id && (
-        <ChangePasswordForm userId={player.id} />
-      )}
     </div>
   );
 }
