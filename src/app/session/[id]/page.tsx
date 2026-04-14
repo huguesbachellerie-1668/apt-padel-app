@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { manualRegisterForSession, manualUnregisterForSession, updatePoolSettings, createCourtReservation, deleteCourtReservation, swapRegistrationOrder } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
+import BackButton from "@/components/BackButton";
 
 export default async function SessionDetailsPage({ params }: { params: any }) {
   const p = await params;
@@ -60,7 +61,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
     <div className="max-w-4xl mx-auto space-y-6 pb-20">
       <div className="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-6">
         <div>
-          <Link href="/" className="text-blue-500 font-bold hover:underline mb-2 inline-block">← Retour à l'accueil</Link>
+          <BackButton fallback="/" />
           <h1 className="text-3xl font-black text-blue-900 flex items-center gap-3">
             <span className="text-4xl">📅</span> Détails Session
           </h1>

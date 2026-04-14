@@ -2,6 +2,7 @@ import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import BackButton from "@/components/BackButton";
 
 export default async function PlayerProfilePage({ params }: { params: any }) {
   const p = await params;
@@ -129,7 +130,7 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-20">
       <div className="mb-8">
-        <Link href="/history" className="text-blue-500 font-bold hover:underline mb-2 inline-block">← Retour à l'historique</Link>
+        <BackButton />
         <div className="flex items-center gap-6 mt-4">
            <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 text-blue-800 rounded-full flex items-center justify-center font-black text-4xl shadow-sm border-4 border-white">
              {player.name.charAt(0)}

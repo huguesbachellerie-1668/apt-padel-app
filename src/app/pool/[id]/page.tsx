@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import SubmitButton from "@/components/SubmitButton";
+import BackButton from "@/components/BackButton";
 
 export default async function PoolPage({ params }: { params: { id: string } }) {
   const { id } = await params;
@@ -102,7 +103,7 @@ export default async function PoolPage({ params }: { params: { id: string } }) {
     <div className="space-y-6 max-w-4xl mx-auto pb-10">
       <div className="flex flex-wrap justify-between items-end mb-6 gap-4">
         <div>
-          <a href="/" className="text-blue-500 font-bold hover:underline mb-2 inline-block">← Retour à l'accueil</a>
+          <BackButton />
           <h1 className="text-3xl font-black text-blue-900 flex flex-wrap items-center gap-3">
             <span>🎾 Poule #{pool.level}</span>
             <span className="text-xl bg-blue-100 text-blue-800 px-4 py-1.5 rounded-xl shadow-sm border border-blue-200 flex items-center gap-2">

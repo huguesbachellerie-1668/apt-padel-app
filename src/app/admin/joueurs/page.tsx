@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { createPlayer } from "./actions";
 import AdminPlayerList from "./AdminPlayerList";
+import BackButton from "@/components/BackButton";
 import SubmitButton from "@/components/SubmitButton";
 
 export default async function AdminPlayersPage() {
@@ -17,7 +18,7 @@ export default async function AdminPlayersPage() {
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-10">
       <div className="flex flex-col gap-2 mb-6">
-        <a href="/admin" className="text-blue-500 font-bold hover:underline inline-block">← Retour à l'administration</a>
+        <BackButton fallback="/admin" />
         <h1 className="text-3xl font-black text-blue-900 flex items-center gap-3 mt-4">
           <span className="text-4xl">👥</span> Gestion des Joueurs ({players.length} membres)
         </h1>

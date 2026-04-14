@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { createNews, toggleNews, deleteNews, createSponsor, toggleSponsor, deleteSponsor, createGoodie, toggleGoodie, deleteGoodie } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
+import BackButton from "@/components/BackButton";
 
 export default async function CommunicationAdmin() {
   const user = await getSessionUser();
@@ -16,7 +17,7 @@ export default async function CommunicationAdmin() {
     <div className="space-y-8 max-w-6xl mx-auto pb-10 mt-6">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <a href="/admin" className="text-blue-500 hover:text-blue-700 font-bold text-sm mb-2 inline-block">← Retour Accueil Board</a>
+          <BackButton fallback="/admin" />
           <h1 className="text-3xl font-black text-blue-900 flex items-center gap-2"><span className="text-4xl">📢</span> Communication & Club</h1>
         </div>
       </div>
