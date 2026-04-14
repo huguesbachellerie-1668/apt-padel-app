@@ -133,7 +133,7 @@ export default async function RulesPage() {
               <li>Si blessure d’un joueur pendant son match : le match est considéré comme perdu pour les 2 joueurs de l’équipe du blessé. Elle marque 10 points + les jeux marqués, et l’équipe adverse marque 30 points + 6 jeux. Les matchs suivants sont annulés et la moyenne de points est ajustée en conséquence.</li>
               <li>Dans chaque poule, le joueur le mieux classé doit transmettre au board les scores des 3 matchs, et est garant des résultats.</li>
               <li>Tous les cas non traités ou points de règlements manquants pourront être rajoutés et mis à jour par le Président avec ou sans concertation.</li>
-              <li>L’application web de l’APT est : <a href="https://apt-padel-app.vercel.app/rules" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">https://apt-padel-app.vercel.app/rules</a></li>
+              <li>L’application web de l’APT est : <a href="https://apt-padel-app.vercel.app" className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">https://apt-padel-app.vercel.app</a></li>
               <li>Le Mot de passe par défaut de l’application : <strong>Apt2026!</strong></li>
               <li>En cas d’oubli de votre mdp, contactez le bureau pour réinitialiser le mdp.</li>
               <li>Une bière est offerte à chaque joueur APT par session, par le club Big Padel, lorsque l'on réserve plus de 4 terrains. Si un joueur ne prends pas sa bière, il doit la donner à Bacho, Benoit ou Paco. Sinon carton jaune 😉</li>
