@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import BackButton from "@/components/BackButton";
+import WhatsAppShareButton from "@/components/WhatsAppShareButton";
 
 export default async function SessionResultsPage({ params }: { params: any }) {
   const p = await params;
@@ -112,13 +113,23 @@ export default async function SessionResultsPage({ params }: { params: any }) {
             standings.sort((a: any, b: any) => b.sessionPoints - a.sessionPoints);
 
             return (
-              <div key={pool.id} className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="bg-indigo-900 px-6 py-4 flex justify-between items-center text-white">
-                   <h2 className="font-black text-xl">Poule #{pool.level}</h2>
-                   <span className="bg-indigo-800 px-4 py-1 rounded-full text-sm font-bold border border-indigo-700 flex items-center gap-1">
-                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5h16M4 19h16M4 5v14M20 5v14M12 5v14M4 12h16"></path></svg>
-                     Terrain {pool.courtNumber}
-                   </span>
+              <div key={pool.id} id={`capture-pool-${pool.id}`} className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden mb-8">
+                <div className="bg-indigo-900 px-6 py-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4 text-white">
+                   <div className="flex items-center gap-4">
+                     <h2 className="font-black text-xl">Poule #{pool.level}</h2>
+                     <span className="bg-indigo-800 px-4 py-1 rounded-full text-sm font-bold border border-indigo-700 flex items-center gap-1">
+                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5h16M4 19h16M4 5v14M20 5v14M12 5v14M4 12h16"></path></svg>
+                       Terrain {pool.courtNumber}
+                     </span>
+                   </div>
+                   <div data-html2canvas-ignore>
+                     <WhatsAppShareButton 
+                       elementId={`capture-pool-${pool.id}`} 
+                       text={`Scores Poule ${pool.level}`} 
+                       fileName={`scores-poule-${pool.level}.png`}
+                       className="py-1.5 px-3 text-sm"
+                     />
+                   </div>
                 </div>
                 
                 <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">

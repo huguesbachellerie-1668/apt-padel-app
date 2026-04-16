@@ -5,6 +5,7 @@ import Link from "next/link";
 import { manualRegisterForSession, manualUnregisterForSession, updatePoolSettings, createCourtReservation, deleteCourtReservation, swapRegistrationOrder } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
 import BackButton from "@/components/BackButton";
+import WhatsAppShareButton from "@/components/WhatsAppShareButton";
 
 export default async function SessionDetailsPage({ params }: { params: any }) {
   const p = await params;
@@ -104,10 +105,21 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
       )}
 
       {(session.status === 'POULES_GENEREES' || session.status === 'TERMINEE') && session.pools && session.pools.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-2xl font-black text-blue-900 flex items-center gap-3 mb-6">
-            <span className="text-3xl">🎾</span> Composition des Poules
-          </h2>
+        <div className="mt-8" id="capture-pools">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+            <h2 className="text-2xl font-black text-blue-900 flex items-center gap-3">
+              <span className="text-3xl">🎾</span> Composition des Poules
+            </h2>
+            {isBoard && (
+              <div data-html2canvas-ignore>
+                <WhatsAppShareButton 
+                  elementId="capture-pools" 
+                  text="🎾 Les Poules de la session sont prêtes !" 
+                  fileName="poules.png" 
+                />
+              </div>
+            )}
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {session.pools.map((pool: any) => {
               const allMatchesFinished = pool.matches && pool.matches.length === 3 && pool.matches.every((m: any) => m.team1Games !== null && m.team2Games !== null);
@@ -206,12 +218,23 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
       )}
 
 
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm mt-6">
-         <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
-           <h2 className="font-bold text-gray-800 text-lg flex items-center justify-between">
-             <span>Liste des Inscrits ({registeredCount})</span>
-           </h2>
-           <p className="text-xs text-gray-500 mt-1">L'ordre prioritaire sera appliqué lors de la fermeture des inscriptions par le Board</p>
+      <div id="capture-players-list" className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm mt-6">
+         <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+           <div>
+             <h2 className="font-bold text-gray-800 text-lg flex items-center justify-between">
+               <span>Liste des Inscrits ({registeredCount})</span>
+             </h2>
+             <p className="text-xs text-gray-500 mt-1">L'ordre prioritaire sera appliqué lors de la fermeture des inscriptions par le Board</p>
+           </div>
+           {isBoard && (
+             <div data-html2canvas-ignore>
+               <WhatsAppShareButton 
+                 elementId="capture-players-list" 
+                 text="📋 Liste des inscrits mise à jour pour la session" 
+                 fileName="liste-inscrits.png" 
+               />
+             </div>
+           )}
          </div>
          <div className="divide-y divide-gray-100">
            {session.registrations.map((reg: any, idx: number) => (
