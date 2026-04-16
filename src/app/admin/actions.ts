@@ -196,7 +196,9 @@ export async function generatePools(formData: FormData) {
            }
            if (targetIndex < finalUsers.length) {
               const removedUser = finalUsers.splice(currentIndex, 1)[0];
-              finalUsers.splice(targetIndex - 1, 0, removedUser);
+              // Insérer précisément à l'index `targetIndex` garanti qu'il tombe dans la bonne poule
+              // (Puisque l'élément original "targetIndex" a glissé à "targetIndex-1" lors du splice).
+              finalUsers.splice(targetIndex, 0, removedUser);
            }
         }
      }
