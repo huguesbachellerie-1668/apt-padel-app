@@ -6,6 +6,7 @@ import { manualRegisterForSession, manualUnregisterForSession, updatePoolSetting
 import SubmitButton from "@/components/SubmitButton";
 import BackButton from "@/components/BackButton";
 import WhatsAppShareButton from "@/components/WhatsAppShareButton";
+import WhatsAppShareTextButton from "@/components/WhatsAppShareTextButton";
 
 export default async function SessionDetailsPage({ params }: { params: any }) {
   const p = await params;
@@ -57,6 +58,15 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
       (a.nickname || a.name).toLowerCase().localeCompare((b.nickname || b.name).toLowerCase())
     );
   }
+
+  const poulesCount = Math.floor(registeredCount / 4);
+  const remplaCount = registeredCount % 4;
+  let listText = `🎾 Session du ${new Date(session.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}\n\n`;
+  listText += `👥 ${registeredCount} inscrit(s)\n`;
+  listText += `▶️ ${poulesCount} poule(s) + ${remplaCount} remplaçant(s)\n\n`;
+  session.registrations.forEach((reg: any, idx: number) => {
+    listText += `${idx + 1} - ${reg.user.nickname || reg.user.name}\n\n`;
+  });
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-20">
@@ -228,10 +238,9 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
            </div>
            {isBoard && (
              <div data-html2canvas-ignore>
-               <WhatsAppShareButton 
-                 elementId="capture-players-list" 
-                 text="📋 Liste des inscrits mise à jour pour la session" 
-                 fileName="liste-inscrits.png" 
+               <WhatsAppShareTextButton 
+                 textToShare={listText} 
+                 label="Partager sur le Groupe APT"
                />
              </div>
            )}
