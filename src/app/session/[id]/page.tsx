@@ -7,11 +7,15 @@ import SubmitButton from "@/components/SubmitButton";
 import BackButton from "@/components/BackButton";
 import WhatsAppShareButton from "@/components/WhatsAppShareButton";
 import WhatsAppShareTextButton from "@/components/WhatsAppShareTextButton";
+import MatchTimer from "@/components/MatchTimer";
 
 export default async function SessionDetailsPage({ params }: { params: any }) {
   const p = await params;
   const user = await getSessionUser();
   if (!user) redirect("/login");
+
+  const settings = await prisma.settings.findUnique({ where: { id: 'global' } });
+  const matchDuration = settings?.matchDuration || 25;
 
   const session = await prisma.session.findUnique({
     where: { id: p.id },
@@ -116,6 +120,9 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
 
       {(session.status === 'POULES_GENEREES' || session.status === 'TERMINEE') && session.pools && session.pools.length > 0 && (
         <div className="mt-8" id="capture-pools">
+          {session.status === 'POULES_GENEREES' && isBoard && (
+             <MatchTimer initialMinutes={matchDuration} />
+          )}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
             <h2 className="text-2xl font-black text-blue-900 flex items-center gap-3">
               <span className="text-3xl">🎾</span> Composition des Poules
