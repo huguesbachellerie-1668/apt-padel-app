@@ -9,6 +9,31 @@ export default function MatchTimer({ initialMinutes }: { initialMinutes: number 
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const wakeLockRef = useRef<any>(null);
+
+  const requestWakeLock = async () => {
+    try {
+      if ('wakeLock' in navigator) {
+        if (!wakeLockRef.current) {
+           wakeLockRef.current = await (navigator as any).wakeLock.request('screen');
+        }
+      }
+    } catch (err) {
+      console.error("Wake Lock request failed", err);
+    }
+  };
+
+  const releaseWakeLock = () => {
+    if (wakeLockRef.current !== null) {
+      try {
+         wakeLockRef.current.release().then(() => {
+            wakeLockRef.current = null;
+         });
+      } catch (err) {
+         console.error("Wake Lock release failed", err);
+      }
+    }
+  };
 
   const initAudio = () => {
     try {
@@ -60,6 +85,17 @@ export default function MatchTimer({ initialMinutes }: { initialMinutes: number 
   };
 
   useEffect(() => {
+    // Re-request wake lock if tab becomes visible again while running
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && isRunning) {
+        requestWakeLock();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isRunning]);
+
+  useEffect(() => {
     if (isRunning && endTime) {
       timerRef.current = setInterval(() => {
         const now = Date.now();
@@ -70,6 +106,7 @@ export default function MatchTimer({ initialMinutes }: { initialMinutes: number 
           clearInterval(timerRef.current!);
           setIsRunning(false);
           setEndTime(null);
+          releaseWakeLock();
           playBeep();
         }
       }, 500); // 500ms allows snappy enough updates
@@ -88,9 +125,11 @@ export default function MatchTimer({ initialMinutes }: { initialMinutes: number 
     if (isRunning) {
       setIsRunning(false);
       setEndTime(null);
+      releaseWakeLock();
     } else {
       setIsRunning(true);
       setEndTime(Date.now() + timeLeft * 1000);
+      requestWakeLock();
     }
   };
 
@@ -98,6 +137,7 @@ export default function MatchTimer({ initialMinutes }: { initialMinutes: number 
     setIsRunning(false);
     setEndTime(null);
     setTimeLeft(initialMinutes * 60);
+    releaseWakeLock();
   };
 
   const formatTime = (seconds: number) => {
