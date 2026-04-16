@@ -8,27 +8,54 @@ export default function MatchTimer({ initialMinutes }: { initialMinutes: number 
   const [endTime, setEndTime] = useState<number | null>(null);
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+
+  const initAudio = () => {
+    try {
+      if (!audioCtxRef.current) {
+        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+        audioCtxRef.current = new AudioCtx();
+      }
+      if (audioCtxRef.current.state === 'suspended') {
+        audioCtxRef.current.resume();
+      }
+    } catch (e) {
+      console.error("Audio Web API init failed", e);
+    }
+  };
 
   const playBeep = () => {
     try {
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const audioCtx = audioCtxRef.current;
+      if (!audioCtx) return;
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
       const oscillator = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
 
       oscillator.connect(gainNode);
       gainNode.connect(audioCtx.destination);
 
+      // Alarm tone
       oscillator.type = 'square';
-      oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // A4
-      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime + 0.2); // A5
-
-      gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3); // 3 seconds beep
+      
+      // 5 repeated loud beeps
+      for (let i = 0; i < 5; i++) {
+         const t = audioCtx.currentTime + i * 0.6;
+         oscillator.frequency.setValueAtTime(880, t); 
+         oscillator.frequency.setValueAtTime(1318.51, t + 0.2); 
+         
+         gainNode.gain.setValueAtTime(1, t);
+         gainNode.gain.setValueAtTime(1, t + 0.4);
+         gainNode.gain.linearRampToValueAtTime(0.001, t + 0.5);
+      }
       
       oscillator.start(audioCtx.currentTime);
       oscillator.stop(audioCtx.currentTime + 3);
     } catch(e) {
-      console.error("Audio Web API not supported", e);
+      console.error("Audio Web API play failed", e);
     }
   };
 
@@ -56,6 +83,8 @@ export default function MatchTimer({ initialMinutes }: { initialMinutes: number 
   }, [isRunning, endTime]);
 
   const toggleStartPause = () => {
+    initAudio(); // Unlock audio on user interaction!
+    
     if (isRunning) {
       setIsRunning(false);
       setEndTime(null);
@@ -83,7 +112,8 @@ export default function MatchTimer({ initialMinutes }: { initialMinutes: number 
 
       <div className="relative z-10 flex flex-col text-center sm:text-left">
         <h3 className="text-gray-400 font-bold tracking-widest uppercase text-xs mb-1 flex justify-center sm:justify-start items-center gap-2">
-          <span>⏱️</span> Chronomètre
+          <span>⏱️</span> Chronomètre 
+          <button onClick={() => { initAudio(); setTimeout(playBeep, 100); }} className="ml-2 text-xs bg-gray-800 hover:bg-gray-700 px-2 py-0.5 rounded text-gray-300" title="Tester le volume">🔔 Test Bip</button>
         </h3>
         <div className={`font-black tracking-tighter transition-colors ${timeLeft === 0 ? 'text-red-500 animate-pulse text-7xl' : 'text-white text-6xl'}`} style={{ fontVariantNumeric: 'tabular-nums' }}>
           {formatTime(timeLeft)}
