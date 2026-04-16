@@ -211,15 +211,6 @@ export async function generatePools(formData: FormData) {
     });
 
     await Promise.all(poolUsers.map(async (u: any, idx: number) => {
-      const placeInSession = ((level - 1) * 4) + idx + 1;
-      const thLevel = Math.ceil((placeInSession * 10) / N);
-      
-      // Update DB Level
-      await prisma.user.update({
-        where: { id: u.id },
-        data: { lastCalculatedLevel: thLevel }
-      });
-
       return prisma.poolPlayer.create({
         data: { poolId: pool.id, userId: u.id, seed: idx + 1 }
       });
@@ -286,8 +277,13 @@ export async function finishSessionAndCalculatePoints(sessionId: string) {
     }
   });
 
+  const N = pools.length * 4;
+
   for (const pool of pools) {
     for (const poolPlayer of pool.players) {
+      const placeInSession = ((pool.level - 1) * 4) + poolPlayer.seed;
+      const thLevel = Math.ceil((placeInSession * 10) / N);
+
       let sessionPoints = 0;
       let wins = 0;
       let draws = 0;
@@ -332,7 +328,8 @@ export async function finishSessionAndCalculatePoints(sessionId: string) {
           totalMatches: newMatchesPlayed,
           averagePoints: newAverage,
           tops: isTop ? (user.tops || 0) + 1 : user.tops,
-          flops: isFlop ? (user.flops || 0) + 1 : user.flops
+          flops: isFlop ? (user.flops || 0) + 1 : user.flops,
+          lastCalculatedLevel: thLevel
         }
       });
     }
