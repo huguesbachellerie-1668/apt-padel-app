@@ -65,7 +65,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
   listText += `👥 ${registeredCount} inscrit(s)\n`;
   listText += `▶️ ${poulesCount} poule(s) + ${remplaCount} remplaçant(s)\n\n`;
   session.registrations.forEach((reg: any, idx: number) => {
-    listText += `${idx + 1} - ${reg.user.nickname || reg.user.name}\n\n`;
+    listText += `${idx + 1} - ${reg.user.nickname || reg.user.name}\n`;
   });
 
   return (
