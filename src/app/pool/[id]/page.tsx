@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import SubmitButton from "@/components/SubmitButton";
 import BackButton from "@/components/BackButton";
+import MatchTimer from "@/components/MatchTimer";
 
 export default async function PoolPage({ params }: { params: { id: string } }) {
   const { id } = await params;
@@ -34,6 +35,9 @@ export default async function PoolPage({ params }: { params: { id: string } }) {
   });
 
   if (!pool) return <div className="text-center py-20 text-gray-500">Poule introuvable.</div>;
+
+  const settings = await prisma.settings.findUnique({ where: { id: 'global' } });
+  const matchDuration = settings?.matchDuration || 25;
 
   const isSeed1 = pool.players[0]?.userId === user.id;
   const isBoard = ['PRESIDENT', 'ORGA', 'TRESORIER'].includes(user.role);
@@ -152,8 +156,10 @@ export default async function PoolPage({ params }: { params: { id: string } }) {
           </div>
       </div>
 
+      <MatchTimer initialMinutes={matchDuration} />
+
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">⚔️ Matchs (25 minutes ou 1 set)</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">⚔️ Matchs ({matchDuration} minutes ou 1 set)</h2>
           <form action={saveScores} className="space-y-8">
               {pool.matches.map((m: any) => (
                   <div key={m.id} className="border-2 border-gray-100 rounded-2xl overflow-hidden hover:border-orange-200 transition-colors">

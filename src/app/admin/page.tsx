@@ -1,7 +1,7 @@
 import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { createSeason, createSession, updateSessionStatus, generatePools, finishSessionAndCalculatePoints, reopenSession, updateSessionCourtsAction } from "./actions";
+import { createSeason, createSession, updateSessionStatus, generatePools, finishSessionAndCalculatePoints, reopenSession, updateSessionCourtsAction, updateGlobalSettings } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
 
 export default async function AdminDashboard() {
@@ -16,6 +16,9 @@ export default async function AdminDashboard() {
 
   const activeSessions = sessions.filter(s => s.status !== 'TERMINEE');
   const closedSessions = sessions.filter(s => s.status === 'TERMINEE');
+
+  const settings = await prisma.settings.findUnique({ where: { id: 'global' } });
+  const matchDuration = settings?.matchDuration || 25;
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-10">
@@ -243,6 +246,22 @@ export default async function AdminDashboard() {
             </div>
           </div>
           )}
+
+          {/* Paramètres Globaux */}
+          <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+              ⚙️ Paramètres du Club
+            </h2>
+            <form action={updateGlobalSettings} className="flex flex-col md:flex-row items-end gap-6 bg-gray-50 p-6 rounded-2xl border border-gray-200">
+              <div className="flex-1 w-full">
+                <label className="block text-sm font-bold text-gray-700 mb-2">Durée standard des matchs (minutes)</label>
+                <input type="number" name="matchDuration" defaultValue={matchDuration} min="1" max="120" required className="w-full p-4 border border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none transition-all font-bold text-lg" />
+              </div>
+              <SubmitButton pendingText="Sauvegarde..." className="bg-blue-900 text-white font-bold py-4 px-8 rounded-xl hover:bg-blue-800 transition-colors shadow-sm whitespace-nowrap w-full md:w-auto">
+                Enregistrer le paramètre
+              </SubmitButton>
+            </form>
+          </div>
         </div>
       )}
     </div>

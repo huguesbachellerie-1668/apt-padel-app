@@ -1,0 +1,109 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+
+export default function MatchTimer({ initialMinutes }: { initialMinutes: number }) {
+  const [timeLeft, setTimeLeft] = useState(initialMinutes * 60);
+  const [isRunning, setIsRunning] = useState(false);
+  const [endTime, setEndTime] = useState<number | null>(null);
+  
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const playBeep = () => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      oscillator.type = 'square';
+      oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // A4
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime + 0.2); // A5
+
+      gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3); // 3 seconds beep
+      
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 3);
+    } catch(e) {
+      console.error("Audio Web API not supported", e);
+    }
+  };
+
+  useEffect(() => {
+    if (isRunning && endTime) {
+      timerRef.current = setInterval(() => {
+        const now = Date.now();
+        const remaining = Math.max(0, Math.floor((endTime - now) / 1000));
+        setTimeLeft(remaining);
+
+        if (remaining <= 0) {
+          clearInterval(timerRef.current!);
+          setIsRunning(false);
+          setEndTime(null);
+          playBeep();
+        }
+      }, 500); // 500ms allows snappy enough updates
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isRunning, endTime]);
+
+  const toggleStartPause = () => {
+    if (isRunning) {
+      setIsRunning(false);
+      setEndTime(null);
+    } else {
+      setIsRunning(true);
+      setEndTime(Date.now() + timeLeft * 1000);
+    }
+  };
+
+  const stopTimer = () => {
+    setIsRunning(false);
+    setEndTime(null);
+    setTimeLeft(initialMinutes * 60);
+  };
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className="bg-gray-900 border-4 border-gray-800 p-6 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-6 overflow-hidden relative group mb-8 shadow-xl">
+      <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMSI+PC9yZWN0Pgo8cGF0aCBkPSJNMCAwTDggOFpNOCAwTDAgOFoiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLW9wYWNpdHk9IjAuMiIgc3Ryb2tlLXdpZHRoPSIxIj48L3BhdGg+Cjwvc3ZnPg==')] pointer-events-none"></div>
+
+      <div className="relative z-10 flex flex-col text-center sm:text-left">
+        <h3 className="text-gray-400 font-bold tracking-widest uppercase text-xs mb-1 flex justify-center sm:justify-start items-center gap-2">
+          <span>⏱️</span> Chronomètre
+        </h3>
+        <div className={`font-black tracking-tighter transition-colors ${timeLeft === 0 ? 'text-red-500 animate-pulse text-7xl' : 'text-white text-6xl'}`} style={{ fontVariantNumeric: 'tabular-nums' }}>
+          {formatTime(timeLeft)}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3 relative z-10 w-full sm:w-auto">
+        {!isRunning ? (
+          <button onClick={toggleStartPause} className="flex-1 bg-green-500 hover:bg-green-400 text-white font-black px-6 py-4 rounded-xl shadow-lg shadow-green-500/20 transition-all flex items-center justify-center gap-2 transform hover:scale-105 active:scale-95">
+            ▶️ Lancer
+          </button>
+        ) : (
+          <button onClick={toggleStartPause} className="flex-1 bg-orange-500 hover:bg-orange-400 text-white font-black px-6 py-4 rounded-xl shadow-lg shadow-orange-500/20 transition-all flex items-center justify-center gap-2 transform hover:scale-105 active:scale-95">
+            ⏸️ Pause
+          </button>
+        )}
+        <button onClick={stopTimer} className="bg-red-600 hover:bg-red-500 text-white font-black px-6 py-4 rounded-xl shadow-lg shadow-red-600/20 transition-all flex items-center justify-center gap-2 transform hover:scale-105 active:scale-95">
+          ⏹️ Stop
+        </button>
+      </div>
+    </div>
+  );
+}

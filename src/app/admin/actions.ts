@@ -341,4 +341,21 @@ export async function finishSessionAndCalculatePoints(sessionId: string) {
   revalidatePath('/admin');
   revalidatePath('/ranking');
   revalidatePath('/history');
+  revalidatePath('/history');
+}
+
+export async function updateGlobalSettings(formData: FormData) {
+  const durationStr = formData.get('matchDuration') as string;
+  const duration = parseInt(durationStr, 10);
+
+  if (!isNaN(duration) && duration > 0 && duration <= 120) {
+     await prisma.settings.upsert({
+        where: { id: 'global' },
+        update: { matchDuration: duration },
+        create: { id: 'global', matchDuration: duration }
+     });
+  }
+
+  revalidatePath('/admin');
+  revalidatePath('/');
 }

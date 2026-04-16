@@ -167,3 +167,8 @@ model Goodie {
   imageUrl    String?
   isActive    Boolean  @default(true)
 }
+
+model Settings {
+  id            String @id @default("global")
+  matchDuration Int    @default(25)
+}
