@@ -4,6 +4,13 @@ import prisma from "@/lib/prisma";
 export default async function RulesPage() {
   const user = await getSessionUser();
 
+  if (user) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastNewsSeenAt: new Date() }
+    });
+  }
+
   const totalPlayers = await prisma.user.count();
   const rawBoardMembers = await prisma.user.findMany({
     where: { role: { in: ['PRESIDENT', 'ORGA', 'TRESORIER'] } }

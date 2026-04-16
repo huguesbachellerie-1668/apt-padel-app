@@ -24,6 +24,15 @@ export default async function RootLayout({
 }>) {
   const user = await getSessionUser();
   const sponsors = await prisma.sponsor.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } });
+  
+  // Check for unread news
+  const latestNews = await prisma.news.findFirst({ where: { isActive: true }, orderBy: { date: 'desc' }, select: { date: true } });
+  let hasUnreadNews = false;
+  if (user && latestNews) {
+    if (!user.lastNewsSeenAt || new Date(user.lastNewsSeenAt) < new Date(latestNews.date)) {
+      hasUnreadNews = true;
+    }
+  }
 
   async function logout() {
     'use server';
@@ -68,7 +77,7 @@ export default async function RootLayout({
               <NavButton href="/ranking" icon="🏆" label="Classement" />
               <NavButton href="/history" icon="📅" label="Historique" />
               <NavButton href="/directory" icon="👥" label="Annuaire" />
-              <NavButton href="/rules" icon="📜" label="APT" />
+              <NavButton href="/rules" icon="📜" label="APT" hasNotification={hasUnreadNews} />
               {['PRESIDENT', 'ORGA', 'TRESORIER'].includes(user.role) && (
                 <NavButton href="/admin" icon="⚙️" label="Admin" className="text-orange-300" />
               )}

@@ -10,9 +10,10 @@ interface NavButtonProps {
   label: string;
   className?: string;
   onClick?: () => void;
+  hasNotification?: boolean;
 }
 
-export default function NavButton({ href, icon, label, className = '' }: NavButtonProps) {
+export default function NavButton({ href, icon, label, className = '', hasNotification = false }: NavButtonProps) {
   const [isPending, setIsPending] = useState(false);
   const pathname = usePathname();
 
@@ -32,7 +33,7 @@ export default function NavButton({ href, icon, label, className = '' }: NavButt
     <Link 
       href={href} 
       onClick={handleClick} 
-      className={`px-3 py-2 hover:bg-white/10 rounded-full transition-colors flex flex-col items-center gap-1 ${isPending ? 'opacity-50 cursor-wait bg-white/10 scale-95' : ''} ${className}`}
+      className={`px-3 py-2 hover:bg-white/10 rounded-full transition-colors flex flex-col items-center gap-1 relative ${isPending ? 'opacity-50 cursor-wait bg-white/10 scale-95' : ''} ${className}`}
     >
       {isPending ? (
         <span className="flex items-center justify-center h-5 w-5">
@@ -42,7 +43,15 @@ export default function NavButton({ href, icon, label, className = '' }: NavButt
             </svg>
         </span>
       ) : (
-        <span className="flex items-center justify-center h-5 w-5 text-[18px]">{icon}</span>
+        <span className="flex items-center justify-center h-5 w-5 text-[18px] relative">
+           {icon}
+           {hasNotification && (
+             <span className="absolute -top-1 -right-2 flex h-3 w-3">
+               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+               <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-blue-900"></span>
+             </span>
+           )}
+        </span>
       )}
       <span className="text-xs">{label}</span>
     </Link>

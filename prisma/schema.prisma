@@ -26,7 +26,8 @@ model User {
   createdAt      DateTime       @default(now())
   historicalStats Json?         @default("{}")
   lastCalculatedLevel Int?
-  
+  lastNewsSeenAt  DateTime?
+
   registrations  Registration[]
   poolPlayers    PoolPlayer[]
 
