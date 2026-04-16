@@ -135,15 +135,15 @@ export default async function AdminDashboard() {
                     </div>
                     <div className="mt-2 flex items-center gap-2">
                       <span className="text-sm text-gray-500 font-medium">Statut actuel :</span>
-                      <span className={`px-3 py-1 text-xs font-bold rounded-full ${
+                      <a href={`/session/${session.id}`} className={`px-3 py-1 text-xs font-bold rounded-full hover:scale-105 hover:shadow-md transition-all ${
                         session.status === 'PREVUE' ? 'bg-gray-200 text-gray-700' : 
                         session.status === 'INSCRIPTIONS_OUVERTES' ? 'bg-green-500 text-white animate-pulse' : 
                         session.status === 'POULES_GENEREES' ? 'bg-orange-500 text-white' : 
                         session.status === 'POULES_EN_ATTENTE' ? 'bg-red-600 text-white animate-pulse' : 
                         'bg-blue-100 text-blue-800'
                       }`}>
-                        {session.status.replace('_', ' ')}
-                      </span>
+                        {session.status.replace('_', ' ')} 🔗
+                      </a>
                     </div>
                   </div>
                   
