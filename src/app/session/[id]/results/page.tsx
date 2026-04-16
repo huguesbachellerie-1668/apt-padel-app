@@ -122,14 +122,16 @@ export default async function SessionResultsPage({ params }: { params: any }) {
                        Terrain {pool.courtNumber}
                      </span>
                    </div>
-                   <div data-html2canvas-ignore>
-                     <WhatsAppShareButton 
-                       elementId={`capture-pool-${pool.id}`} 
-                       text={`Scores Poule ${pool.level}`} 
-                       fileName={`scores-poule-${pool.level}.png`}
-                       className="py-1.5 px-3 text-sm"
-                     />
-                   </div>
+                   {session.status !== 'TERMINEE' && (
+                     <div data-html2canvas-ignore>
+                       <WhatsAppShareButton 
+                         elementId={`capture-pool-${pool.id}`} 
+                         text={`Scores Poule ${pool.level}`} 
+                         fileName={`scores-poule-${pool.level}.png`}
+                         className="py-1.5 px-3 text-sm"
+                       />
+                     </div>
+                   )}
                 </div>
                 
                 <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
