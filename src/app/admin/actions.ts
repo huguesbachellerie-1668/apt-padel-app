@@ -114,7 +114,7 @@ export async function generatePools(formData: FormData) {
   const N = maxPlayers;
 
   // --- Tri par points généraux (Initial Point Seed)
-  const electedUsers = selectedRegistrations.map((r: any) => r.user).sort((a: any, b: any) => b.points - a.points);
+  const electedUsers = selectedRegistrations.map((r: any) => r.user).sort((a: any, b: any) => b.averagePoints - a.averagePoints);
   const userToReg = new Map(selectedRegistrations.map(r => [r.userId, r]));
 
   // --- Clear previous pools
