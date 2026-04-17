@@ -255,7 +255,7 @@ export default async function AdminDashboard() {
             <form action={updateGlobalSettings} className="flex flex-col md:flex-row items-end gap-6 bg-gray-50 p-6 rounded-2xl border border-gray-200">
               <div className="flex-1 w-full">
                 <label className="block text-sm font-bold text-gray-700 mb-2">Durée standard des matchs (minutes)</label>
-                <input type="number" name="matchDuration" defaultValue={matchDuration} min="1" max="120" required className="w-full p-4 border border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none transition-all font-bold text-lg" />
+                <input type="number" name="matchDuration" defaultValue={matchDuration} min="1" max="120" required className="w-full p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none transition-all font-black text-xl" />
               </div>
               <SubmitButton pendingText="Sauvegarde..." className="bg-blue-900 text-white font-bold py-4 px-8 rounded-xl hover:bg-blue-800 transition-colors shadow-sm whitespace-nowrap w-full md:w-auto">
                 Enregistrer le paramètre

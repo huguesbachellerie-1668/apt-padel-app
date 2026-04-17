@@ -27,7 +27,7 @@ export default function WhatsAppShareButton({ elementId, text, fileName = 'parta
       // Generation de l'image (html-to-image supporte Tailwind v4 / lch / lab)
       const blob = await toBlob(element, {
         backgroundColor: "#ffffff",
-        pixelRatio: 2,
+        pixelRatio: 4,
         filter: (node) => {
           if (node instanceof HTMLElement && node.dataset && 'html2canvasIgnore' in node.dataset) {
             return false;

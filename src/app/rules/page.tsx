@@ -119,7 +119,7 @@ export default async function RulesPage() {
               <li>Les matchs se jouent lors d’une session hebdomadaire maximum. Une session équivaut à une journée de rencontre entre les joueurs inscrits.</li>
               <li>Lors d’une session, un terrain est attribué à 4 joueurs, regroupés dans une poule.</li>
               <li>Les poules sont constituées de 4 joueurs de niveaux de points équivalents. Lors de la session, chaque joueur participe à 3 matchs de 25 minutes, à chaque match, il fait équipe avec un joueur différent de sa poule.</li>
-              <li>Une fois les 25 minutes passées, les joueurs finissent le jeu avant de passer au match suivant.</li>
+              <li>Une fois les 25 minutes passées, les joueurs finissent le jeu avant de passer au match suivant. S’il reste moins d’1 minute de jeu, les joueurs ont libre appréciation de jouer ou pas le dernier jeu.</li>
               <li><strong>Point en or :</strong> lorsque les 25 minutes sont écoulées, la regle de l’avantage est supprimée sur le jeu en cours : en cas d’égalité 40A, la 1ere equipe qui gagne le point remporte le jeu.</li>
               <li>Chaque joueur a un nombre de points calculé à la fin de chaque session. Les poules sont établies en fonction des points de chaque joueur.</li>
               <li>Le système de points est défini comme suit : une victoire = <strong>30 points</strong>, un match nul = <strong>20 points</strong>, une défaite = <strong>10 points</strong>. À ce total, on rajoute le nombre de jeux marqués par le joueur au cours de ses matchs.</li>
