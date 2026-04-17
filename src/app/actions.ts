@@ -21,6 +21,13 @@ export async function registerForSession(sessionId: string, formData?: FormData)
     }
   });
 
+  await prisma.activityLog.create({
+    data: {
+      sessionId,
+      message: `${user.nickname || user.name.split(' ')[0]} - Inscription${isReturningFromInjury ? ' (Retour blessure)' : ''}`
+    }
+  });
+
   revalidatePath('/');
 }
 
@@ -41,6 +48,13 @@ export async function unregisterFromSession(sessionId: string) {
     where: { userId: user.id, sessionId }
   });
   
+  await prisma.activityLog.create({
+    data: {
+      sessionId,
+      message: `${user.nickname || user.name.split(' ')[0]} - Désinscription`
+    }
+  });
+
   revalidatePath('/');
   revalidatePath('/admin');
   revalidatePath(`/session/${sessionId}`);

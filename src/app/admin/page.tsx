@@ -11,7 +11,12 @@ export default async function AdminDashboard() {
   const activeSeason = await prisma.season.findFirst({ where: { isActive: true } });
   const sessions = activeSeason ? await prisma.session.findMany({ 
     where: { seasonId: activeSeason.id },
-    orderBy: { date: 'desc' }
+    orderBy: { date: 'desc' },
+    include: {
+      activityLogs: {
+        orderBy: { createdAt: 'desc' }
+      }
+    }
   }) : [];
 
   const activeSessions = sessions.filter(s => s.status !== 'TERMINEE');
@@ -205,6 +210,32 @@ export default async function AdminDashboard() {
                         </form>
                       </div>
                     )}
+                  </div>
+                  
+                  {/* Activity Log Accordion */}
+                  <div className="w-full mt-6 pt-4 border-t border-gray-100">
+                    <details className="group">
+                      <summary className="flex cursor-pointer items-center justify-between font-bold text-sm text-gray-500 bg-gray-100/50 hover:bg-gray-100 p-3 rounded-xl transition-colors select-none">
+                        <span>📝 Journal d'activité ({session.activityLogs?.length || 0} entrées)</span>
+                        <span className="transition transform group-open:rotate-180">
+                          <svg fill="none" height="20" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="20"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                      </summary>
+                      <div className="mt-3 bg-white border border-gray-100 rounded-xl p-4 text-sm max-h-60 overflow-y-auto space-y-2">
+                        {session.activityLogs && session.activityLogs.length > 0 ? (
+                          session.activityLogs.map((log: any) => (
+                            <div key={log.id} className="flex gap-3 items-start border-b border-gray-50 pb-2 last:border-0 last:pb-0">
+                              <span className="text-gray-400 min-w-[110px] whitespace-nowrap text-xs mt-0.5 bg-gray-50 px-2 py-0.5 rounded font-mono">
+                                {log.createdAt.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' }).replace(',', ' -')}
+                              </span>
+                              <span className="font-bold text-gray-700">{log.message}</span>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-center text-gray-400 italic py-4">Le journal est complètement vide.</p>
+                        )}
+                      </div>
+                    </details>
                   </div>
                 </div>
               ))}

@@ -60,6 +60,7 @@ model Session {
   registrations     Registration[]
   pools             Pool[]
   reservations      CourtReservation[]
+  activityLogs      ActivityLog[]
 }
 
 model Registration {
@@ -172,4 +173,12 @@ model Goodie {
 model Settings {
   id            String @id @default("global")
   matchDuration Int    @default(25)
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  message   String
+  createdAt DateTime @default(now())
 }

@@ -229,6 +229,10 @@ export async function generatePools(formData: FormData) {
     data: { status: 'POULES_GENEREES', courts: actualPoolsCount }
   });
 
+  await prisma.activityLog.create({
+    data: { sessionId, message: `Admin - Génération des poules (x${actualPoolsCount})` }
+  });
+
   revalidatePath('/admin');
   revalidatePath('/');
 }
@@ -245,6 +249,10 @@ export async function reopenSession(sessionId: string) {
   await prisma.session.update({
     where: { id: sessionId },
     data: { status: 'INSCRIPTIONS_OUVERTES' }
+  });
+
+  await prisma.activityLog.create({
+    data: { sessionId, message: 'Admin - Annulation complète des poules' }
   });
 
   revalidatePath('/admin');
@@ -269,6 +277,11 @@ export async function finishSessionAndCalculatePoints(sessionId: string) {
   await prisma.session.update({
     where: { id: sessionId },
     data: { status: 'TERMINEE' }
+  });
+
+  // Nettoyage des logs pour ne pas surcharger la BDD
+  await prisma.activityLog.deleteMany({
+    where: { sessionId }
   });
 
   const pools = await prisma.pool.findMany({
