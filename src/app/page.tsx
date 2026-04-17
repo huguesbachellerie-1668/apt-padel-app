@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { registerForSession, unregisterFromSession } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
+import UnregisterButtonWithWhatsApp from "@/components/UnregisterButtonWithWhatsApp";
 
 export default async function Dashboard() {
   const user = await getSessionUser();
@@ -138,11 +139,14 @@ export default async function Dashboard() {
                         <p className="font-black text-green-700 flex items-center justify-center gap-2 mb-4 text-lg">
                           ✅ Vous êtes bien inscrit(e) sur la liste !
                         </p>
-                        <form action={unregisterFromSession.bind(null, activeSession.id)}>
-                          <SubmitButton className="text-sm border border-red-200 text-red-600 hover:bg-red-50 bg-white font-bold py-2.5 px-6 rounded-xl transition-colors shadow-sm">
-                            Me désinscrire
-                          </SubmitButton>
-                        </form>
+                        <UnregisterButtonWithWhatsApp
+                          sessionId={activeSession.id}
+                          sessionDate={new Date(activeSession.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                          userName={user.nickname || user.name.split(' ')[0]}
+                          className="text-sm border border-red-200 text-red-600 hover:bg-red-50 bg-white font-bold py-2.5 px-6 rounded-xl transition-colors shadow-sm"
+                        >
+                          Me désinscrire
+                        </UnregisterButtonWithWhatsApp>
                       </div>
                     ) : (
                       <form action={registerForSession.bind(null, activeSession.id)} className="bg-orange-50 p-5 rounded-2xl border border-orange-100 mb-4">
@@ -165,22 +169,28 @@ export default async function Dashboard() {
                          <div className="flex items-center gap-3">
                            <span className="text-xl">✅</span> Inscrit
                          </div>
-                         <form action={unregisterFromSession.bind(null, activeSession.id)}>
-                           <SubmitButton className="text-xs border border-red-200 text-red-600 bg-white hover:bg-red-50 py-1.5 px-3 rounded-lg font-bold transition-colors">
-                             Me désinscrire
-                           </SubmitButton>
-                         </form>
+                         <UnregisterButtonWithWhatsApp
+                           sessionId={activeSession.id}
+                           sessionDate={new Date(activeSession.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                           userName={user.nickname || user.name.split(' ')[0]}
+                           className="text-xs border border-red-200 text-red-600 bg-white hover:bg-red-50 py-1.5 px-3 rounded-lg font-bold transition-colors"
+                         >
+                           Me désinscrire
+                         </UnregisterButtonWithWhatsApp>
                        </div>
                      ) : userRegistration ? (
                        <div className="bg-orange-50 text-orange-800 p-4 rounded-xl border border-orange-200 text-sm font-bold mb-4 flex items-center justify-between gap-3">
                          <div className="flex items-center gap-3">
                            <span className="text-xl">⏳</span> Vous êtes sur liste d'attente.
                          </div>
-                         <form action={unregisterFromSession.bind(null, activeSession.id)}>
-                           <SubmitButton className="text-xs border border-red-200 text-red-600 bg-white hover:bg-red-50 py-1.5 px-3 rounded-lg font-bold transition-colors">
-                             Me désinscrire
-                           </SubmitButton>
-                         </form>
+                         <UnregisterButtonWithWhatsApp
+                           sessionId={activeSession.id}
+                           sessionDate={new Date(activeSession.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                           userName={user.nickname || user.name.split(' ')[0]}
+                           className="text-xs border border-red-200 text-red-600 bg-white hover:bg-red-50 py-1.5 px-3 rounded-lg font-bold transition-colors"
+                         >
+                           Me désinscrire
+                         </UnregisterButtonWithWhatsApp>
                        </div>
                      ) : (
                        <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-200 text-sm font-bold mb-4 flex items-center gap-3">
