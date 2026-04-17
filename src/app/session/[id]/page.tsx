@@ -115,7 +115,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
       )}
 
       {(session.status === 'POULES_GENEREES' || session.status === 'TERMINEE') && session.pools && session.pools.length > 0 && (
-        <div className="mt-8" id="capture-pools">
+        <div className="mt-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
             <h2 className="text-2xl font-black text-blue-900 flex items-center gap-3">
               <span className="text-3xl">🎾</span> Composition des Poules
@@ -123,7 +123,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
             {isBoard && (
               <div data-html2canvas-ignore>
                 <WhatsAppShareButton 
-                  elementId="capture-pools" 
+                  elementIds={session.pools.map((p: any) => `capture-pool-${p.id}`)}
                   text="🎾 Les Poules de la session sont prêtes !" 
                   fileName="poules.png" 
                 />
@@ -134,7 +134,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
             {session.pools.map((pool: any) => {
               const allMatchesFinished = pool.matches && pool.matches.length === 3 && pool.matches.every((m: any) => m.team1Games !== null && m.team2Games !== null);
               return (
-              <div key={pool.id} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+              <div key={pool.id} id={`capture-pool-${pool.id}`} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                  <div className="bg-blue-900 px-5 py-3 flex flex-wrap justify-between items-center text-white gap-2">
                    <div className="flex items-center gap-3">
                      <h3 className="font-bold text-lg">Poule #{pool.level}</h3>
