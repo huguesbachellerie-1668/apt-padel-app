@@ -205,8 +205,12 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
         <div className="bg-orange-50/50 p-5 rounded-2xl border border-orange-100 mt-6 relative overflow-hidden">
           <div className="absolute right-0 top-0 opacity-10 text-8xl">👑</div>
            <h3 className="font-bold text-orange-800 mb-3 relative z-10">Gestion des inscriptions</h3>
-           <form action={manualRegisterForSession.bind(null, session.id)} className="flex items-end gap-3 relative z-10 w-full md:w-2/3">
-             <div className="flex gap-3">
+           <form action={manualRegisterForSession.bind(null, session.id)} className="flex flex-col gap-2 relative z-10 w-full md:w-2/3">
+             <div className="flex items-center gap-2 bg-orange-100 p-2 rounded-xl border border-orange-200 w-fit">
+               <input type="checkbox" id="boardInjury" name="isReturningFromInjury" value="true" className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500 cursor-pointer" />
+               <label htmlFor="boardInjury" className="text-orange-900 text-sm font-bold cursor-pointer">Retour blessure</label>
+             </div>
+             <div className="flex gap-3 w-full">
                <select name="userId" required className="flex-1 p-2.5 rounded-xl border border-orange-200 text-sm focus:outline-none">
                  <option value="">-- Sélectionner un joueur --</option>
                  {availableUsers.map((u: any) => (
@@ -218,10 +222,6 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                <SubmitButton pendingText="Inscription..." className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-colors whitespace-nowrap">
                  Inscrire
                </SubmitButton>
-             </div>
-             <div className="flex items-center gap-2 bg-orange-100 p-2 rounded-xl border border-orange-200 mt-2">
-               <input type="checkbox" id="boardInjury" name="isReturningFromInjury" value="true" className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500 cursor-pointer" />
-               <label htmlFor="boardInjury" className="text-orange-900 text-sm font-bold cursor-pointer">Appliquer "Retour de blessure" (descend d'une poule)</label>
              </div>
            </form>
         </div>
