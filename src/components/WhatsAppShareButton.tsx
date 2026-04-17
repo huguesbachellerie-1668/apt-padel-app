@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import html2canvas from 'html2canvas';
+import { toBlob } from 'html-to-image';
 
 type Props = {
   elementId: string;
@@ -24,16 +24,19 @@ export default function WhatsAppShareButton({ elementId, text, fileName = 'parta
         return;
       }
 
-      // Generation de l'image via html2canvas (mieux supporté par Safari/iOS pour la netteté)
-      const canvas = await html2canvas(element, {
-        scale: 3,
+      // Generation de l'image (html-to-image supporte Tailwind v4 oklch/lab)
+      // On utilise un pixelRatio de 2.5 au lieu de 4 : une image trop grande (ex: 4000px) force WhatsApp 
+      // à appliquer sa propre compression ultra réductrice qui floute tout le texte. 2.5 est le "sweet spot".
+      const blob = await toBlob(element, {
         backgroundColor: "#ffffff",
-        ignoreElements: (node) => {
-          return node instanceof HTMLElement && node.dataset && 'html2canvasIgnore' in node.dataset;
+        pixelRatio: 2.5,
+        filter: (node) => {
+          if (node instanceof HTMLElement && node.dataset && 'html2canvasIgnore' in node.dataset) {
+            return false;
+          }
+          return true;
         }
       });
-      
-      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png', 1.0));
 
       if (!blob) {
         alert("Erreur: Impossible de générer l'image.");
