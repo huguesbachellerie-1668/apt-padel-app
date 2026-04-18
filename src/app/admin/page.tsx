@@ -134,13 +134,15 @@ export default async function AdminDashboard() {
 
             <div className="space-y-4">
               {activeSessions.map(session => (
-                <div key={session.id} className={`border-2 rounded-2xl p-6 flex flex-col sm:flex-row gap-4 justify-between items-center transition-all ${
+                <div key={session.id} className={`border-2 rounded-2xl p-6 flex flex-col w-full transition-all ${
                   session.status === 'PREVUE' ? 'border-gray-200 bg-gray-50' : 
                   session.status === 'INSCRIPTIONS_OUVERTES' ? 'border-green-400 bg-green-50 shadow-md transform scale-[1.01]' : 
                   session.status === 'POULES_GENEREES' ? 'border-orange-400 bg-orange-50' : 
                   session.status === 'POULES_EN_ATTENTE' ? 'border-red-400 bg-red-50 shadow-md animate-pulse' : 
                   'border-gray-100 opacity-70'
                 }`}>
+                  {/* Ligne du haut : Infos & Boutons d'action */}
+                  <div className="flex flex-col sm:flex-row gap-4 justify-between items-center w-full">
                   <div>
                     <div className="font-black text-xl text-gray-800">
                       {new Date(session.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit' }).replace(':', 'h')}
@@ -214,6 +216,7 @@ export default async function AdminDashboard() {
                         </form>
                       </div>
                     )}
+                  </div>
                   </div>
                   
                   {/* Gestion des Terrains Accordion */}
