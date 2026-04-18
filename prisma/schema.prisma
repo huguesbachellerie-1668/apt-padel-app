@@ -142,6 +142,8 @@ model CourtReservation {
   name      String  // Ex: "Terrain 1" ou "Piste Centrale"
   startTime String  // Ex: "18:30"
   
+  defaultPoolLevel Int? // Ex: 1 pour Poule 1
+  
   pool      Pool?
 }
 

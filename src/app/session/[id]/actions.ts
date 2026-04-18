@@ -55,6 +55,14 @@ export async function updatePoolSettings(poolId: string, sessionId: string, form
   const dataToUpdate: any = {};
   if (reservationId !== undefined) {
     dataToUpdate.courtReservationId = reservationId === "" ? null : reservationId;
+    
+    // BUG FIX: Prevent @unique constraint violation if this reservation is already assigned to another pool.
+    if (dataToUpdate.courtReservationId !== null) {
+      await prisma.pool.updateMany({
+        where: { courtReservationId: dataToUpdate.courtReservationId },
+        data: { courtReservationId: null }
+      });
+    }
   }
   if (courtNumberStr) {
     const courtNumber = parseInt(courtNumberStr, 10);
@@ -75,47 +83,6 @@ export async function updatePoolSettings(poolId: string, sessionId: string, form
   revalidatePath(`/`);
 }
 
-export async function createCourtReservation(sessionId: string, formData: FormData) {
-  const currUser = await getSessionUser();
-  if (!currUser || !['PRESIDENT', 'ORGA', 'TRESORIER'].includes(currUser.role)) throw new Error("Unauthorized");
-
-  const clubId = formData.get('clubId') as string;
-  const name = formData.get('name') as string;
-  const startTime = formData.get('startTime') as string;
-
-  if (!clubId || !name || !startTime) return;
-
-  await prisma.courtReservation.create({
-    data: {
-      sessionId,
-      clubId,
-      name,
-      startTime
-    }
-  });
-
-  revalidatePath(`/session/${sessionId}`);
-}
-
-export async function deleteCourtReservation(sessionId: string, formData: FormData) {
-  const currUser = await getSessionUser();
-  if (!currUser || !['PRESIDENT', 'ORGA', 'TRESORIER'].includes(currUser.role)) throw new Error("Unauthorized");
-  
-  const reservationId = formData.get('reservationId') as string;
-  if (!reservationId) return;
-
-  // Unlink from pool if any
-  await prisma.pool.updateMany({
-    where: { courtReservationId: reservationId },
-    data: { courtReservationId: null }
-  });
-
-  await prisma.courtReservation.delete({
-    where: { id: reservationId }
-  });
-
-  revalidatePath(`/session/${sessionId}`);
-}
 
 export async function swapRegistrationOrder(sessionId: string, formData: FormData) {
   const currUser = await getSessionUser();

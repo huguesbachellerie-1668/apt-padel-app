@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import { getSessionUser } from "@/lib/auth"
 
 export async function createSeason(formData: FormData) {
   const name = formData.get('name') as string;
@@ -204,12 +205,24 @@ export async function generatePools(formData: FormData) {
      }
   }
 
+  // --- Fetch Session Reservations for Auto-Assignment
+  const sessionReservations = await prisma.courtReservation.findMany({
+    where: { sessionId }
+  });
+
   // --- Save to DB
   for (let level = 1; level <= actualPoolsCount; level++) {
     const poolUsers = finalUsers.slice((level - 1) * 4, level * 4);
     
+    const matchingRes = sessionReservations.find(r => r.defaultPoolLevel === level);
+    
     const pool = await prisma.pool.create({
-      data: { sessionId, courtNumber: level, level: level }
+      data: { 
+        sessionId, 
+        courtNumber: level, 
+        level: level,
+        courtReservationId: matchingRes ? matchingRes.id : null
+      }
     });
 
     await Promise.all(poolUsers.map(async (u: any, idx: number) => {
@@ -371,4 +384,68 @@ export async function updateGlobalSettings(formData: FormData) {
 
   revalidatePath('/admin');
   revalidatePath('/');
+}
+
+// --- Gestion des terrains / Réservations (déplacé de Session Detail -> Admin) ---
+
+export async function createCourtReservation(sessionId: string, formData: FormData) {
+  const currUser = await getSessionUser();
+  if (!currUser || !['PRESIDENT', 'ORGA', 'TRESORIER'].includes(currUser.role)) throw new Error("Unauthorized");
+
+  const clubId = formData.get('clubId') as string;
+  const name = formData.get('name') as string;
+  const startTime = formData.get('startTime') as string;
+
+  if (!clubId || !name || !startTime) return;
+
+  await prisma.courtReservation.create({
+    data: {
+      sessionId,
+      clubId,
+      name,
+      startTime,
+      defaultPoolLevel: null
+    }
+  });
+
+  revalidatePath(`/admin`);
+  revalidatePath(`/session/${sessionId}`);
+}
+
+export async function updateReservationDefaultLevel(reservationId: string, formData: FormData) {
+  const currUser = await getSessionUser();
+  if (!currUser || !['PRESIDENT', 'ORGA', 'TRESORIER'].includes(currUser.role)) throw new Error("Unauthorized");
+
+  const poolLvlStr = formData.get('defaultPoolLevel') as string;
+  const targetLevel = poolLvlStr ? parseInt(poolLvlStr, 10) : null;
+
+  await prisma.courtReservation.update({
+    where: { id: reservationId },
+    data: {
+      defaultPoolLevel: isNaN(targetLevel as number) ? null : targetLevel
+    }
+  });
+
+  revalidatePath(`/admin`);
+}
+
+export async function deleteCourtReservation(sessionId: string, formData: FormData) {
+  const currUser = await getSessionUser();
+  if (!currUser || !['PRESIDENT', 'ORGA', 'TRESORIER'].includes(currUser.role)) throw new Error("Unauthorized");
+  
+  const reservationId = formData.get('reservationId') as string;
+  if (!reservationId) return;
+
+  // Unlink from pool if any (Set courtReservationId to null)
+  await prisma.pool.updateMany({
+    where: { courtReservationId: reservationId },
+    data: { courtReservationId: null }
+  });
+
+  await prisma.courtReservation.delete({
+    where: { id: reservationId }
+  });
+
+  revalidatePath(`/admin`);
+  revalidatePath(`/session/${sessionId}`);
 }

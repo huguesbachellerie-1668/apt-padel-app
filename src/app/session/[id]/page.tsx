@@ -2,7 +2,7 @@ import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { manualRegisterForSession, manualUnregisterForSession, updatePoolSettings, createCourtReservation, deleteCourtReservation, swapRegistrationOrder } from "./actions";
+import { manualRegisterForSession, manualUnregisterForSession, updatePoolSettings, swapRegistrationOrder } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
 import BackButton from "@/components/BackButton";
 import WhatsAppShareButton from "@/components/WhatsAppShareButton";
@@ -41,8 +41,6 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
   if (!session) return <div className="text-center p-10 font-bold text-gray-500">Session introuvable</div>;
 
   const isBoard = ['PRESIDENT', 'ORGA', 'TRESORIER'].includes(user.role);
-  
-  const allClubs = isBoard ? await prisma.club.findMany({ orderBy: { name: 'asc' } }) : [];
   const totalPlaces = session.courts * 4;
   const registeredCount = session.registrations.length;
   const placesLeft = Math.max(0, totalPlaces - registeredCount);
@@ -304,56 +302,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
          </div>
       </div>
 
-      {isBoard && (
-        <div className="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100 mt-6 relative overflow-hidden">
-          <div className="absolute right-0 top-0 opacity-10 text-8xl">🏟️</div>
-           <h3 className="font-bold text-indigo-800 mb-3 relative z-10">Gestion des Terrains (Réservations)</h3>
-           
-           {/* Liste des réservations actuelles */}
-           {session.reservations && session.reservations.length > 0 && (
-             <div className="mb-4 relative z-10 flex flex-col gap-2">
-               {session.reservations.map((res: any) => (
-                 <div key={res.id} className="flex justify-between items-center bg-white p-3 rounded-xl border border-indigo-100 shadow-sm">
-                   <div className="flex flex-col">
-                     <span className="font-bold text-indigo-900">{res.club.name} - {res.name}</span>
-                     <span className="text-xs text-gray-500">{res.club.city} | Heure: <strong className="text-indigo-600">{res.startTime}</strong></span>
-                   </div>
-                   <form action={deleteCourtReservation.bind(null, session.id)}>
-                     <input type="hidden" name="reservationId" value={res.id} />
-                     <SubmitButton pendingText="..." className="text-red-500 hover:text-white font-bold bg-red-50 hover:bg-red-500 p-2 rounded-lg transition-colors shadow-sm">
-                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                     </SubmitButton>
-                   </form>
-                 </div>
-               ))}
-             </div>
-           )}
 
-           {/* Formulaire d'ajout */}
-           <form action={createCourtReservation.bind(null, session.id)} className="flex flex-col md:flex-row items-end gap-3 relative z-10 w-full">
-             <div className="flex-[1.5] w-full flex flex-col gap-1">
-               <label className="text-xs font-bold text-indigo-600 uppercase">Club</label>
-               <select name="clubId" required className="w-full p-2.5 rounded-xl border border-indigo-200 text-sm focus:outline-none focus:border-indigo-500 bg-white text-gray-900">
-                 <option value="">-- Sélectionner un lieu --</option>
-                 {allClubs.map((c: any) => (
-                   <option key={c.id} value={c.id}>{c.name} ({c.city})</option>
-                 ))}
-               </select>
-             </div>
-             <div className="flex-1 w-full flex flex-col gap-1">
-               <label className="text-xs font-bold text-indigo-600 uppercase">Piste</label>
-               <input type="text" name="name" required placeholder="Ex: T1, Piste Centrale" className="w-full p-2.5 rounded-xl border border-indigo-200 text-sm focus:outline-none focus:border-indigo-500 bg-white text-gray-900" />
-             </div>
-             <div className="w-full md:w-28 flex flex-col gap-1">
-               <label className="text-xs font-bold text-indigo-600 uppercase">Heure</label>
-               <input type="time" name="startTime" required className="w-full p-2.5 rounded-xl border border-indigo-200 text-sm font-bold focus:outline-none focus:border-indigo-500 bg-white text-gray-900" />
-             </div>
-             <SubmitButton pendingText="..." className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-5 rounded-xl text-sm transition-colors mt-2 md:mt-0 w-full md:w-auto">
-               Ajouter
-             </SubmitButton>
-           </form>
-        </div>
-      )}
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { createSeason, createSession, updateSessionStatus, generatePools, finishSessionAndCalculatePoints, reopenSession, updateSessionCourtsAction, updateGlobalSettings } from "./actions";
+import { createSeason, createSession, updateSessionStatus, generatePools, finishSessionAndCalculatePoints, reopenSession, updateSessionCourtsAction, updateGlobalSettings, createCourtReservation, deleteCourtReservation, updateReservationDefaultLevel } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
 
 export default async function AdminDashboard() {
@@ -15,6 +15,9 @@ export default async function AdminDashboard() {
     include: {
       activityLogs: {
         orderBy: { createdAt: 'desc' }
+      },
+      reservations: {
+        include: { club: true }
       }
     }
   }) : [];
@@ -23,6 +26,7 @@ export default async function AdminDashboard() {
   const closedSessions = sessions.filter(s => s.status === 'TERMINEE');
 
   const settings = await prisma.settings.findUnique({ where: { id: 'global' } });
+  const allClubs = await prisma.club.findMany({ orderBy: { name: 'asc' } });
   const matchDuration = settings?.matchDuration || 25;
 
   return (
@@ -212,8 +216,76 @@ export default async function AdminDashboard() {
                     )}
                   </div>
                   
-                  {/* Activity Log Accordion */}
+                  {/* Gestion des Terrains Accordion */}
                   <div className="w-full mt-6 pt-4 border-t border-gray-100">
+                    <details className="group" open>
+                      <summary className="flex cursor-pointer items-center justify-between font-bold text-sm text-indigo-800 bg-indigo-50 hover:bg-indigo-100 p-3 rounded-xl transition-colors select-none">
+                        <span>🏟️ Terrains assignés & Poules par défaut ({session.reservations?.length || 0})</span>
+                        <span className="transition transform group-open:rotate-180">
+                          <svg fill="none" height="20" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="20"><path d="M6 9l6 6 6-6"></path></svg>
+                        </span>
+                      </summary>
+                      <div className="mt-4 px-1">
+                        {session.reservations && session.reservations.length > 0 && (
+                          <div className="mb-4 flex flex-col gap-2">
+                            {session.reservations.map((res: any) => (
+                              <div key={res.id} className="flex flex-col sm:flex-row justify-between sm:items-center bg-white p-3 rounded-xl border border-indigo-100 shadow-sm gap-3">
+                                <div className="flex flex-col">
+                                  <span className="font-bold text-indigo-900">{res.club.name} - {res.name}</span>
+                                  <span className="text-xs text-gray-500">{res.club.city} | Heure: <strong className="text-indigo-600">{res.startTime}</strong></span>
+                                </div>
+                                
+                                <div className="flex items-center gap-2 self-end sm:self-auto">
+                                  <form action={updateReservationDefaultLevel.bind(null, res.id)} className="flex items-center gap-1">
+                                    <select name="defaultPoolLevel" defaultValue={res.defaultPoolLevel || ""} className="p-1.5 rounded-lg border border-indigo-200 text-xs font-bold text-indigo-800 bg-indigo-50 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                      <option value="">-- Générique --</option>
+                                      {[...Array(12)].map((_, i) => (
+                                        <option key={i+1} value={i+1}>Poule {i+1}</option>
+                                      ))}
+                                    </select>
+                                    <SubmitButton pendingText="..." className="bg-indigo-600 text-white rounded px-2 py-1.5 text-xs font-bold hover:bg-indigo-700">OK</SubmitButton>
+                                  </form>
+                                  
+                                  <form action={deleteCourtReservation.bind(null, session.id)}>
+                                    <input type="hidden" name="reservationId" value={res.id} />
+                                    <SubmitButton pendingText="..." className="text-red-500 hover:text-white font-bold bg-red-50 hover:bg-red-500 p-1.5 rounded-lg transition-colors">
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </SubmitButton>
+                                  </form>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        <form action={createCourtReservation.bind(null, session.id)} className="flex flex-col sm:flex-row items-end gap-2 bg-gray-50/50 p-3 rounded-xl border border-gray-100">
+                          <div className="w-full sm:flex-[2] flex flex-col gap-1">
+                            <label className="text-[10px] font-bold text-gray-500 uppercase">Club</label>
+                            <select name="clubId" required className="w-full p-2 rounded-lg border border-gray-200 text-xs focus:outline-none bg-white">
+                              <option value="">Sélectionner...</option>
+                              {allClubs.map((c: any) => (
+                                <option key={c.id} value={c.id}>{c.name}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="w-full sm:flex-1 flex flex-col gap-1">
+                            <label className="text-[10px] font-bold text-gray-500 uppercase">Piste</label>
+                            <input type="text" name="name" required placeholder="Ex: T1" className="w-full p-2 rounded-lg border border-gray-200 text-xs focus:outline-none bg-white" />
+                          </div>
+                          <div className="w-full sm:w-20 flex flex-col gap-1">
+                            <label className="text-[10px] font-bold text-gray-500 uppercase">Heure</label>
+                            <input type="time" name="startTime" required className="w-full p-2 rounded-lg border border-gray-200 text-xs font-bold focus:outline-none bg-white" />
+                          </div>
+                          <SubmitButton pendingText="..." className="bg-gray-800 hover:bg-gray-900 text-white font-bold p-2 text-xs rounded-lg w-full sm:w-auto h-[34px]">
+                            +
+                          </SubmitButton>
+                        </form>
+                      </div>
+                    </details>
+                  </div>
+
+                  {/* Activity Log Accordion */}
+                  <div className="w-full mt-4 pt-4 border-t border-gray-100">
                     <details className="group">
                       <summary className="flex cursor-pointer items-center justify-between font-bold text-sm text-gray-500 bg-gray-100/50 hover:bg-gray-100 p-3 rounded-xl transition-colors select-none">
                         <span>📝 Journal d'activité ({session.activityLogs?.length || 0} entrées)</span>
