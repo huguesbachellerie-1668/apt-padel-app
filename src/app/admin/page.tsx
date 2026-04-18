@@ -301,7 +301,7 @@ export default async function AdminDashboard() {
                           session.activityLogs.map((log: any) => (
                             <div key={log.id} className="flex gap-3 items-start border-b border-gray-50 pb-2 last:border-0 last:pb-0">
                               <span className="text-gray-400 min-w-[110px] whitespace-nowrap text-xs mt-0.5 bg-gray-50 px-2 py-0.5 rounded font-mono">
-                                {log.createdAt.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' }).replace(',', ' -')}
+                                {log.createdAt.toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' }).replace(',', ' -')}
                               </span>
                               <span className="font-bold text-gray-700">{log.message}</span>
                             </div>
