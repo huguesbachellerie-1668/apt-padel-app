@@ -369,7 +369,7 @@ export default async function AdminDashboard() {
                 <div className="flex-1 w-full border-l border-gray-200 pl-6 hidden md:block">
                   <label className="block text-sm font-bold text-gray-700 mb-2 whitespace-nowrap">Verrouillage des désinscriptions</label>
                   <div className="flex items-center gap-2">
-                    <select name="lockUnregisterDay" defaultValue={settings?.lockUnregisterDay ?? 5} className="w-full p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none font-bold text-md">
+                    <select name="lockUnregisterDay" defaultValue={settings?.lockUnregisterDay ?? 5} className="flex-[2] min-w-0 p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none font-bold text-md">
                       <option value="1">Lundi</option>
                       <option value="2">Mardi</option>
                       <option value="3">Mercredi</option>
@@ -379,15 +379,15 @@ export default async function AdminDashboard() {
                       <option value="0">Dimanche</option>
                     </select>
                     <span className="font-medium text-gray-500">à</span>
-                    <input type="time" name="lockUnregisterTime" defaultValue={settings?.lockUnregisterTime ?? "20:00"} className="p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none font-bold text-md w-32" />
+                    <input type="time" name="lockUnregisterTime" defaultValue={settings?.lockUnregisterTime ?? "20:00"} className="flex-1 min-w-0 p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none font-bold text-md" />
                   </div>
                 </div>
 
                 {/* Mobile version */}
                 <div className="flex-1 w-full md:hidden">
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Verrouillage désinscriptions (Jour & Heure)</label>
-                  <div className="flex flex-col gap-2">
-                    <select name="lockUnregisterDay" defaultValue={settings?.lockUnregisterDay ?? 5} className="w-full p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none font-bold text-md">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Verrouillage désinscriptions</label>
+                  <div className="flex items-center gap-2">
+                    <select name="lockUnregisterDay" defaultValue={settings?.lockUnregisterDay ?? 5} className="flex-[2] min-w-0 p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none font-bold text-md">
                       <option value="1">Lundi</option>
                       <option value="2">Mardi</option>
                       <option value="3">Mercredi</option>
@@ -396,7 +396,8 @@ export default async function AdminDashboard() {
                       <option value="6">Samedi</option>
                       <option value="0">Dimanche</option>
                     </select>
-                    <input type="time" name="lockUnregisterTime" defaultValue={settings?.lockUnregisterTime ?? "20:00"} className="w-full p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none font-bold text-md" />
+                    <span className="font-medium text-gray-500">à</span>
+                    <input type="time" name="lockUnregisterTime" defaultValue={settings?.lockUnregisterTime ?? "20:00"} className="flex-1 min-w-0 p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none font-bold text-md" />
                   </div>
                 </div>
 
