@@ -173,8 +173,10 @@ model Goodie {
 }
 
 model Settings {
-  id            String @id @default("global")
-  matchDuration Int    @default(25)
+  id                  String @id @default("global")
+  matchDuration       Int    @default(25)
+  lockUnregisterDay   Int    @default(5)
+  lockUnregisterTime  String @default("20:00")
 }
 
 model ActivityLog {

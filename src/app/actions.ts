@@ -36,6 +36,26 @@ export async function unregisterFromSession(sessionId: string) {
   if (!user) return;
 
   const session = await prisma.session.findUnique({ where: { id: sessionId } });
+  if (!session) return;
+
+  if (!['PRESIDENT', 'ORGA', 'TRESORIER'].includes(user.role)) {
+    const globalSettings = await prisma.settings.findUnique({ where: { id: 'global' } });
+    const lockDay = globalSettings?.lockUnregisterDay ?? 5;
+    const lockTime = globalSettings?.lockUnregisterTime ?? "20:00";
+
+    const sessionDate = new Date(session.date);
+    const lockdownDate = new Date(sessionDate);
+    lockdownDate.setHours(0, 0, 0, 0);
+    const daysToSubtract = (lockdownDate.getDay() - lockDay + 7) % 7;
+    lockdownDate.setDate(lockdownDate.getDate() - daysToSubtract);
+    const [hours, minutes] = lockTime.split(':').map(Number);
+    lockdownDate.setHours(hours, minutes, 0, 0);
+
+    const now = new Date();
+    if (now > lockdownDate) {
+      throw new Error("Désinscription verrouillée. Veuillez contacter les administrateurs.");
+    }
+  }
 
   if (session?.status === 'POULES_GENEREES') {
     await prisma.session.update({

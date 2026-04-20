@@ -8,13 +8,21 @@ type Props = {
   sessionDate: string;
   userName: string;
   className?: string;
+  isLocked?: boolean;
   children: React.ReactNode;
 };
 
-export default function UnregisterButtonWithWhatsApp({ sessionId, sessionDate, userName, className, children }: Props) {
+export default function UnregisterButtonWithWhatsApp({ sessionId, sessionDate, userName, className, isLocked, children }: Props) {
   const [isPending, startTransition] = useTransition();
 
   const handleUnregister = () => {
+    if (isLocked) {
+      // Direct WhatsApp redirect without unregistering
+      const text = encodeURIComponent(`Salut, je souhaite me désinscrire exceptionnellement pour la session du dimanche ${sessionDate}.`);
+      window.open(`https://wa.me/?text=${text}`, '_blank');
+      return;
+    }
+
     if (confirm("Êtes-vous sûr de vouloir vous désinscrire ? Un message WhatsApp sera préparé pour informer le club.")) {
       // 1. Prepare Whatsapp
       const text = encodeURIComponent(`${userName} se désinscrit de la session du ${sessionDate}`);

@@ -373,12 +373,28 @@ export async function finishSessionAndCalculatePoints(sessionId: string) {
 export async function updateGlobalSettings(formData: FormData) {
   const durationStr = formData.get('matchDuration') as string;
   const duration = parseInt(durationStr, 10);
+  
+  const lockUnregisterDayStr = formData.get('lockUnregisterDay') as string;
+  const lockUnregisterDay = parseInt(lockUnregisterDayStr, 10);
+  
+  const lockUnregisterTime = formData.get('lockUnregisterTime') as string;
 
+  const dataToUpdate: any = {};
   if (!isNaN(duration) && duration > 0 && duration <= 120) {
+    dataToUpdate.matchDuration = duration;
+  }
+  if (!isNaN(lockUnregisterDay)) {
+    dataToUpdate.lockUnregisterDay = lockUnregisterDay;
+  }
+  if (lockUnregisterTime) {
+    dataToUpdate.lockUnregisterTime = lockUnregisterTime;
+  }
+
+  if (Object.keys(dataToUpdate).length > 0) {
      await prisma.settings.upsert({
         where: { id: 'global' },
-        update: { matchDuration: duration },
-        create: { id: 'global', matchDuration: duration }
+        update: dataToUpdate,
+        create: { id: 'global', ...dataToUpdate }
      });
   }
 

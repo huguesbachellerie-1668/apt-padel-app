@@ -358,14 +358,54 @@ export default async function AdminDashboard() {
             <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
               ⚙️ Paramètres du Club
             </h2>
-            <form action={updateGlobalSettings} className="flex flex-col md:flex-row items-end gap-6 bg-gray-50 p-6 rounded-2xl border border-gray-200">
-              <div className="flex-1 w-full">
-                <label className="block text-sm font-bold text-gray-700 mb-2">Durée standard des matchs (minutes)</label>
-                <input type="number" name="matchDuration" defaultValue={matchDuration} min="1" max="120" required className="w-full p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none transition-all font-black text-xl" />
+            <form action={updateGlobalSettings} className="flex flex-col gap-6 bg-gray-50 p-6 rounded-2xl border border-gray-200">
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full items-end">
+                <div className="flex-1 w-full">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Durée standard des matchs (min)</label>
+                  <input type="number" name="matchDuration" defaultValue={matchDuration} min="1" max="120" required className="w-full p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none transition-all font-black text-xl" />
+                </div>
+                
+                <div className="flex-1 w-full border-l border-gray-200 pl-6 hidden md:block">
+                  <label className="block text-sm font-bold text-gray-700 mb-2 whitespace-nowrap">Verrouillage des désinscriptions</label>
+                  <div className="flex items-center gap-2">
+                    <select name="lockUnregisterDay" defaultValue={settings?.lockUnregisterDay ?? 5} className="w-full p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none font-bold text-md">
+                      <option value="1">Lundi</option>
+                      <option value="2">Mardi</option>
+                      <option value="3">Mercredi</option>
+                      <option value="4">Jeudi</option>
+                      <option value="5">Vendredi</option>
+                      <option value="6">Samedi</option>
+                      <option value="0">Dimanche</option>
+                    </select>
+                    <span className="font-medium text-gray-500">à</span>
+                    <input type="time" name="lockUnregisterTime" defaultValue={settings?.lockUnregisterTime ?? "20:00"} className="p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none font-bold text-md w-32" />
+                  </div>
+                </div>
+
+                {/* Mobile version */}
+                <div className="flex-1 w-full md:hidden">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Verrouillage désinscriptions (Jour & Heure)</label>
+                  <div className="flex flex-col gap-2">
+                    <select name="lockUnregisterDay" defaultValue={settings?.lockUnregisterDay ?? 5} className="w-full p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none font-bold text-md">
+                      <option value="1">Lundi</option>
+                      <option value="2">Mardi</option>
+                      <option value="3">Mercredi</option>
+                      <option value="4">Jeudi</option>
+                      <option value="5">Vendredi</option>
+                      <option value="6">Samedi</option>
+                      <option value="0">Dimanche</option>
+                    </select>
+                    <input type="time" name="lockUnregisterTime" defaultValue={settings?.lockUnregisterTime ?? "20:00"} className="w-full p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none font-bold text-md" />
+                  </div>
+                </div>
+
+                <div className="w-full md:w-auto self-end mt-4 md:mt-0">
+                  <SubmitButton pendingText="Sauvegarde..." className="bg-blue-900 text-white font-bold py-4 px-8 rounded-xl hover:bg-blue-800 transition-colors shadow-sm whitespace-nowrap w-full">
+                    Enregistrer
+                  </SubmitButton>
+                </div>
               </div>
-              <SubmitButton pendingText="Sauvegarde..." className="bg-blue-900 text-white font-bold py-4 px-8 rounded-xl hover:bg-blue-800 transition-colors shadow-sm whitespace-nowrap w-full md:w-auto">
-                Enregistrer le paramètre
-              </SubmitButton>
             </form>
           </div>
         </div>
