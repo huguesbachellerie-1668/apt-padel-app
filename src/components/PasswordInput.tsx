@@ -18,7 +18,7 @@ export default function PasswordInput() {
       <button 
         type="button" 
         onClick={() => setShowPwd(!showPwd)} 
-        className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-orange-500 focus:outline-none text-xl" 
+        className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-orange-500 focus:outline-none text-xl z-20 cursor-pointer" 
         title={showPwd ? "Cacher" : "Afficher"}
       >
         {showPwd ? '🙈' : '👁️'}
