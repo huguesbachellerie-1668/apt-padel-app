@@ -146,7 +146,7 @@ export default async function Dashboard() {
                   
                   <div className="flex flex-wrap items-center gap-3 mb-5">
                     <p className="text-md text-blue-900 font-black capitalize bg-blue-50 p-3 rounded-xl border border-blue-100 inline-block m-0">
-                       Dimanche {new Date(activeSession.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit' }).replace(':', 'h')}
+                       Dimanche {new Date(activeSession.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit' }).replace(':', 'h').replace(' à ', ' à partir de ')}
                     </p>
                     {new Date(activeSession.date).toDateString() === new Date().toDateString() && (
                        <span className="bg-red-500 text-white text-xs font-black uppercase px-3 py-1.5 rounded-full animate-pulse shadow-sm border border-red-600">
