@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import SubmitButton from '@/components/SubmitButton';
 import { saveScoresAction, registerPlayersNextSession } from '@/app/pool/[id]/actions';
+import WhatsAppShareTextButton from '@/components/WhatsAppShareTextButton';
 
 type PoolScoreFormProps = {
   pool: any;
@@ -13,8 +14,16 @@ type PoolScoreFormProps = {
 export default function PoolScoreForm({ pool, nextSession, canEditScores }: PoolScoreFormProps) {
   const allMatchesFinishedInitial = pool.matches.length === 3 && pool.matches.every((m: any) => m.team1Games !== null && m.team2Games !== null);
   
-  // To track newly filled scores to pop up the modal exactly once
-  const [scores, setScores] = useState<Record<string, string>>({});
+  const [currentScores, setCurrentScores] = useState<Record<string, {t1: string, t2: string}>>(() => {
+     const init: Record<string, {t1: string, t2: string}> = {};
+     pool.matches.forEach((m: any) => {
+         if (m.team1Games !== null && m.team2Games !== null) {
+             init[m.order] = { t1: String(m.team1Games), t2: String(m.team2Games) };
+         }
+     });
+     return init;
+  });
+
   const [hasPromptedModal, setHasPromptedModal] = useState(allMatchesFinishedInitial); // if already finished before rendering, don't pop up again
   const [showModal, setShowModal] = useState(false);
   const [playersNextStatus, setPlayersNextStatus] = useState<Record<string, boolean>>({});
@@ -36,36 +45,70 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
      const formData = new FormData(formRef.current);
      
      let allFilled = true;
+     const newScores: Record<string, {t1: string, t2: string}> = {};
      for (let i = 1; i <= 3; i++) {
         const t1 = formData.get(`m${i}_t1`) as string;
         const t2 = formData.get(`m${i}_t2`) as string;
         if (!t1 || !t2) {
            allFilled = false;
-           break;
+        } else {
+           newScores[i] = {t1, t2};
         }
      }
 
-     if (allFilled && !hasPromptedModal && nextSession !== null) {
+     setCurrentScores(newScores);
+
+     if (allFilled && !hasPromptedModal) {
         setHasPromptedModal(true);
         setShowModal(true);
      }
   };
 
-  const submitModal = async () => {
+  const generateWhatsAppText = () => {
+      let text = `🎾 *Scores Poule ${pool.level}*\n\n`;
+      pool.matches.forEach((m: any) => {
+          const s = currentScores[m.order];
+          if (s) {
+              const p1 = m.team1Player1.nickname || m.team1Player1.name.split(' ')[0];
+              const p2 = m.team1Player2.nickname || m.team1Player2.name.split(' ')[0];
+              const p3 = m.team2Player1.nickname || m.team2Player1.name.split(' ')[0];
+              const p4 = m.team2Player2.nickname || m.team2Player2.name.split(' ')[0];
+              text += `${p1} & ${p2}  *${s.t1} - ${s.t2}*  ${p3} & ${p4}\n`;
+          }
+      });
+
+      if (nextSession) {
+          text += `\n📅 *Présents prochaine session (${new Date(nextSession.date).toLocaleDateString('fr-FR')})* :\n`;
+          let hasPresences = false;
+          pool.players.forEach((p: any) => {
+              if (playersNextStatus[p.userId]) {
+                  text += `- ${p.user.nickname || p.user.name.split(' ')[0]}\n`;
+                  hasPresences = true;
+              }
+          });
+          if (!hasPresences) {
+              text += `(Aucun inscrit pour le moment)\n`;
+          }
+      }
+      return text;
+  };
+
+  const handleFinalize = async () => {
     setIsRegistering(true);
-    const usersToRegister = Object.keys(playersNextStatus).filter(uid => playersNextStatus[uid]);
-    
     try {
-       await registerPlayersNextSession(nextSession!.id, usersToRegister);
+        if (nextSession) {
+            const usersToRegister = Object.keys(playersNextStatus).filter(uid => playersNextStatus[uid]);
+            await registerPlayersNextSession(nextSession.id, usersToRegister);
+        }
+        
+        if (formRef.current) {
+            const formData = new FormData(formRef.current);
+            formData.set('redirect', 'true');
+            await saveScoresAction(formData);
+        }
     } catch(e) {
-       console.error("Failed to register", e);
-    } finally {
-       setIsRegistering(false);
-       setShowModal(false);
-       // Scroll smoothly back to submit button to encourage validation
-       setTimeout(() => {
-          window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-       }, 300);
+        console.error("Failed to finalize", e);
+        setIsRegistering(false);
     }
   };
 
@@ -116,13 +159,11 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
           {canEditScores && pool.session.status !== 'TERMINEE' && (
               <div className="text-center pt-8 border-t border-gray-200">
                   {allMatchesFinishedInitial || hasPromptedModal ? (
-                      <>
-                        <p className="text-green-600 mb-4 text-sm font-bold">Maintenant, n'oubliez pas d'enregistrer les scores :</p>
-                        <input type="hidden" name="redirect" value="true" />
-                        <SubmitButton pendingText="Enregistrement..." formAction={saveScoresAction} className="bg-green-500 hover:bg-green-600 text-white font-black py-4 px-10 rounded-2xl shadow-xl transition-transform transform hover:scale-[1.02] text-lg w-full md:w-auto animate-bounce-short">
-                            ✅ Scores enregistrés ! Voir les Résultats 👉
-                        </SubmitButton>
-                      </>
+                      <div className="flex flex-col items-center gap-4">
+                        <button type="button" onClick={() => setShowModal(true)} className="bg-green-500 hover:bg-green-600 text-white font-black py-4 px-10 rounded-2xl shadow-xl transition-transform transform hover:scale-[1.02] text-lg w-full md:w-auto animate-bounce-short">
+                            ✅ Finaliser la session 👉
+                        </button>
+                      </div>
                   ) : (
                       <>
                         <p className="text-gray-500 mb-4 text-sm font-medium">Assurez-vous que les scores des {pool.matches.length} matchs sont saisis.</p>
@@ -136,23 +177,28 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
           )}
       </form>
 
-      {/* MODAL INSCRIPTIONS PROCHAINE SESSION */}
-      {showModal && nextSession && (
+      {/* MODAL FINALISATION */}
+      {showModal && (
         <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl animate-fade-in-up">
-               <div className="bg-gradient-to-r from-blue-900 to-blue-800 p-6 text-white text-center">
-                  <div className="text-4xl mb-3">📅</div>
-                  <h3 className="text-2xl font-black">Prochaine Session !</h3>
-                  <p className="font-medium opacity-90 mt-1">Voulez-vous vérifier qui souhaite s'inscrire pour la session du {new Date(nextSession.date).toLocaleDateString('fr-FR')} ?</p>
+            <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl animate-fade-in-up max-h-[90vh] flex flex-col">
+               <div className="bg-gradient-to-r from-blue-900 to-blue-800 p-6 text-white text-center relative shrink-0">
+                  <button onClick={() => setShowModal(false)} type="button" className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors">
+                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                  </button>
+                  <div className="text-4xl mb-3">✅</div>
+                  <h3 className="text-2xl font-black">Finalisation</h3>
+                  {nextSession && (
+                     <p className="font-medium opacity-90 mt-1">Inscriptions pour la session du {new Date(nextSession.date).toLocaleDateString('fr-FR')}</p>
+                  )}
                </div>
                
-               <div className="p-6 space-y-4">
-                  {pool.players.map((p: any) => {
+               <div className="p-6 space-y-4 overflow-y-auto">
+                  {nextSession && pool.players.map((p: any) => {
                      const isYes = playersNextStatus[p.userId] === true;
                      return (
                         <div key={p.userId} className="flex justify-between items-center p-3 sm:p-4 border border-gray-100 rounded-2xl bg-gray-50">
                            <span className="font-bold text-gray-800 flex-1">{p.user.nickname || p.user.name}</span>
-                           <div className="flex bg-white rounded-full p-1 border border-gray-200 shadow-sm">
+                           <div className="flex bg-white rounded-full p-1 border border-gray-200 shadow-sm shrink-0">
                               <button 
                                  type="button"
                                  onClick={() => setPlayersNextStatus(prev => ({...prev, [p.userId]: true}))}
@@ -172,13 +218,20 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
                      )
                   })}
 
-                  <button 
-                    onClick={submitModal} 
-                    disabled={isRegistering}
-                    className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl shadow-lg transition-transform transform hover:scale-[1.02] disabled:opacity-50"
-                  >
-                    {isRegistering ? 'Inscription...' : 'Valider les inscriptions'}
-                  </button>
+                  <div className="mt-8 space-y-4 pt-4 border-t border-gray-100">
+                     <WhatsAppShareTextButton 
+                        textToShare={generateWhatsAppText()}
+                        label="1. Partager sur WhatsApp"
+                        className="w-full flex justify-center text-lg py-4"
+                     />
+                     <button 
+                       onClick={handleFinalize} 
+                       disabled={isRegistering}
+                       className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl shadow-lg transition-transform transform hover:scale-[1.02] disabled:opacity-50 flex items-center justify-center gap-2 text-lg"
+                     >
+                       {isRegistering ? 'Enregistrement...' : '2. Valider et Terminer 👉'}
+                     </button>
+                  </div>
                </div>
             </div>
         </div>
