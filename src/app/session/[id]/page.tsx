@@ -308,7 +308,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                 </div>
                 {isBoard && session.status !== 'TERMINEE' && (
                   <div className="flex items-center gap-2">
-                    {idx > 0 && session.registrations[idx - 1].priorityType === reg.priorityType && (
+                    {idx > 0 && (session.registrations[idx - 1] as any).priorityType === reg.priorityType && (
                       <form action={swapRegistrationOrder.bind(null, session.id)}>
                         <input type="hidden" name="userId" value={reg.userId} />
                         <input type="hidden" name="direction" value="up" />
@@ -317,7 +317,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                         </SubmitButton>
                       </form>
                     )}
-                    {idx < session.registrations.length - 1 && session.registrations[idx + 1].priorityType === reg.priorityType && (
+                    {idx < session.registrations.length - 1 && (session.registrations[idx + 1] as any).priorityType === reg.priorityType && (
                       <form action={swapRegistrationOrder.bind(null, session.id)}>
                         <input type="hidden" name="userId" value={reg.userId} />
                         <input type="hidden" name="direction" value="down" />
