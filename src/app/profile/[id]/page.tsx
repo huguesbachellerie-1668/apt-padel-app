@@ -277,7 +277,7 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
             {bestTeammate ? (
               <div>
                 <Link href={`/profile/${bestTeammate.user.id}`} className="text-2xl font-black text-green-700 hover:text-green-900 transition-colors">
-                  {bestTeammate.user.name}
+                  {bestTeammate.user.nickname || bestTeammate.user.name}
                 </Link>
                 <p className="text-green-600 font-medium mt-2">
                   <strong className="text-green-800">{bestTeammate.winsTogether} victoires</strong> remportées ensemble !
@@ -296,7 +296,7 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
             {nemesis ? (
               <div>
                 <Link href={`/profile/${nemesis.user.id}`} className="text-2xl font-black text-red-700 hover:text-red-900 transition-colors">
-                  {nemesis.user.name}
+                  {nemesis.user.nickname || nemesis.user.name}
                 </Link>
                 <p className="text-red-600 font-medium mt-2">
                   <strong className="text-red-800">{nemesis.lossesAgainst} défaites</strong> en face à face.
