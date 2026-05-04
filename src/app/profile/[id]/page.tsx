@@ -110,10 +110,49 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
 
   const winRate = totalMatchesPlayed > 0 ? Math.round((wins / totalMatchesPlayed) * 100) : 0;
   
-  // Calculate historical chart data
-  let cumulativePoints = 0;
-  let cumulativeSessions = 0;
-  const chartData = [...poolPlayers].reverse().map((pp) => {
+  // Calculate historical chart data (incorporating past seasons not in the Match table)
+  let dbPoints = 0;
+  for (const pp of poolPlayers) {
+    let sessionPoints = 0;
+    for (const match of pp.pool.matches) {
+      const isTeam1 = match.team1Player1Id === player.id || match.team1Player2Id === player.id;
+      const isTeam2 = match.team2Player1Id === player.id || match.team2Player2Id === player.id;
+      if (!isTeam1 && !isTeam2) continue;
+
+      const myGames = isTeam1 ? match.team1Games : match.team2Games;
+      const theirGames = isTeam1 ? match.team2Games : match.team1Games;
+      if (myGames === null || theirGames === null) continue;
+
+      sessionPoints += myGames;
+      if (myGames > theirGames) {
+         sessionPoints += 30;
+      } else if (myGames === theirGames) {
+         sessionPoints += 20;
+      } else {
+         sessionPoints += 10;
+      }
+    }
+    dbPoints += (sessionPoints / 3);
+  }
+
+  const playerTotalSessions = Math.floor((player.totalMatches || 0) / 3);
+  const dbSessionsCount = poolPlayers.length;
+  const historicalSessions = Math.max(0, playerTotalSessions - dbSessionsCount);
+  const historicalPoints = Math.max(0, (player.points || 0) - dbPoints);
+
+  let cumulativePoints = historicalSessions > 0 ? historicalPoints : 0;
+  let cumulativeSessions = historicalSessions;
+  
+  const chartData: any[] = [];
+  if (historicalSessions > 0) {
+    chartData.push({
+      name: "Départ",
+      average: cumulativePoints / cumulativeSessions
+    });
+  }
+
+  const chronologicalPools = [...poolPlayers].reverse();
+  for (const pp of chronologicalPools) {
     let sessionPoints = 0;
     for (const match of pp.pool.matches) {
       const isTeam1 = match.team1Player1Id === player.id || match.team1Player2Id === player.id;
@@ -134,18 +173,15 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
       }
     }
     
-    const sessionAverage = sessionPoints / 3;
-    cumulativePoints += sessionAverage;
+    cumulativePoints += (sessionPoints / 3);
     cumulativeSessions++;
     
-    const currentAverage = cumulativeSessions > 0 ? cumulativePoints / cumulativeSessions : 0;
     const dateStr = new Date(pp.pool.session.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
-    
-    return {
+    chartData.push({
       name: dateStr,
-      average: currentAverage
-    };
-  });
+      average: cumulativeSessions > 0 ? cumulativePoints / cumulativeSessions : 0
+    });
+  }
   
   // Calculate Best Teammate (highest volume of wins together, tie broken by total points earned)
   const bestTeammates = Array.from(teammateStats.values())
