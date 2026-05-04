@@ -126,7 +126,9 @@ export default async function Dashboard() {
       {/* Dynamic Session Dashboard (Multiple Sessions support) */}
       {sessionsData.length > 0 ? (
         <div className="space-y-12 pb-6">
-          {sessionsData.map(({ session: activeSession, hasFinishedPool, allPoolsFinished, userRegistration, userPoolPlayer, isUnregisterLocked }, index) => (
+          {sessionsData.map(({ session: activeSession, hasFinishedPool, allPoolsFinished, userRegistration, userPoolPlayer, isUnregisterLocked }, index) => {
+             const isToday = new Date(activeSession.date).toDateString() === new Date().toDateString();
+             return (
              <div key={activeSession.id} className="space-y-6">
                 
                 {index > 0 && <hr className="my-10 border-gray-200" />}
@@ -135,7 +137,7 @@ export default async function Dashboard() {
                 <section className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 relative overflow-hidden">
                   <div className="flex flex-wrap justify-between items-center mb-5 gap-4">
                     <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                      <span className="text-2xl">📋</span> {index === 0 ? "Prochaine Session" : "Session Suivante"}
+                      <span className="text-2xl">📋</span> {isToday ? "Session Aujourd'hui" : (index === 0 ? "Prochaine Session" : "Session Suivante")}
                     </h2>
                     {activeSession.status !== 'POULES_GENEREES' && (
                       <span className={`px-3 py-1 text-xs font-bold rounded-full ${activeSession.status === 'INSCRIPTIONS_OUVERTES' ? 'bg-orange-500 text-white' : activeSession.status === 'POULES_EN_ATTENTE' ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-200 text-gray-700'}`}>
@@ -148,14 +150,9 @@ export default async function Dashboard() {
                     <p className="text-md text-blue-900 font-black capitalize bg-blue-50 p-3 rounded-xl border border-blue-100 inline-block m-0">
                        Dimanche {new Date(activeSession.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit' }).replace(':', 'h').replace(' à ', ' à partir de ')}
                     </p>
-                    {new Date(activeSession.date).toDateString() === new Date().toDateString() && (
-                       <span className="bg-red-500 text-white text-xs font-black uppercase px-3 py-1.5 rounded-full animate-pulse shadow-sm border border-red-600">
-                          Aujourd'hui !
-                       </span>
-                    )}
                   </div>
 
-                  {activeSession.status === 'INSCRIPTIONS_OUVERTES' && (
+                  {activeSession.status === 'INSCRIPTIONS_OUVERTES' && !isToday && (
                     userRegistration ? (
                       <div className="bg-green-500/10 border border-green-200 p-5 rounded-2xl text-center mb-4">
                         <p className="font-black text-green-700 flex items-center justify-center gap-2 mb-4 text-lg">
@@ -190,7 +187,7 @@ export default async function Dashboard() {
                     )
                   )}
 
-                  {(activeSession.status === 'POULES_GENEREES' || activeSession.status === 'POULES_EN_ATTENTE') && (
+                  {(activeSession.status === 'POULES_GENEREES' || activeSession.status === 'POULES_EN_ATTENTE') && !isToday && (
                      userPoolPlayer ? (
                        <div className="bg-green-50 text-green-700 p-4 rounded-xl border border-green-200 text-sm font-bold mb-4 flex items-center justify-between gap-3">
                          <div className="flex items-center gap-3">
@@ -321,7 +318,8 @@ export default async function Dashboard() {
                 )}
 
              </div>
-          ))}
+           );
+          })}
         </div>
       ) : (
         <section className="bg-white border border-gray-100 p-12 rounded-3xl shadow-sm text-center">
