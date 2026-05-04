@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import BackButton from "@/components/BackButton";
+import PlayerStatsChart from "@/components/PlayerStatsChart";
 
 export default async function PlayerProfilePage({ params }: { params: any }) {
   const p = await params;
@@ -108,6 +109,43 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
   }
 
   const winRate = totalMatchesPlayed > 0 ? Math.round((wins / totalMatchesPlayed) * 100) : 0;
+  
+  // Calculate historical chart data
+  let cumulativePoints = 0;
+  let cumulativeSessions = 0;
+  const chartData = [...poolPlayers].reverse().map((pp) => {
+    let sessionPoints = 0;
+    for (const match of pp.pool.matches) {
+      const isTeam1 = match.team1Player1Id === player.id || match.team1Player2Id === player.id;
+      const isTeam2 = match.team2Player1Id === player.id || match.team2Player2Id === player.id;
+      if (!isTeam1 && !isTeam2) continue;
+
+      const myGames = isTeam1 ? match.team1Games : match.team2Games;
+      const theirGames = isTeam1 ? match.team2Games : match.team1Games;
+      if (myGames === null || theirGames === null) continue;
+
+      sessionPoints += myGames;
+      if (myGames > theirGames) {
+         sessionPoints += 30;
+      } else if (myGames === theirGames) {
+         sessionPoints += 20;
+      } else {
+         sessionPoints += 10;
+      }
+    }
+    
+    const sessionAverage = sessionPoints / 3;
+    cumulativePoints += sessionAverage;
+    cumulativeSessions++;
+    
+    const currentAverage = cumulativeSessions > 0 ? cumulativePoints / cumulativeSessions : 0;
+    const dateStr = new Date(pp.pool.session.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+    
+    return {
+      name: dateStr,
+      average: currentAverage
+    };
+  });
   
   // Calculate Best Teammate (highest volume of wins together, tie broken by total points earned)
   const bestTeammates = Array.from(teammateStats.values())
@@ -234,6 +272,12 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
             )}
          </div>
       </div>
+
+      {chartData.length > 0 && (
+        <div className="mt-12">
+          <PlayerStatsChart data={chartData} />
+        </div>
+      )}
 
       <div className="mt-12">
         <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-3 mb-6">
