@@ -59,6 +59,32 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
 
   const poulesCount = Math.floor(registeredCount / 4);
   const remplaCount = registeredCount % 4;
+
+  const lastSession = await prisma.session.findFirst({
+    where: { status: 'TERMINEE' },
+    orderBy: { date: 'desc' },
+    include: { pools: { include: { players: true } } }
+  });
+  const lastSessionUserIds = new Set<string>();
+  if (lastSession) {
+    lastSession.pools.forEach((p: any) => p.players.forEach((pp: any) => lastSessionUserIds.add(pp.userId)));
+  }
+
+  session.registrations.forEach((reg: any) => {
+     if (lastSessionUserIds.has(reg.userId)) {
+         reg.priorityType = 1;
+     } else if (reg.user.totalMatches && reg.user.totalMatches > 0) {
+         reg.priorityType = 2;
+     } else {
+         reg.priorityType = 3;
+     }
+  });
+
+  session.registrations.sort((a: any, b: any) => {
+      if (a.priorityType !== b.priorityType) return a.priorityType - b.priorityType;
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+  });
+
   let listText = `🎾 Session du ${new Date(session.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}\n\n`;
   listText += `👥 ${registeredCount} inscrit(s)\n`;
   listText += `▶️ ${poulesCount} poule(s) + ${remplaCount} remplaçant(s)\n\n`;
@@ -75,7 +101,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
             <span className="text-4xl">📅</span> Détails Session
           </h1>
           <p className="text-gray-500 mt-2 font-medium capitalize">
-            {new Date(session.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            {new Date(session.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Paris' })}
           </p>
         </div>
       </div>
@@ -244,28 +270,45 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
            )}
          </div>
          <div className="divide-y divide-gray-100">
-           {session.registrations.map((reg: any, idx: number) => (
-             <div key={reg.id} className={`flex items-center gap-4 p-4 ${reg.userId === user.id ? 'bg-orange-50/30' : ''}`}>
+           {session.registrations.map((reg: any, idx: number) => {
+             const isCurrentUser = reg.userId === user.id;
+             let priorityStyles = '';
+             let priorityBadge = null;
+             
+             if (reg.priorityType === 1) {
+                priorityStyles = isCurrentUser ? 'bg-orange-50/50 border-l-4 border-green-500' : 'bg-green-50/40 border-l-4 border-green-500';
+                priorityBadge = <span className="text-[10px] uppercase font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-md border border-green-200">Session Précédente</span>;
+             } else if (reg.priorityType === 2) {
+                priorityStyles = isCurrentUser ? 'bg-orange-50/50 border-l-4 border-blue-500' : 'bg-blue-50/40 border-l-4 border-blue-500';
+                priorityBadge = <span className="text-[10px] uppercase font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-md border border-blue-200">Inscrit</span>;
+             } else {
+                priorityStyles = isCurrentUser ? 'bg-orange-50/50 border-l-4 border-purple-500' : 'bg-purple-50/40 border-l-4 border-purple-500';
+                priorityBadge = <span className="text-[10px] uppercase font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded-md border border-purple-200">Nouveau</span>;
+             }
+
+             return (
+             <div key={reg.id} className={`flex items-center gap-4 p-4 ${priorityStyles}`}>
                 <div className="flex-shrink-0 w-8 text-center font-black text-gray-400">
                   {idx + 1}
                 </div>
-                <div className="flex-shrink-0 w-10 h-10 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center font-bold">
+                <div className="flex-shrink-0 w-10 h-10 bg-white text-blue-800 rounded-full flex items-center justify-center font-bold shadow-sm border border-gray-100">
                   {(reg.user.nickname || reg.user.name).charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1">
-                  <div className="font-bold text-gray-900 flex items-center gap-2">
+                  <div className="font-bold text-gray-900 flex items-center gap-2 flex-wrap">
                     <span className="text-lg">{reg.user.nickname || reg.user.name}</span>
                     {reg.user.nickname && <span className="text-sm font-medium text-gray-500">{reg.user.name}</span>}
-                    {reg.userId === user.id && <span className="text-[10px] uppercase font-bold bg-orange-200 text-orange-800 px-2 py-0.5 rounded-full">Vous</span>}
+                    {priorityBadge}
+                    {isCurrentUser && <span className="text-[10px] uppercase font-bold bg-orange-200 text-orange-800 px-2 py-0.5 rounded-full">Vous</span>}
                   </div>
-                  <div className="text-xs text-gray-400 mt-0.5 flex gap-2 items-center">
-                    <span>Inscrit le {new Date(reg.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).replace(':', 'h')}</span>
-                    {reg.isReturningFromInjury && <span className="text-orange-600 font-bold flex items-center bg-orange-50 px-1 py-0.5 rounded">🩺 Blessure</span>}
+                  <div className="text-xs text-gray-500 mt-1 flex gap-2 items-center flex-wrap">
+                    <span>Inscrit le {new Date(reg.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' }).replace(':', 'h')}</span>
+                    {reg.isReturningFromInjury && <span className="text-orange-600 font-bold flex items-center bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200">🩺 Blessure</span>}
                   </div>
                 </div>
                 {isBoard && session.status !== 'TERMINEE' && (
                   <div className="flex items-center gap-2">
-                    {idx > 0 && (
+                    {idx > 0 && session.registrations[idx - 1].priorityType === reg.priorityType && (
                       <form action={swapRegistrationOrder.bind(null, session.id)}>
                         <input type="hidden" name="userId" value={reg.userId} />
                         <input type="hidden" name="direction" value="up" />
@@ -274,7 +317,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                         </SubmitButton>
                       </form>
                     )}
-                    {idx < session.registrations.length - 1 && (
+                    {idx < session.registrations.length - 1 && session.registrations[idx + 1].priorityType === reg.priorityType && (
                       <form action={swapRegistrationOrder.bind(null, session.id)}>
                         <input type="hidden" name="userId" value={reg.userId} />
                         <input type="hidden" name="direction" value="down" />
@@ -292,7 +335,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                   </div>
                 )}
              </div>
-           ))}
+           )})}
            
            {registeredCount === 0 && (
              <div className="p-8 text-center text-gray-500 font-medium">

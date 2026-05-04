@@ -95,8 +95,35 @@ export async function swapRegistrationOrder(sessionId: string, formData: FormDat
 
   const registrations = await prisma.registration.findMany({
     where: { sessionId },
+    include: { user: true },
     orderBy: { createdAt: 'asc' }
   });
+
+  const lastSession = await prisma.session.findFirst({
+    where: { status: 'TERMINEE' },
+    orderBy: { date: 'desc' },
+    include: { pools: { include: { players: true } } }
+  });
+  const lastSessionUserIds = new Set<string>();
+  if (lastSession) {
+    lastSession.pools.forEach((p: any) => p.players.forEach((pp: any) => lastSessionUserIds.add(pp.userId)));
+  }
+
+  registrations.forEach((reg: any) => {
+     if (lastSessionUserIds.has(reg.userId)) {
+         reg.priorityType = 1;
+     } else if (reg.user.totalMatches && reg.user.totalMatches > 0) {
+         reg.priorityType = 2;
+     } else {
+         reg.priorityType = 3;
+     }
+  });
+
+  registrations.sort((a: any, b: any) => {
+      if (a.priorityType !== b.priorityType) return a.priorityType - b.priorityType;
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+  });
+
 
   const currentIndex = registrations.findIndex(r => r.userId === userId);
   if (currentIndex === -1) return;
