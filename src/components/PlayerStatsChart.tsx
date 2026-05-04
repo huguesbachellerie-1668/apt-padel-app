@@ -22,10 +22,10 @@ export default function PlayerStatsChart({ data }: PlayerStatsChartProps) {
   const minAvg = Math.min(...averages);
   const maxAvg = Math.max(...averages);
   
-  // Add some padding to the domain
+  // Add some padding to the domain to better see variations
   const yDomain = [
-    Math.max(0, Math.floor(minAvg - 5)), 
-    Math.ceil(maxAvg + 5)
+    Math.max(0, Math.floor(minAvg - 1)), 
+    Math.ceil(maxAvg + 1)
   ];
 
   const CustomTooltip = ({ active, payload, label }: any) => {
