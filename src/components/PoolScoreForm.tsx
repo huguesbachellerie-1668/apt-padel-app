@@ -95,6 +95,17 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
 
   const handleFinalize = async () => {
     setIsRegistering(true);
+    
+    // 1. WhatsApp Share (déclenché immédiatement pour éviter les bloqueurs de pop-ups)
+    const textToShare = generateWhatsAppText();
+    if (navigator.share && navigator.canShare && navigator.canShare({ text: textToShare })) {
+        navigator.share({ title: "APT Padel", text: textToShare }).catch(e => console.log(e));
+    } else {
+        const encodedText = encodeURIComponent(textToShare);
+        window.open(`https://wa.me/?text=${encodedText}`, '_blank');
+    }
+
+    // 2. Enregistrement en base de données
     try {
         if (nextSession) {
             const usersToRegister = Object.keys(playersNextStatus).filter(uid => playersNextStatus[uid]);
@@ -219,17 +230,12 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
                   })}
 
                   <div className="mt-8 space-y-4 pt-4 border-t border-gray-100">
-                     <WhatsAppShareTextButton 
-                        textToShare={generateWhatsAppText()}
-                        label="1. Partager sur WhatsApp"
-                        className="w-full flex justify-center text-lg py-4"
-                     />
                      <button 
                        onClick={handleFinalize} 
                        disabled={isRegistering}
-                       className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl shadow-lg transition-transform transform hover:scale-[1.02] disabled:opacity-50 flex items-center justify-center gap-2 text-lg"
+                       className="w-full bg-[#25D366] hover:bg-[#1DA851] text-white font-black py-4 rounded-2xl shadow-lg transition-transform transform hover:scale-[1.02] disabled:opacity-50 flex items-center justify-center gap-2 text-lg"
                      >
-                       {isRegistering ? 'Enregistrement...' : '2. Valider et Terminer 👉'}
+                       {isRegistering ? 'Enregistrement en cours...' : '💬 Valider, Enregistrer et Partager'}
                      </button>
                   </div>
                </div>

@@ -57,6 +57,15 @@ export default async function SessionResultsPage({ params }: { params: any }) {
              Clôturer la session définitivement
            </a>
         )}
+        {isBoard && session.status === 'TERMINEE' && (
+           <div data-html2canvas-ignore>
+               <WhatsAppShareButton 
+                   elementIds={finishedPools.map((p: any) => `capture-pool-${p.id}`)}
+                   text={`🏆 Résultats de la session du ${new Date(session.date).toLocaleDateString('fr-FR')}\n\nVoici les classements de toutes les poules !`}
+                   fileName="resultats.png"
+               />
+           </div>
+        )}
       </div>
 
       {allPoolsFinished && session.status !== 'TERMINEE' && (
@@ -195,6 +204,27 @@ export default async function SessionResultsPage({ params }: { params: any }) {
                     </div>
                   </div>
                 </div>
+
+                {/* Top / Flop */}
+                <div className="bg-orange-50/50 px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                    <div className="flex items-center gap-3 bg-white p-3 rounded-2xl shadow-sm border border-orange-100 flex-1">
+                       <span className="text-3xl">🏆</span>
+                       <div>
+                          <span className="font-bold text-gray-400 uppercase text-xs tracking-wider">Top de la poule</span><br/>
+                          <span className="font-black text-gray-800 text-lg">{standings[0].player.nickname || standings[0].player.name.split(' ')[0]}</span>
+                          <span className="text-green-600 font-bold ml-2">(+{standings[0].sessionPoints} pts)</span>
+                       </div>
+                    </div>
+                    <div className="flex items-center gap-3 bg-white p-3 rounded-2xl shadow-sm border border-orange-100 flex-1 justify-end text-right">
+                       <div>
+                          <span className="font-bold text-gray-400 uppercase text-xs tracking-wider">Flop de la poule</span><br/>
+                          <span className="font-black text-gray-800 text-lg">{standings[standings.length - 1].player.nickname || standings[standings.length - 1].player.name.split(' ')[0]}</span>
+                          <span className="text-red-500 font-bold ml-2">(+{standings[standings.length - 1].sessionPoints} pts)</span>
+                       </div>
+                       <span className="text-3xl">💩</span>
+                    </div>
+                </div>
+
               </div>
             );
           })}
