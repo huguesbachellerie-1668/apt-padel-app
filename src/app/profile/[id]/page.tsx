@@ -4,16 +4,34 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import BackButton from "@/components/BackButton";
 import PlayerStatsChart from "@/components/PlayerStatsChart";
+import PlayerRankChart from "@/components/PlayerRankChart";
 
 export default async function PlayerProfilePage({ params }: { params: any }) {
   const p = await params;
   const currentUser = await getSessionUser();
   if (!currentUser) redirect("/login");
 
-  // Fetch the target user
-  const player = await prisma.user.findUnique({
-    where: { id: p.id }
-  });
+  // Fetch the target user and all others for ranking
+  const [player, allUsers, allSessions] = await Promise.all([
+    prisma.user.findUnique({ where: { id: p.id } }),
+    prisma.user.findMany({ select: { id: true, points: true, totalMatches: true } }),
+    prisma.session.findMany({
+      where: { status: 'TERMINEE' },
+      orderBy: { date: 'asc' },
+      include: {
+        pools: {
+          include: {
+            matches: {
+              select: {
+                 team1Player1Id: true, team1Player2Id: true, team2Player1Id: true, team2Player2Id: true,
+                 team1Games: true, team2Games: true
+              }
+            }
+          }
+        }
+      }
+    })
+  ]);
 
   if (!player) return <div className="text-center p-10 font-bold text-gray-500">Joueur introuvable</div>;
 
@@ -182,6 +200,132 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
       average: cumulativeSessions > 0 ? cumulativePoints / cumulativeSessions : 0
     });
   }
+
+  // --- Historique du Classement (Ranking) ---
+  const userStats = new Map();
+  for (const u of allUsers) {
+    userStats.set(u.id, { 
+       id: u.id,
+       currentPoints: u.points || 0, 
+       currentMatches: u.totalMatches || 0,
+       dbPoints: 0,
+       dbMatches: 0
+    });
+  }
+
+  for (const session of allSessions) {
+     for (const pool of session.pools) {
+        for (const match of pool.matches) {
+           const team1Ids = [match.team1Player1Id, match.team1Player2Id].filter(Boolean);
+           const team2Ids = [match.team2Player1Id, match.team2Player2Id].filter(Boolean);
+           
+           if (match.team1Games !== null && match.team2Games !== null) {
+               for (const uid of team1Ids) {
+                   const st = userStats.get(uid);
+                   if (st) {
+                       st.dbMatches++;
+                       st.dbPoints += match.team1Games;
+                       if (match.team1Games > match.team2Games) st.dbPoints += 30;
+                       else if (match.team1Games === match.team2Games) st.dbPoints += 20;
+                       else st.dbPoints += 10;
+                   }
+               }
+               for (const uid of team2Ids) {
+                   const st = userStats.get(uid);
+                   if (st) {
+                       st.dbMatches++;
+                       st.dbPoints += match.team2Games;
+                       if (match.team2Games > match.team1Games) st.dbPoints += 30;
+                       else if (match.team2Games === match.team1Games) st.dbPoints += 20;
+                       else st.dbPoints += 10;
+                   }
+               }
+           }
+        }
+     }
+  }
+
+  for (const [uid, stats] of userStats.entries()) {
+     const sessionDbPoints = stats.dbPoints / 3;
+     stats.startPoints = Math.max(0, stats.currentPoints - sessionDbPoints);
+     stats.startSessions = Math.max(0, Math.floor(stats.currentMatches / 3) - Math.floor(stats.dbMatches / 3));
+     
+     stats.trackingPoints = stats.startPoints;
+     stats.trackingSessions = stats.startSessions;
+     stats.trackingAverage = stats.trackingSessions > 0 ? stats.trackingPoints / stats.trackingSessions : 0;
+  }
+
+  const rankChartData: any[] = [];
+  
+  if (historicalSessions > 0) {
+      const sortedUsers = Array.from(userStats.values()).sort((a: any, b: any) => b.trackingAverage - a.trackingAverage);
+      const startRank = sortedUsers.findIndex((u: any) => u.id === player.id) + 1;
+      rankChartData.push({
+         name: "Départ",
+         rank: startRank
+      });
+  }
+
+  for (const session of allSessions) {
+     for (const pool of session.pools) {
+        for (const match of pool.matches) {
+           const team1Ids = [match.team1Player1Id, match.team1Player2Id].filter(Boolean);
+           const team2Ids = [match.team2Player1Id, match.team2Player2Id].filter(Boolean);
+           
+           if (match.team1Games !== null && match.team2Games !== null) {
+               for (const uid of team1Ids) {
+                   const st = userStats.get(uid);
+                   if (st) {
+                       let pts = match.team1Games;
+                       if (match.team1Games > match.team2Games) pts += 30;
+                       else if (match.team1Games === match.team2Games) pts += 20;
+                       else pts += 10;
+                       st.trackingPoints += (pts / 3);
+                   }
+               }
+               for (const uid of team2Ids) {
+                   const st = userStats.get(uid);
+                   if (st) {
+                       let pts = match.team2Games;
+                       if (match.team2Games > match.team1Games) pts += 30;
+                       else if (match.team2Games === match.team1Games) pts += 20;
+                       else pts += 10;
+                       st.trackingPoints += (pts / 3);
+                   }
+               }
+           }
+        }
+        
+        const poolPlayersIds = new Set();
+        for (const match of pool.matches) {
+           if (match.team1Player1Id) poolPlayersIds.add(match.team1Player1Id);
+           if (match.team1Player2Id) poolPlayersIds.add(match.team1Player2Id);
+           if (match.team2Player1Id) poolPlayersIds.add(match.team2Player1Id);
+           if (match.team2Player2Id) poolPlayersIds.add(match.team2Player2Id);
+        }
+        for (const uid of poolPlayersIds) {
+            const st = userStats.get(uid as string);
+            if (st) st.trackingSessions++;
+        }
+     }
+     
+     for (const st of userStats.values()) {
+         st.trackingAverage = st.trackingSessions > 0 ? st.trackingPoints / st.trackingSessions : 0;
+     }
+     
+     const sortedUsers = Array.from(userStats.values()).sort((a: any, b: any) => b.trackingAverage - a.trackingAverage);
+     const rank = sortedUsers.findIndex((u: any) => u.id === player.id) + 1;
+     
+     const playedInSession = session.pools.some((p: any) => p.matches.some((m: any) => m.team1Player1Id === player.id || m.team1Player2Id === player.id || m.team2Player1Id === player.id || m.team2Player2Id === player.id));
+     
+     if (playedInSession) {
+        const dateStr = new Date(session.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+        rankChartData.push({
+           name: dateStr,
+           rank: rank
+        });
+     }
+  }
   
   // Calculate Best Teammate (highest volume of wins together, tie broken by total points earned)
   const bestTeammates = Array.from(teammateStats.values())
@@ -310,8 +454,9 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
       </div>
 
       {chartData.length > 0 && (
-        <div className="mt-12">
+        <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <PlayerStatsChart data={chartData} />
+          <PlayerRankChart data={rankChartData} />
         </div>
       )}
 
