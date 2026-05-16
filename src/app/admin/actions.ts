@@ -219,6 +219,9 @@ export async function generatePools(formData: FormData) {
   for (let level = 1; level <= actualPoolsCount; level++) {
     const poolUsers = finalUsers.slice((level - 1) * 4, level * 4);
     
+    // Ultime étape : classer les joueurs par points dans chaque poule (du plus grand au plus petit)
+    poolUsers.sort((a: any, b: any) => b.averagePoints - a.averagePoints);
+    
     const matchingRes = sessionReservations.find(r => r.defaultPoolLevel === level);
     
     const pool = await prisma.pool.create({
