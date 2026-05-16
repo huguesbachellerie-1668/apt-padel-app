@@ -129,14 +129,17 @@ export async function generatePools(formData: FormData) {
 
   // --- Step 11: Top-Down Cascade
   const finalUsers = [...electedUsers];
-  const movedUserIds = new Set<string>();
 
   let hasMoved = true;
-  while (hasMoved) {
+  let iterations = 0;
+  const MAX_ITERATIONS = 1000;
+
+  while (hasMoved && iterations < MAX_ITERATIONS) {
     hasMoved = false;
+    iterations++;
+
     for (let i = 0; i < N; i++) {
        const u = finalUsers[i];
-       if (movedUserIds.has(u.id)) continue;
        
        const theoreticalLevel = Math.ceil(((i + 1) * 10) / N);
        const dbLevel = u.lastCalculatedLevel;
@@ -151,7 +154,6 @@ export async function generatePools(formData: FormData) {
            if (targetIndex > i) {
              finalUsers.splice(i, 1);
              finalUsers.splice(targetIndex, 0, u);
-             movedUserIds.add(u.id);
              hasMoved = true;
              break; 
            }
@@ -162,13 +164,16 @@ export async function generatePools(formData: FormData) {
            if (targetIndex < i) {
              finalUsers.splice(i, 1);
              finalUsers.splice(targetIndex, 0, u);
-             movedUserIds.add(u.id);
              hasMoved = true;
              break;
            }
          }
        }
     }
+  }
+
+  if (iterations >= MAX_ITERATIONS) {
+    console.warn("Max iterations reached in Top-Down Cascade. Some constraints may be unsatisfiable.");
   }
 
   // --- Injury logic (Retour Blessure)
