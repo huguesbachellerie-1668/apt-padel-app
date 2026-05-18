@@ -40,6 +40,37 @@ export default async function SessionResultsPage({ params }: { params: any }) {
   const allPoolsFinished = session.pools.length > 0 && finishedPools.length === session.pools.length;
   const isBoard = ['PRESIDENT', 'ORGA', 'TRESORIER'].includes(user.role);
 
+  let finalWhatsAppText = `🏆 *Résultats de la session du ${new Date(session.date).toLocaleDateString('fr-FR')}*\n\nVoici les classements de toutes les poules !\n`;
+  if (session.status === 'TERMINEE') {
+      finishedPools.forEach((pool: any) => {
+          const standings = pool.players.map((pt: any) => {
+              let sessionPoints = 0; let wins = 0; let draws = 0; let losses = 0;
+              for (const match of pool.matches) {
+                  const isTeam1 = match.team1Player1Id === pt.userId || match.team1Player2Id === pt.userId;
+                  const isTeam2 = match.team2Player1Id === pt.userId || match.team2Player2Id === pt.userId;
+                  if (!isTeam1 && !isTeam2) continue;
+                  const myGames = isTeam1 ? match.team1Games : match.team2Games;
+                  const theirGames = isTeam1 ? match.team2Games : match.team1Games;
+                  if (myGames === null || theirGames === null) continue;
+                  sessionPoints += myGames;
+                  if (myGames > theirGames) { sessionPoints += 30; wins++; }
+                  else if (myGames === theirGames) { sessionPoints += 20; draws++; }
+                  else { sessionPoints += 10; losses++; }
+              }
+              return { player: pt.user, wins, draws, losses, sessionPoints };
+          });
+          standings.sort((a: any, b: any) => b.sessionPoints - a.sessionPoints);
+          const topPlayer = standings.find((s: any) => s.wins === 3 || (s.wins === 2 && s.draws === 1));
+          const flopPlayer = [...standings].reverse().find((s: any) => s.losses === 3);
+
+          if (topPlayer || flopPlayer) {
+              finalWhatsAppText += `\n🎾 *Poule ${pool.level}* :\n`;
+              if (topPlayer) finalWhatsAppText += `🏆 TOP : ${topPlayer.player.nickname || topPlayer.player.name.split(' ')[0]} (Moy: ${(topPlayer.sessionPoints / 3).toFixed(2)})\n`;
+              if (flopPlayer) finalWhatsAppText += `💩 FLOP : ${flopPlayer.player.nickname || flopPlayer.player.name.split(' ')[0]} (Moy: ${(flopPlayer.sessionPoints / 3).toFixed(2)})\n`;
+          }
+      });
+  }
+
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-20">
       <div className="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-6">
@@ -61,7 +92,7 @@ export default async function SessionResultsPage({ params }: { params: any }) {
            <div data-html2canvas-ignore>
                <WhatsAppShareButton 
                    elementIds={finishedPools.map((p: any) => `capture-pool-${p.id}`)}
-                   text={`🏆 Résultats de la session du ${new Date(session.date).toLocaleDateString('fr-FR')}\n\nVoici les classements de toutes les poules !`}
+                   text={finalWhatsAppText}
                    fileName="resultats.png"
                />
            </div>
@@ -217,7 +248,7 @@ export default async function SessionResultsPage({ params }: { params: any }) {
                            <div>
                               <span className="font-bold text-gray-400 uppercase text-xs tracking-wider">TOP</span><br/>
                               <span className="font-black text-gray-800 text-lg">{topPlayer.player.nickname || topPlayer.player.name.split(' ')[0]}</span>
-                              <span className="text-green-600 font-bold ml-2">(+{topPlayer.sessionPoints} pts)</span>
+                              <span className="text-green-600 font-bold ml-2">(Moy: {(topPlayer.sessionPoints / 3).toFixed(2)})</span>
                            </div>
                         </div>
                       ) : <div className="flex-1"></div>}
@@ -227,7 +258,7 @@ export default async function SessionResultsPage({ params }: { params: any }) {
                            <div>
                               <span className="font-bold text-gray-400 uppercase text-xs tracking-wider">FLOP</span><br/>
                               <span className="font-black text-gray-800 text-lg">{flopPlayer.player.nickname || flopPlayer.player.name.split(' ')[0]}</span>
-                              <span className="text-red-500 font-bold ml-2">(+{flopPlayer.sessionPoints} pts)</span>
+                              <span className="text-red-500 font-bold ml-2">(Moy: {(flopPlayer.sessionPoints / 3).toFixed(2)})</span>
                            </div>
                            <span className="text-3xl">💩</span>
                         </div>

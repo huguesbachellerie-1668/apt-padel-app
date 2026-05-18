@@ -76,6 +76,43 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
               text += `${p1} & ${p2}  *${s.t1} - ${s.t2}*  ${p3} & ${p4}\n`;
           }
       });
+      const standings = pool.players.map((pt: any) => {
+          let sessionPoints = 0;
+          let wins = 0;
+          let draws = 0;
+          let losses = 0;
+          
+          pool.matches.forEach((m: any) => {
+              const s = currentScores[m.order];
+              if (!s) return;
+              
+              const isTeam1 = m.team1Player1Id === pt.userId || m.team1Player2Id === pt.userId;
+              const isTeam2 = m.team2Player1Id === pt.userId || m.team2Player2Id === pt.userId;
+              
+              if (!isTeam1 && !isTeam2) return;
+              
+              const myGames = isTeam1 ? parseInt(s.t1) : parseInt(s.t2);
+              const theirGames = isTeam1 ? parseInt(s.t2) : parseInt(s.t1);
+                                 
+              if (!isNaN(myGames) && !isNaN(theirGames)) {
+                  sessionPoints += myGames;
+                  if (myGames > theirGames) { sessionPoints += 30; wins++; }
+                  else if (myGames === theirGames) { sessionPoints += 20; draws++; }
+                  else { sessionPoints += 10; losses++; }
+              }
+          });
+          return { player: pt.user, wins, draws, losses, sessionPoints };
+      });
+      
+      standings.sort((a: any, b: any) => b.sessionPoints - a.sessionPoints);
+      const topPlayer = standings.find((s: any) => s.wins === 3 || (s.wins === 2 && s.draws === 1));
+      const flopPlayer = [...standings].reverse().find((s: any) => s.losses === 3);
+      
+      if (topPlayer || flopPlayer) {
+          text += `\n`;
+          if (topPlayer) text += `🏆 *TOP* : ${topPlayer.player.nickname || topPlayer.player.name.split(' ')[0]} (Moy: ${(topPlayer.sessionPoints / 3).toFixed(2)})\n`;
+          if (flopPlayer) text += `💩 *FLOP* : ${flopPlayer.player.nickname || flopPlayer.player.name.split(' ')[0]} (Moy: ${(flopPlayer.sessionPoints / 3).toFixed(2)})\n`;
+      }
 
       if (nextSession) {
           text += `\n📅 *Présents prochaine session (${new Date(nextSession.date).toLocaleDateString('fr-FR')})* :\n`;
