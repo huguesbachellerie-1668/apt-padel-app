@@ -109,6 +109,16 @@ export default async function SessionResultsPage({ params }: { params: any }) {
         </div>
       )}
 
+      {session.status === 'TERMINEE' && !session.isCounted && (
+        <div className="bg-red-50 border border-red-200 p-5 rounded-2xl flex items-center gap-4 shadow-sm mb-8">
+          <div className="text-3xl">⚠️</div>
+          <div>
+            <h3 className="font-bold text-red-900">Session non comptabilisée</h3>
+            <p className="text-red-800 text-sm">Les points de cette session n'ont pas été pris en compte pour le classement général.</p>
+          </div>
+        </div>
+      )}
+
       {finishedPools.length === 0 ? (
         <div className="bg-white p-10 rounded-3xl shadow-sm border border-gray-100 text-center text-gray-500 font-medium">
           <div className="text-4xl mb-4">⏳</div>

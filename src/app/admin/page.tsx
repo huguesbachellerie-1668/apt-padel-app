@@ -198,7 +198,11 @@ export default async function AdminDashboard() {
                             Annuler les Poules ⏪
                           </SubmitButton>
                         </form>
-                        <form action={finishSessionAndCalculatePoints.bind(null, session.id)}>
+                        <form action={finishSessionAndCalculatePoints.bind(null, session.id)} className="flex flex-col gap-2">
+                          <label className="flex items-center gap-2 cursor-pointer bg-white p-2 rounded-lg border border-gray-200 shadow-sm">
+                            <input type="checkbox" name="countPoints" value="true" defaultChecked className="w-4 h-4 text-blue-600" />
+                            <span className="text-[10px] font-bold text-gray-700 leading-tight">Comptabiliser pour le classement général</span>
+                          </label>
                           <SubmitButton pendingText="Fermeture..." className="w-full bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-sm hover:bg-blue-700 transition-colors">
                             Terminer session 🏁
                           </SubmitButton>

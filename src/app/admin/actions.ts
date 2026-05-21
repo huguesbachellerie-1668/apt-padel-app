@@ -294,10 +294,12 @@ export async function updateSessionCourtsAction(formData: FormData) {
   revalidatePath(`/session/${sessionId}`);
 }
 
-export async function finishSessionAndCalculatePoints(sessionId: string) {
+export async function finishSessionAndCalculatePoints(sessionId: string, formData?: FormData) {
+  const countPoints = formData ? formData.get('countPoints') !== null : true;
+
   await prisma.session.update({
     where: { id: sessionId },
-    data: { status: 'TERMINEE' }
+    data: { status: 'TERMINEE', isCounted: countPoints }
   });
 
   // Nettoyage des logs pour ne pas surcharger la BDD
@@ -305,7 +307,8 @@ export async function finishSessionAndCalculatePoints(sessionId: string) {
     where: { sessionId }
   });
 
-  const pools = await prisma.pool.findMany({
+  if (countPoints) {
+    const pools = await prisma.pool.findMany({
     where: { sessionId },
     include: {
       players: { include: { user: true } },
@@ -369,6 +372,7 @@ export async function finishSessionAndCalculatePoints(sessionId: string) {
         }
       });
     }
+  }
   }
 
   revalidatePath('/');

@@ -130,6 +130,11 @@ export default async function HistoryPage() {
                      <div className="font-black text-xl text-blue-900 group-hover:text-blue-700 transition-colors mb-4 pr-10 capitalize">
                        {new Date(session.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                      </div>
+                     {!session.isCounted && (
+                       <div className="mb-4 inline-block bg-red-100 text-red-700 text-[10px] font-black uppercase px-2 py-1 rounded-md border border-red-200 shadow-sm">
+                         Non comptabilisée pour le classement général
+                       </div>
+                     )}
                      <div className="flex gap-4">
                        <div className="bg-blue-50 px-3 py-2 rounded-xl text-center flex-1 border border-blue-100">
                          <div className="text-xl font-black text-blue-800">{session.pools.length}</div>
