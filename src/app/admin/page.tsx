@@ -1,8 +1,9 @@
 import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { createSeason, createSession, updateSessionStatus, generatePools, finishSessionAndCalculatePoints, reopenSession, updateSessionCourtsAction, updateGlobalSettings, createCourtReservation, deleteCourtReservation, updateReservationDefaultLevel } from "./actions";
+import { createSeason, createSession, updateSessionStatus, generatePools, finishSessionAndCalculatePoints, reopenSession, deleteSession, updateSessionCourtsAction, updateGlobalSettings, createCourtReservation, deleteCourtReservation, updateReservationDefaultLevel } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
+import DeleteSessionButton from "./DeleteSessionButton";
 
 export default async function AdminDashboard() {
   const user = await getSessionUser();
@@ -220,6 +221,11 @@ export default async function AdminDashboard() {
                         </form>
                       </div>
                     )}
+                    <div className="flex flex-col gap-2 w-full sm:w-auto ml-auto">
+                      <form action={deleteSession.bind(null, session.id)}>
+                        <DeleteSessionButton />
+                      </form>
+                    </div>
                   </div>
                   </div>
                   

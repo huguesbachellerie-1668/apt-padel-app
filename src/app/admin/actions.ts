@@ -280,6 +280,27 @@ export async function reopenSession(sessionId: string) {
   revalidatePath('/');
 }
 
+export async function deleteSession(sessionId: string) {
+  const poolsToDelete = await prisma.pool.findMany({ where: { sessionId } });
+  const poolIds = poolsToDelete.map(p => p.id);
+  
+  if (poolIds.length > 0) {
+    await prisma.match.deleteMany({ where: { poolId: { in: poolIds } } });
+    await prisma.poolPlayer.deleteMany({ where: { poolId: { in: poolIds } } });
+    await prisma.pool.deleteMany({ where: { sessionId } });
+  }
+
+  await prisma.registration.deleteMany({ where: { sessionId } });
+  await prisma.courtReservation.deleteMany({ where: { sessionId } });
+  // activityLog est en Cascade, mais au cas où :
+  await prisma.activityLog.deleteMany({ where: { sessionId } });
+
+  await prisma.session.delete({ where: { id: sessionId } });
+
+  revalidatePath('/admin');
+  revalidatePath('/');
+}
+
 export async function updateSessionCourtsAction(formData: FormData) {
   const sessionId = formData.get('sessionId') as string;
   const courts = parseInt(formData.get('courts') as string) || 1;
