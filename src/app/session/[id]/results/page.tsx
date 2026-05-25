@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import BackButton from "@/components/BackButton";
 import WhatsAppShareButton from "@/components/WhatsAppShareButton";
+import { finishSessionAndCalculatePoints } from "@/app/admin/actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function SessionResultsPage({ params }: { params: any }) {
   const p = await params;
@@ -84,9 +86,17 @@ export default async function SessionResultsPage({ params }: { params: any }) {
           </p>
         </div>
         {isBoard && allPoolsFinished && session.status !== 'TERMINEE' && (
-           <a href="/admin" className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-xl shadow-md transition-colors text-center inline-block">
-             Clôturer la session définitivement
-           </a>
+           <div className="flex flex-col gap-2 items-end">
+             <form action={finishSessionAndCalculatePoints.bind(null, session.id)} className="flex flex-col gap-2 items-end">
+               <label className="flex items-center gap-2 cursor-pointer bg-white p-2 rounded-lg border border-gray-200 shadow-sm w-fit">
+                 <input type="checkbox" name="countPoints" value="true" defaultChecked className="w-4 h-4 text-orange-500" />
+                 <span className="text-xs font-bold text-gray-700">Comptabiliser pour le classement général</span>
+               </label>
+               <SubmitButton pendingText="Fermeture en cours..." className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-xl shadow-md transition-colors text-center inline-block">
+                 Clôturer la session définitivement
+               </SubmitButton>
+             </form>
+           </div>
         )}
         {isBoard && session.status === 'TERMINEE' && (
            <div data-html2canvas-ignore>

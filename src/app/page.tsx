@@ -127,7 +127,14 @@ export default async function Dashboard() {
       {sessionsData.length > 0 ? (
         <div className="space-y-12 pb-6">
           {sessionsData.map(({ session: activeSession, hasFinishedPool, allPoolsFinished, userRegistration, userPoolPlayer, isUnregisterLocked }, index) => {
-             const isToday = new Date(activeSession.date).toDateString() === new Date().toDateString();
+             const sessionDateObj = new Date(activeSession.date);
+             const todayObj = new Date();
+             const isToday = sessionDateObj.toDateString() === todayObj.toDateString();
+             const isPast = sessionDateObj < todayObj && !isToday;
+             
+             let sessionTitle = isToday ? "Session Aujourd'hui" : (index === 0 ? "Prochaine Session" : "Session Suivante");
+             if (isPast) sessionTitle = "Dernière Session jouée";
+
              return (
              <div key={activeSession.id} className="space-y-6">
                 
@@ -137,7 +144,7 @@ export default async function Dashboard() {
                 <section className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 relative overflow-hidden">
                   <div className="flex flex-wrap justify-between items-center mb-5 gap-4">
                     <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                      <span className="text-2xl">📋</span> {isToday ? "Session Aujourd'hui" : (index === 0 ? "Prochaine Session" : "Session Suivante")}
+                      <span className="text-2xl">📋</span> {sessionTitle}
                     </h2>
                     {activeSession.status !== 'POULES_GENEREES' && (
                       <span className={`px-3 py-1 text-xs font-bold rounded-full ${activeSession.status === 'INSCRIPTIONS_OUVERTES' ? 'bg-orange-500 text-white' : activeSession.status === 'POULES_EN_ATTENTE' ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-200 text-gray-700'}`}>
