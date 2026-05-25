@@ -16,7 +16,7 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
     prisma.user.findUnique({ where: { id: p.id } }),
     prisma.user.findMany({ select: { id: true, points: true, totalMatches: true } }),
     prisma.session.findMany({
-      where: { status: 'TERMINEE' },
+      where: { status: 'TERMINEE', isCounted: true },
       orderBy: { date: 'asc' },
       include: {
         pools: {
@@ -72,7 +72,9 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
   const teammateStats = new Map<string, { user: any, totalPoints: number, matchesPlayed: number, winsTogether: number }>();
   const opponentStats = new Map<string, { user: any, lossesAgainst: number, matchesAgainst: number }>();
 
-  for (const pp of poolPlayers) {
+  const countedPoolPlayers = poolPlayers.filter(pp => pp.pool.session.isCounted);
+
+  for (const pp of countedPoolPlayers) {
     if (pp.pool.level < bestPoolReached) bestPoolReached = pp.pool.level;
 
     for (const match of pp.pool.matches) {
@@ -130,7 +132,7 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
   
   // Calculate historical chart data (incorporating past seasons not in the Match table)
   let dbPoints = 0;
-  for (const pp of poolPlayers) {
+  for (const pp of countedPoolPlayers) {
     let sessionPoints = 0;
     for (const match of pp.pool.matches) {
       const isTeam1 = match.team1Player1Id === player.id || match.team1Player2Id === player.id;
@@ -154,7 +156,7 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
   }
 
   const playerTotalSessions = Math.floor((player.totalMatches || 0) / 3);
-  const dbSessionsCount = poolPlayers.length;
+  const dbSessionsCount = countedPoolPlayers.length;
   const historicalSessions = Math.max(0, playerTotalSessions - dbSessionsCount);
   const historicalPoints = Math.max(0, (player.points || 0) - dbPoints);
 
@@ -169,7 +171,7 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
     });
   }
 
-  const chronologicalPools = [...poolPlayers].reverse();
+  const chronologicalPools = [...countedPoolPlayers].reverse();
   for (const pp of chronologicalPools) {
     let sessionPoints = 0;
     for (const match of pp.pool.matches) {

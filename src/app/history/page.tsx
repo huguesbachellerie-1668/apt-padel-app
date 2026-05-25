@@ -29,11 +29,11 @@ export default async function HistoryPage() {
   const totalSessions = pastSessions.length;
   
   const totalMatches = await prisma.match.count({
-    where: { pool: { session: { status: 'TERMINEE' } } }
+    where: { pool: { session: { status: 'TERMINEE', isCounted: true } } }
   });
 
   const uniquePlayersRaw = await prisma.poolPlayer.findMany({
-    where: { pool: { session: { status: 'TERMINEE' } } },
+    where: { pool: { session: { status: 'TERMINEE', isCounted: true } } },
     select: { userId: true },
     distinct: ['userId']
   });
@@ -41,7 +41,7 @@ export default async function HistoryPage() {
 
   // 3. Top 3 most active players
   const allPoolPlayers = await prisma.poolPlayer.findMany({
-    where: { pool: { session: { status: 'TERMINEE' } } },
+    where: { pool: { session: { status: 'TERMINEE', isCounted: true } } },
     include: { user: true }
   });
 
