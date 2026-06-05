@@ -130,50 +130,52 @@ export async function generatePools(formData: FormData) {
   // --- Step 11: Top-Down Cascade
   const finalUsers = [...electedUsers];
 
-  let hasMoved = true;
-  let iterations = 0;
-  const MAX_ITERATIONS = 1000;
+  if (actualPoolsCount >= 4 && actualPoolsCount <= 7) {
+      let hasMoved = true;
+      let iterations = 0;
+      const MAX_ITERATIONS = 1000;
 
-  while (hasMoved && iterations < MAX_ITERATIONS) {
-    hasMoved = false;
-    iterations++;
+      while (hasMoved && iterations < MAX_ITERATIONS) {
+        hasMoved = false;
+        iterations++;
 
-    for (let i = 0; i < N; i++) {
-       const u = finalUsers[i];
-       
-       const theoreticalLevel = Math.ceil(((i + 1) * 10) / N);
-       const dbLevel = u.lastCalculatedLevel;
+        for (let i = 0; i < N; i++) {
+           const u = finalUsers[i];
+           
+           const theoreticalLevel = Math.ceil(((i + 1) * 10) / N);
+           const dbLevel = u.lastCalculatedLevel;
 
-       if (dbLevel !== null && dbLevel !== undefined && dbLevel !== 0) {
-         const minLevelAllowed = Math.max(1, dbLevel - 3);
-         const maxLevelAllowed = Math.min(10, dbLevel + 3);
+           if (dbLevel !== null && dbLevel !== undefined && dbLevel !== 0) {
+             const minLevelAllowed = Math.max(1, dbLevel - 3);
+             const maxLevelAllowed = Math.min(10, dbLevel + 3);
 
-         if (theoreticalLevel < minLevelAllowed) { // Trop haut -> doit descendre
-           const targetPlace = Math.floor(((minLevelAllowed - 1) * N) / 10) + 1;
-           const targetIndex = Math.min(N - 1, targetPlace - 1);
-           if (targetIndex > i) {
-             finalUsers.splice(i, 1);
-             finalUsers.splice(targetIndex, 0, u);
-             hasMoved = true;
-             break; 
+             if (theoreticalLevel < minLevelAllowed) { // Trop haut -> doit descendre
+               const targetPlace = Math.floor(((minLevelAllowed - 1) * N) / 10) + 1;
+               const targetIndex = Math.min(N - 1, targetPlace - 1);
+               if (targetIndex > i) {
+                 finalUsers.splice(i, 1);
+                 finalUsers.splice(targetIndex, 0, u);
+                 hasMoved = true;
+                 break; 
+               }
+             } 
+             else if (theoreticalLevel > maxLevelAllowed) { // Trop bas -> doit monter
+               const targetPlace = Math.max(1, Math.floor((maxLevelAllowed * N) / 10)); // Pire place pour le maxLevel autorisé
+               const targetIndex = Math.max(0, targetPlace - 1);
+               if (targetIndex < i) {
+                 finalUsers.splice(i, 1);
+                 finalUsers.splice(targetIndex, 0, u);
+                 hasMoved = true;
+                 break;
+               }
+             }
            }
-         } 
-         else if (theoreticalLevel > maxLevelAllowed) { // Trop bas -> doit monter
-           const targetPlace = Math.max(1, Math.floor((maxLevelAllowed * N) / 10)); // Pire place pour le maxLevel autorisé
-           const targetIndex = Math.max(0, targetPlace - 1);
-           if (targetIndex < i) {
-             finalUsers.splice(i, 1);
-             finalUsers.splice(targetIndex, 0, u);
-             hasMoved = true;
-             break;
-           }
-         }
-       }
-    }
-  }
+        }
+      }
 
-  if (iterations >= MAX_ITERATIONS) {
-    console.warn("Max iterations reached in Top-Down Cascade. Some constraints may be unsatisfiable.");
+      if (iterations >= MAX_ITERATIONS) {
+        console.warn("Max iterations reached in Top-Down Cascade. Some constraints may be unsatisfiable.");
+      }
   }
 
   // --- Injury logic (Retour Blessure)
