@@ -210,9 +210,16 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                       </div>
                    ))}
                    {allMatchesFinished ? (
-                     <a href={`/session/${session.id}/results`} className="mt-2 flex items-center justify-center gap-2 text-sm font-bold text-green-700 bg-green-50 hover:bg-green-100 py-2.5 rounded-xl transition-colors border border-green-200">
-                       ✅ Voir les résultats définitifs 👉
-                     </a>
+                     <div className="mt-2 flex flex-col gap-2">
+                       <a href={`/session/${session.id}/results`} className="flex items-center justify-center gap-2 text-sm font-bold text-green-700 bg-green-50 hover:bg-green-100 py-2.5 rounded-xl transition-colors border border-green-200">
+                         ✅ Voir les résultats définitifs 👉
+                       </a>
+                       {(isBoard || pool.players[0]?.userId === user.id) && (
+                         <a href={`/pool/${pool.id}`} className="text-center text-xs font-bold text-orange-600 hover:text-orange-700 bg-white py-1.5 rounded-xl transition-colors border border-orange-100 shadow-sm">
+                           ✏️ Modifier les scores
+                         </a>
+                       )}
+                     </div>
                    ) : (
                      <a href={`/pool/${pool.id}`} className="mt-2 text-center text-sm font-bold text-orange-600 hover:text-orange-700 bg-orange-50 hover:bg-orange-100 py-2.5 rounded-xl transition-colors border border-orange-100">
                        Voir la poule et les matchs 👉
