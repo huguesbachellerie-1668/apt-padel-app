@@ -13,30 +13,37 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
   const user = await getSessionUser();
   if (!user) redirect("/login");
 
-  const session = await prisma.session.findUnique({
-    where: { id: p.id },
-    include: {
-      registrations: {
-        include: { user: true },
-        orderBy: { createdAt: 'asc' } // Tri chronologique par défaut
-      },
-      pools: {
-        include: {
-          players: {
-            include: { user: true },
-            orderBy: { seed: 'asc' }
-          },
-          matches: true,
-          courtReservation: { include: { club: true } }
+  const [session, lastSession] = await Promise.all([
+    prisma.session.findUnique({
+      where: { id: p.id },
+      include: {
+        registrations: {
+          include: { user: true },
+          orderBy: { createdAt: 'asc' } // Tri chronologique par défaut
         },
-        orderBy: { level: 'asc' }
-      },
-      reservations: {
-        include: { club: true },
-        orderBy: { startTime: 'asc' }
+        pools: {
+          include: {
+            players: {
+              include: { user: true },
+              orderBy: { seed: 'asc' }
+            },
+            matches: true,
+            courtReservation: { include: { club: true } }
+          },
+          orderBy: { level: 'asc' }
+        },
+        reservations: {
+          include: { club: true },
+          orderBy: { startTime: 'asc' }
+        }
       }
-    }
-  });
+    }),
+    prisma.session.findFirst({
+      where: { status: 'TERMINEE' },
+      orderBy: { date: 'desc' },
+      include: { pools: { include: { players: true } } }
+    })
+  ]);
 
   if (!session) return <div className="text-center p-10 font-bold text-gray-500">Session introuvable</div>;
 
@@ -59,12 +66,6 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
 
   const poulesCount = Math.floor(registeredCount / 4);
   const remplaCount = registeredCount % 4;
-
-  const lastSession = await prisma.session.findFirst({
-    where: { status: 'TERMINEE' },
-    orderBy: { date: 'desc' },
-    include: { pools: { include: { players: true } } }
-  });
   const lastSessionUserIds = new Set<string>();
   if (lastSession) {
     lastSession.pools.forEach((p: any) => p.players.forEach((pp: any) => lastSessionUserIds.add(pp.userId)));

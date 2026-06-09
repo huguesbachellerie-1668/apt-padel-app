@@ -9,32 +9,48 @@ export default async function Dashboard() {
   const user = await getSessionUser();
   if (!user) redirect("/login");
 
-  // Rank calculation
-  const rankedPlayers = await prisma.user.findMany({
-    where: { totalMatches: { gt: 0 } },
-    orderBy: { averagePoints: 'desc' },
-    select: { id: true }
-  });
+  // Fetch independent global data in parallel
+  const [rankedPlayers, globalSettings, activeSessions] = await Promise.all([
+    prisma.user.findMany({
+      where: { totalMatches: { gt: 0 } },
+      orderBy: { averagePoints: 'desc' },
+      select: { id: true }
+    }),
+    prisma.settings.findUnique({ where: { id: 'global' } }),
+    prisma.session.findMany({
+      where: { status: { in: ['PREVUE', 'INSCRIPTIONS_OUVERTES', 'POULES_GENEREES', 'POULES_EN_ATTENTE'] } },
+      orderBy: { date: 'asc' },
+      include: {
+        pools: {
+          include: { matches: true, courtReservation: true }
+        }
+      }
+    })
+  ]);
+
   const rankIndex = rankedPlayers.findIndex((p: { id: string }) => p.id === user.id);
   const rank = rankIndex !== -1 ? `${rankIndex + 1}` : '-';
 
-  // Settings for limits
-  const globalSettings = await prisma.settings.findUnique({ where: { id: 'global' } });
   const lockDay = globalSettings?.lockUnregisterDay ?? 5;
   const lockTime = globalSettings?.lockUnregisterTime ?? "20:00";
 
-  // Get ALL active sessions
-  const activeSessions = await prisma.session.findMany({
-    where: { status: { in: ['PREVUE', 'INSCRIPTIONS_OUVERTES', 'POULES_GENEREES', 'POULES_EN_ATTENTE'] } },
-    orderBy: { date: 'asc' },
-    include: {
-      pools: {
-        include: { matches: true, courtReservation: true }
+  // Pre-fetch all user registrations and pool placements for the active sessions in parallel
+  const sessionIds = activeSessions.map(s => s.id);
+  const [allUserRegistrations, allUserPoolPlayers] = await Promise.all([
+    prisma.registration.findMany({
+      where: { userId: user.id, sessionId: { in: sessionIds } }
+    }),
+    prisma.poolPlayer.findMany({
+      where: { userId: user.id, pool: { sessionId: { in: sessionIds } } },
+      include: { 
+        pool: {
+          include: { courtReservation: true }
+        } 
       }
-    }
-  });
+    })
+  ]);
 
-  const sessionsData = await Promise.all(activeSessions.map(async (session) => {
+  const sessionsData = activeSessions.map((session) => {
     let hasFinishedPool = false;
     let allPoolsFinished = false;
     if (session.status === 'POULES_GENEREES' && session.pools) {
@@ -43,21 +59,12 @@ export default async function Dashboard() {
       allPoolsFinished = session.pools.length > 0 && finishedPools.length === session.pools.length;
     }
 
-    const userRegistration = await prisma.registration.findFirst({
-      where: { userId: user.id, sessionId: session.id }
-    });
-
+    const userRegistration = allUserRegistrations.find(r => r.sessionId === session.id);
     let userPoolPlayer = null;
+
     if (session.status === 'POULES_GENEREES' || session.status === 'POULES_EN_ATTENTE') {
       if (userRegistration) {
-        userPoolPlayer = await prisma.poolPlayer.findFirst({
-          where: { userId: user.id, pool: { sessionId: session.id } },
-          include: { 
-            pool: {
-              include: { courtReservation: true }
-            } 
-          }
-        });
+        userPoolPlayer = allUserPoolPlayers.find(p => p.pool.sessionId === session.id) || null;
       }
     }
 
@@ -85,7 +92,7 @@ export default async function Dashboard() {
       userPoolPlayer,
       isUnregisterLocked
     };
-  }));
+  });
 
   return (
     <div className="space-y-6">
