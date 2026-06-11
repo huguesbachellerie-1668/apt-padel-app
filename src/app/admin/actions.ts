@@ -127,10 +127,27 @@ export async function generatePools(formData: FormData) {
     await prisma.pool.deleteMany({ where: { sessionId } });
   }
 
-  // --- Step 11: Top-Down Cascade
+  // --- Step 11: Top-Down Cascade & Pool Plafond
   const finalUsers = [...electedUsers];
 
-  if (actualPoolsCount >= 4 && actualPoolsCount <= 7) {
+  // Fetch last pool level for all elected users
+  const userLastPoolMap = new Map<string, number>();
+  const pastPoolPlayers = await prisma.poolPlayer.findMany({
+    where: {
+      userId: { in: electedUsers.map((u: any) => u.id) },
+      pool: { session: { status: 'TERMINEE' } }
+    },
+    include: { pool: { include: { session: true } } },
+    orderBy: { pool: { session: { date: 'desc' } } }
+  });
+  
+  for (const pp of pastPoolPlayers) {
+     if (!userLastPoolMap.has(pp.userId)) {
+         userLastPoolMap.set(pp.userId, pp.pool.level);
+     }
+  }
+
+  if (actualPoolsCount < 8) {
       let hasMoved = true;
       let iterations = 0;
       const MAX_ITERATIONS = 1000;
@@ -174,7 +191,53 @@ export async function generatePools(formData: FormData) {
       }
 
       if (iterations >= MAX_ITERATIONS) {
-        console.warn("Max iterations reached in Top-Down Cascade. Some constraints may be unsatisfiable.");
+        console.warn("Max iterations reached in Top-Down Cascade (< 8 pools).");
+      }
+  } else {
+      // >= 8 pools : Plafonnement forfaitaire +/- 3 poules
+      let hasMoved = true;
+      let iterations = 0;
+      const MAX_ITERATIONS = 1000;
+
+      while (hasMoved && iterations < MAX_ITERATIONS) {
+        hasMoved = false;
+        iterations++;
+
+        for (let i = 0; i < N; i++) {
+           const u = finalUsers[i];
+           const currentPool = Math.floor(i / 4) + 1; // 1-indexed
+           const lastPool = userLastPoolMap.get(u.id);
+
+           if (lastPool !== undefined) {
+             const minPoolAllowed = Math.max(1, lastPool - 3);
+             const maxPoolAllowed = Math.min(actualPoolsCount, lastPool + 3);
+
+             if (currentPool < minPoolAllowed) { // Trop haut -> doit descendre
+               // Target index is the best seed of the minimum allowed pool
+               const targetIndex = Math.min(N - 1, (minPoolAllowed - 1) * 4);
+               if (targetIndex > i) {
+                 finalUsers.splice(i, 1);
+                 finalUsers.splice(targetIndex, 0, u);
+                 hasMoved = true;
+                 break; 
+               }
+             } 
+             else if (currentPool > maxPoolAllowed) { // Trop bas -> doit monter
+               // Target index is the worst seed of the maximum allowed pool
+               const targetIndex = Math.max(0, (maxPoolAllowed * 4) - 1);
+               if (targetIndex < i) {
+                 finalUsers.splice(i, 1);
+                 finalUsers.splice(targetIndex, 0, u);
+                 hasMoved = true;
+                 break;
+               }
+             }
+           }
+        }
+      }
+
+      if (iterations >= MAX_ITERATIONS) {
+        console.warn("Max iterations reached in Pool Plafond (>= 8 pools).");
       }
   }
 
