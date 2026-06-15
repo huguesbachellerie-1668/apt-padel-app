@@ -413,6 +413,7 @@ export async function finishSessionAndCalculatePoints(sessionId: string, formDat
       let wins = 0;
       let draws = 0;
       let losses = 0;
+      let validMatches = 0;
 
       for (const match of pool.matches) {
         const isTeam1 = match.team1Player1Id === poolPlayer.userId || match.team1Player2Id === poolPlayer.userId;
@@ -425,6 +426,10 @@ export async function finishSessionAndCalculatePoints(sessionId: string, formDat
 
         if (myGames === null || theirGames === null) continue;
 
+        // Match annulé pour cause de forfait/blessure (0-0)
+        if (myGames === 0 && theirGames === 0) continue;
+
+        validMatches++;
         sessionPoints += myGames;
 
         if (myGames > theirGames) {
@@ -436,13 +441,14 @@ export async function finishSessionAndCalculatePoints(sessionId: string, formDat
         }
       }
 
-      const isTop = wins === 3 || (wins === 2 && draws === 1);
-      const isFlop = losses === 3;
+      // Un TOP ou FLOP n'est possible QUE si les 3 matchs ont été joués validement
+      const isTop = validMatches === 3 && (wins === 3 || (wins === 2 && draws === 1));
+      const isFlop = validMatches === 3 && losses === 3;
 
       const user = poolPlayer.user;
       const sessionAverage = sessionPoints / 3;
       const newTotalPoints = (user.points || 0) + sessionAverage;
-      const newMatchesPlayed = (user.totalMatches || 0) + 3;
+      const newMatchesPlayed = (user.totalMatches || 0) + validMatches;
       const newSessionsPlayed = newMatchesPlayed / 3;
       const newAverage = newSessionsPlayed > 0 ? (newTotalPoints / newSessionsPlayed) : 0;
 
