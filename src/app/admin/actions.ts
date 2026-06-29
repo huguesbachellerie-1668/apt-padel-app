@@ -6,6 +6,13 @@ import { getSessionUser } from "@/lib/auth"
 
 export async function createSeason(formData: FormData) {
   const name = formData.get('name') as string;
+  
+  // Désactive toutes les autres saisons
+  await prisma.season.updateMany({
+    where: { isActive: true },
+    data: { isActive: false }
+  });
+
   await prisma.season.create({
     data: {
       name,
