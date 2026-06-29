@@ -329,20 +329,25 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
      }
   }
   
-  // Calculate Best Teammate (highest volume of wins together, tie broken by total points earned)
+  // Calculate Best Teammate (highest volume of wins together, tie broken by average points per match, then matches played)
   const bestTeammates = Array.from(teammateStats.values())
     .sort((a,b) => {
         if (b.winsTogether !== a.winsTogether) return b.winsTogether - a.winsTogether;
-        if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+        const aAvg = a.totalPoints / a.matchesPlayed;
+        const bAvg = b.totalPoints / b.matchesPlayed;
+        if (bAvg !== aAvg) return bAvg - aAvg;
         return b.matchesPlayed - a.matchesPlayed;
     });
   const bestTeammate = bestTeammates[0];
 
-  // Calculate Nemesis (highest absolute losses against, tie broken by number of matches played against them)
+  // Calculate Nemesis (highest absolute losses against, tie broken by highest loss rate, then matches played)
   const nemeses = Array.from(opponentStats.values())
     .filter(o => o.lossesAgainst > 0)
     .sort((a,b) => {
         if (b.lossesAgainst !== a.lossesAgainst) return b.lossesAgainst - a.lossesAgainst;
+        const aLossRate = a.lossesAgainst / a.matchesAgainst;
+        const bLossRate = b.lossesAgainst / b.matchesAgainst;
+        if (bLossRate !== aLossRate) return bLossRate - aLossRate;
         return b.matchesAgainst - a.matchesAgainst;
     });
   const nemesis = nemeses[0];
