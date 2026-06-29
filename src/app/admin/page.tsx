@@ -419,6 +419,27 @@ export default async function AdminDashboard() {
               </div>
             </form>
           </div>
+          
+          {/* Gestion des Saisons */}
+          <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+            <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+              📅 Gestion des Saisons
+            </h2>
+            <form action={createSeason} className="flex flex-col gap-6 bg-gray-50 p-6 rounded-2xl border border-gray-200">
+              <div className="flex flex-col md:flex-row gap-6 w-full items-end">
+                <div className="flex-1 w-full">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Nom de la nouvelle saison</label>
+                  <input type="text" name="name" placeholder="ex: Saison 2026-2027" required className="w-full p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none transition-all font-bold" />
+                </div>
+                <div className="w-full md:w-auto mt-4 md:mt-0">
+                  <SubmitButton pendingText="Création..." className="bg-orange-600 text-white font-bold py-4 px-8 rounded-xl hover:bg-orange-700 transition-colors shadow-sm whitespace-nowrap w-full">
+                    Démarrer une Nouvelle Saison
+                  </SubmitButton>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 italic">Attention : démarrer une nouvelle saison désactivera l'ancienne. Le Dashboard basculera automatiquement sur la nouvelle.</p>
+            </form>
+          </div>
         </div>
       )}
     </div>
