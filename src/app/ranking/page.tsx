@@ -8,9 +8,14 @@ export default async function RankingPage() {
   const user = await getSessionUser();
   if (!user) redirect("/login");
 
-  // Fetch players with at least 1 match played, sorted by average points descending
+  // Fetch players with at least 1 match played OR an existing average points (from previous season)
   const players = await prisma.user.findMany({
-    where: { totalMatches: { gt: 0 } },
+    where: { 
+      OR: [
+        { totalMatches: { gt: 0 } },
+        { averagePoints: { gt: 0 } }
+      ]
+    },
     orderBy: { averagePoints: 'desc' }
   });
 
@@ -61,7 +66,8 @@ export default async function RankingPage() {
                           className="flex items-center gap-3 group hover:opacity-80 transition-opacity"
                         >
                           <div className="flex flex-wrap items-baseline gap-2">
-                            <span className={`uppercase ${isCurrentUser ? 'group-hover:text-orange-800' : 'group-hover:text-blue-600'} transition-colors`}>
+                            <span className={`uppercase ${isCurrentUser ? 'group-hover:text-orange-800' : 'group-hover:text-blue-600'} transition-colors flex items-center gap-1`}>
+                              {(player.stars || 0) > 0 && <span className="text-yellow-400">{'⭐'.repeat(player.stars)}</span>}
                               {player.nickname || player.name}
                             </span>
                             {player.nickname && (

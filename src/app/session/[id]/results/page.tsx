@@ -221,7 +221,10 @@ export default async function SessionResultsPage({ params }: { params: any }) {
                                 <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${idx === 0 ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-500'}`}>
                                   {idx + 1}
                                 </span>
-                                {s.player.nickname || s.player.name.split(' ')[0]}
+                                <span className="flex items-center gap-1">
+                                  {(s.player.stars || 0) > 0 && <span className="text-yellow-400">{'⭐'.repeat(s.player.stars)}</span>}
+                                  {s.player.nickname || s.player.name.split(' ')[0]}
+                                </span>
                               </td>
                               <td className="px-4 py-3 text-center font-bold text-green-600">{s.wins}</td>
                               <td className="px-4 py-3 text-center font-bold text-yellow-600">{s.draws}</td>

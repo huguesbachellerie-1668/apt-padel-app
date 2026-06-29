@@ -202,7 +202,10 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                            {pt.seed}
                          </div>
                          <div className="flex-1 flex items-baseline gap-2">
-                           <span className="font-bold text-gray-800 text-base">{pt.user.nickname || pt.user.name}</span>
+                           <span className="font-bold text-gray-800 text-base flex items-center gap-1">
+                             {(pt.user.stars || 0) > 0 && <span className="text-yellow-400">{'⭐'.repeat(pt.user.stars)}</span>}
+                             {pt.user.nickname || pt.user.name}
+                           </span>
                            {pt.user.nickname && <span className="text-xs font-medium text-gray-500">{pt.user.name}</span>}
                          </div>
                          <div className="text-xs font-bold text-blue-500 bg-blue-100 px-2 py-1 rounded-lg">
@@ -304,7 +307,10 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                 </div>
                 <div className="flex-1">
                   <div className="font-bold text-gray-900 flex items-center gap-2 flex-wrap">
-                    <span className="text-lg">{reg.user.nickname || reg.user.name}</span>
+                    <span className="text-lg flex items-center gap-1">
+                      {(reg.user.stars || 0) > 0 && <span className="text-yellow-400">{'⭐'.repeat(reg.user.stars)}</span>}
+                      {reg.user.nickname || reg.user.name}
+                    </span>
                     {reg.user.nickname && <span className="text-sm font-medium text-gray-500">{reg.user.name}</span>}
                     {priorityBadge}
                     {isCurrentUser && <span className="text-[10px] uppercase font-bold bg-orange-200 text-orange-800 px-2 py-0.5 rounded-full">Vous</span>}

@@ -23,6 +23,7 @@ model User {
   redCards       Int            @default(0)
   tops           Int            @default(0)
   flops          Int            @default(0)
+  stars          Int            @default(0)
   createdAt      DateTime       @default(now())
   historicalStats Json?         @default("{}")
   lastCalculatedLevel Int?

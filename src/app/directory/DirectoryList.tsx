@@ -36,7 +36,10 @@ export default function DirectoryList({ players, user }: { players: any[], user:
               <div className="flex-1 px-1">
                 <h3 className="font-bold text-gray-900 flex flex-wrap items-center gap-2">
                   <Link href={`/profile/${player.id}`} className="hover:text-blue-600 hover:underline transition-colors flex items-baseline gap-2">
-                    <span className="text-lg">{player.nickname || player.name}</span>
+                    <span className="text-lg flex items-center gap-1">
+                      {(player.stars || 0) > 0 && <span className="text-yellow-400">{'⭐'.repeat(player.stars)}</span>}
+                      {player.nickname || player.name}
+                    </span>
                     {player.nickname && <span className="text-sm font-medium text-gray-500">{player.name}</span>}
                   </Link>
                   {player.id === user.id && <span className="text-[10px] bg-orange-500 text-white px-2 py-0.5 rounded-full uppercase cursor-default">Vous</span>}

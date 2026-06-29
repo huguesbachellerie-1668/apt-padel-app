@@ -58,7 +58,8 @@ export default async function RootLayout({
                 <div className="flex items-center gap-4">
                   <span className="text-sm text-blue-200 flex items-center gap-1">
                     <span className="hidden sm:inline">Connecté :</span>
-                    <strong className="text-white max-w-[100px] sm:max-w-none truncate" title={user.nickname || user.name.split(' ')[0]}>
+                    <strong className="text-white max-w-[100px] sm:max-w-none truncate flex items-center gap-1" title={user.nickname || user.name.split(' ')[0]}>
+                      {(user.stars || 0) > 0 && <span className="text-yellow-400">{'⭐'.repeat(user.stars)}</span>}
                       {user.nickname || user.name.split(' ')[0]}
                     </strong>
                     <ProfileSettingsModal user={user} />

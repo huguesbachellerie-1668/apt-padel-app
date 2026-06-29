@@ -130,48 +130,26 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
 
   const winRate = totalMatchesPlayed > 0 ? Math.round((wins / totalMatchesPlayed) * 100) : 0;
   
-  // Calculate historical chart data (incorporating past seasons not in the Match table)
-  let dbPoints = 0;
-  for (const pp of countedPoolPlayers) {
-    let sessionPoints = 0;
-    for (const match of pp.pool.matches) {
-      const isTeam1 = match.team1Player1Id === player.id || match.team1Player2Id === player.id;
-      const isTeam2 = match.team2Player1Id === player.id || match.team2Player2Id === player.id;
-      if (!isTeam1 && !isTeam2) continue;
-
-      const myGames = isTeam1 ? match.team1Games : match.team2Games;
-      const theirGames = isTeam1 ? match.team2Games : match.team1Games;
-      if (myGames === null || theirGames === null) continue;
-
-      sessionPoints += myGames;
-      if (myGames > theirGames) {
-         sessionPoints += 30;
-      } else if (myGames === theirGames) {
-         sessionPoints += 20;
-      } else {
-         sessionPoints += 10;
-      }
-    }
-    dbPoints += (sessionPoints / 3);
+  // Calculate historical chart data
+  let ghostAverage = 0;
+  const histStats = player.historicalStats ? (typeof player.historicalStats === 'object' ? player.historicalStats : JSON.parse(player.historicalStats as string)) : {};
+  const keys = Object.keys(histStats).sort();
+  if (keys.length > 0) {
+     ghostAverage = Number(histStats[keys[keys.length - 1]]) || 0;
   }
 
-  const playerTotalSessions = Math.floor((player.totalMatches || 0) / 3);
-  const dbSessionsCount = countedPoolPlayers.length;
-  const historicalSessions = Math.max(0, playerTotalSessions - dbSessionsCount);
-  const historicalPoints = Math.max(0, (player.points || 0) - dbPoints);
-
-  let cumulativePoints = historicalSessions > 0 ? historicalPoints : 0;
-  let cumulativeSessions = historicalSessions;
-  
   const chartData: any[] = [];
-  if (historicalSessions > 0) {
+  if (ghostAverage > 0) {
     chartData.push({
-      name: "Départ",
-      average: cumulativePoints / cumulativeSessions
+      name: "Saison prec.",
+      average: ghostAverage
     });
   }
 
   const chronologicalPools = [...countedPoolPlayers].reverse();
+  let cumulativeSessionPoints = 0;
+  let realSessions = 0;
+
   for (const pp of chronologicalPools) {
     let sessionPoints = 0;
     for (const match of pp.pool.matches) {
@@ -193,13 +171,20 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
       }
     }
     
-    cumulativePoints += (sessionPoints / 3);
-    cumulativeSessions++;
+    cumulativeSessionPoints += (sessionPoints / 3);
+    realSessions++;
+    
+    let currentAverage = 0;
+    if (realSessions < 4 && ghostAverage > 0) {
+        currentAverage = (ghostAverage + cumulativeSessionPoints) / (1 + realSessions);
+    } else {
+        currentAverage = cumulativeSessionPoints / realSessions;
+    }
     
     const dateStr = new Date(pp.pool.session.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
     chartData.push({
       name: dateStr,
-      average: cumulativeSessions > 0 ? cumulativePoints / cumulativeSessions : 0
+      average: currentAverage
     });
   }
 
@@ -256,6 +241,10 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
      stats.trackingSessions = stats.startSessions;
      stats.trackingAverage = stats.trackingSessions > 0 ? stats.trackingPoints / stats.trackingSessions : 0;
   }
+
+  const playerTotalSessions = Math.floor((player.totalMatches || 0) / 3);
+  const dbSessionsCount = countedPoolPlayers.length;
+  const historicalSessions = Math.max(0, playerTotalSessions - dbSessionsCount);
 
   const rankChartData: any[] = [];
   
@@ -362,6 +351,7 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
            </div>
            <div>
               <h1 className="text-4xl font-black text-blue-900 flex items-center gap-3">
+                {(player.stars || 0) > 0 && <span className="text-yellow-400 drop-shadow-sm">{'⭐'.repeat(player.stars)}</span>}
                 {player.name}
               </h1>
               {player.nickname && <p className="text-xl text-gray-400 italic font-medium mt-1">"{player.nickname}"</p>}
@@ -369,8 +359,11 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
                  <span className="bg-orange-100 text-orange-800 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-orange-200">
                    {totalSessions} Sessions
                  </span>
-                 <span className="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-blue-200">
+                 <span className="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-blue-200 flex items-center gap-1">
                    Actuelle : {(player.averagePoints || 0).toFixed(2)} pts
+                   {(totalSessions < 4 && ghostAverage > 0) && (
+                       <span title="Bouclier de classement actif (Moyenne lissée avec la saison précédente)" className="cursor-help">🛡️</span>
+                   )}
                  </span>
                  {typeof (player as any).historicalStats === 'object' && (player as any).historicalStats !== null && Object.entries((player as any).historicalStats).map(([season, pts]: any) => (
                     <span key={season} className="bg-gray-50 border border-gray-200 text-gray-600 font-bold px-3 py-1 rounded-full text-sm flex items-center gap-1 shadow-sm" title={`Ancienne moyenne enregistrée pour ${season}`}>

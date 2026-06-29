@@ -4,15 +4,77 @@ import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { getSessionUser } from "@/lib/auth"
 
+export async function archiveSeason() {
+  const activeSeason = await prisma.season.findFirst({
+    where: { isActive: true }
+  });
+
+  if (!activeSeason) return;
+
+  const users = await prisma.user.findMany();
+  
+  // Find the season winner
+  let winner = null;
+  for (const user of users) {
+    if (user.totalMatches >= 30) {
+      if (!winner || user.averagePoints > winner.averagePoints) {
+        winner = user;
+      }
+    }
+  }
+
+  for (const user of users) {
+    const historicalStats = user.historicalStats ? (typeof user.historicalStats === 'object' ? { ...user.historicalStats } : JSON.parse(user.historicalStats as string)) : {};
+    
+    if (user.totalMatches >= 30) {
+      historicalStats[activeSeason.name] = user.averagePoints || 0;
+      
+      const updateData: any = { historicalStats };
+      if (winner && user.id === winner.id) {
+         updateData.stars = { increment: 1 };
+      }
+      
+      await prisma.user.update({
+        where: { id: user.id },
+        data: updateData
+      });
+    }
+  }
+  revalidatePath('/admin');
+  revalidatePath('/');
+}
+
 export async function createSeason(formData: FormData) {
   const name = formData.get('name') as string;
   
-  // Désactive toutes les autres saisons
-  await prisma.season.updateMany({
-    where: { isActive: true },
-    data: { isActive: false }
+  // Find current active season
+  const activeSeason = await prisma.season.findFirst({
+    where: { isActive: true }
   });
 
+  if (activeSeason) {
+    // Remettre à zéro les compteurs pour la nouvelle saison
+    const users = await prisma.user.findMany();
+    for (const user of users) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          points: 0,
+          totalMatches: 0,
+          tops: 0,
+          flops: 0
+        }
+      });
+    }
+
+    // Désactive l'ancienne saison
+    await prisma.season.update({
+      where: { id: activeSeason.id },
+      data: { isActive: false }
+    });
+  }
+
+  // Création de la nouvelle saison
   await prisma.season.create({
     data: {
       name,
@@ -456,8 +518,28 @@ export async function finishSessionAndCalculatePoints(sessionId: string, formDat
       const sessionAverage = sessionPoints / 3;
       const newTotalPoints = (user.points || 0) + sessionAverage;
       const newMatchesPlayed = (user.totalMatches || 0) + validMatches;
-      const newSessionsPlayed = newMatchesPlayed / 3;
-      const newAverage = newSessionsPlayed > 0 ? (newTotalPoints / newSessionsPlayed) : 0;
+      const realSessionsPlayed = newMatchesPlayed / 3;
+
+      let newAverage = 0;
+      if (realSessionsPlayed > 0) {
+        if (realSessionsPlayed < 4) {
+          // Lissage inter-saison (Bouclier de classement)
+          let ghostAverage = 0;
+          const histStats = user.historicalStats ? (typeof user.historicalStats === 'object' ? user.historicalStats : JSON.parse(user.historicalStats as string)) : {};
+          const keys = Object.keys(histStats).sort();
+          if (keys.length > 0) {
+            ghostAverage = Number(histStats[keys[keys.length - 1]]) || 0;
+          }
+          if (ghostAverage > 0) {
+            newAverage = (ghostAverage + newTotalPoints) / (1 + realSessionsPlayed);
+          } else {
+            newAverage = newTotalPoints / realSessionsPlayed;
+          }
+        } else {
+          // A partir de la 4ème vraie session, la moyenne historique est abandonnée
+          newAverage = newTotalPoints / realSessionsPlayed;
+        }
+      }
 
       await prisma.user.update({
         where: { id: user.id },

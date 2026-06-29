@@ -1,7 +1,7 @@
 import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { createSeason, createSession, updateSessionStatus, generatePools, finishSessionAndCalculatePoints, reopenSession, deleteSession, updateSessionCourtsAction, updateGlobalSettings, createCourtReservation, deleteCourtReservation, updateReservationDefaultLevel } from "./actions";
+import { createSeason, archiveSeason, createSession, updateSessionStatus, generatePools, finishSessionAndCalculatePoints, reopenSession, deleteSession, updateSessionCourtsAction, updateGlobalSettings, createCourtReservation, deleteCourtReservation, updateReservationDefaultLevel } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
 import DeleteSessionButton from "./DeleteSessionButton";
 
@@ -425,21 +425,39 @@ export default async function AdminDashboard() {
             <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
               📅 Gestion des Saisons
             </h2>
-            <form action={createSeason} className="flex flex-col gap-6 bg-gray-50 p-6 rounded-2xl border border-gray-200">
-              <div className="flex flex-col md:flex-row gap-6 w-full items-end">
-                <div className="flex-1 w-full">
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Nom de la nouvelle saison</label>
-                  <input type="text" name="name" placeholder="ex: Saison 2026-2027" required className="w-full p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none transition-all font-bold" />
-                </div>
-                <div className="w-full md:w-auto mt-4 md:mt-0">
-                  <SubmitButton pendingText="Création..." className="bg-orange-600 text-white font-bold py-4 px-8 rounded-xl hover:bg-orange-700 transition-colors shadow-sm whitespace-nowrap w-full">
-                    Démarrer une Nouvelle Saison
+            
+            <div className="flex flex-col gap-6">
+              {/* Clôture de la saison en cours */}
+              <form action={archiveSeason} className="flex flex-col gap-4 bg-orange-50 p-6 rounded-2xl border border-orange-200">
+                <h3 className="text-lg font-bold text-orange-800">1. Clôturer la saison en cours</h3>
+                <p className="text-sm text-gray-600">Archive le classement final de la saison actuelle pour les joueurs ayant participé à plus de 10 sessions. Les points actuels ne seront pas effacés tout de suite.</p>
+                <div className="w-full md:w-auto mt-2">
+                  <SubmitButton pendingText="Archivage..." className="bg-orange-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-orange-700 transition-colors shadow-sm whitespace-nowrap">
+                    Archiver le Classement Final
                   </SubmitButton>
                 </div>
-              </div>
-              <p className="text-sm text-gray-500 italic">Attention : démarrer une nouvelle saison désactivera l'ancienne. Le Dashboard basculera automatiquement sur la nouvelle.</p>
-            </form>
+              </form>
+
+              {/* Démarrage nouvelle saison */}
+              <form action={createSeason} className="flex flex-col gap-4 bg-gray-50 p-6 rounded-2xl border border-gray-200">
+                <h3 className="text-lg font-bold text-gray-800">2. Démarrer une Nouvelle Saison</h3>
+                <p className="text-sm text-gray-600">Remet à zéro tous les points, matchs, tops et flops pour démarrer une nouvelle année sur de bonnes bases.</p>
+                <div className="flex flex-col md:flex-row gap-6 w-full items-end mt-2">
+                  <div className="flex-1 w-full">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Nom de la nouvelle saison</label>
+                    <input type="text" name="name" placeholder="ex: Saison 2026-2027" required className="w-full p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none transition-all font-bold" />
+                  </div>
+                  <div className="w-full md:w-auto mt-4 md:mt-0">
+                    <SubmitButton pendingText="Création..." className="bg-blue-600 text-white font-bold py-4 px-8 rounded-xl hover:bg-blue-700 transition-colors shadow-sm whitespace-nowrap w-full">
+                      Démarrer la Saison
+                    </SubmitButton>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 italic mt-2">Attention : démarrer une nouvelle saison désactivera l'ancienne. Le Dashboard basculera automatiquement sur la nouvelle.</p>
+              </form>
+            </div>
           </div>
+
         </div>
       )}
     </div>

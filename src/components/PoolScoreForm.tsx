@@ -245,7 +245,10 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
                      const isYes = playersNextStatus[p.userId] === true;
                      return (
                         <div key={p.userId} className="flex justify-between items-center p-3 sm:p-4 border border-gray-100 rounded-2xl bg-gray-50">
-                           <span className="font-bold text-gray-800 flex-1">{p.user.nickname || p.user.name}</span>
+                           <span className="font-bold text-gray-800 flex-1 flex items-center gap-1">
+                             {(p.user.stars || 0) > 0 && <span className="text-yellow-400 drop-shadow-sm">{'⭐'.repeat(p.user.stars)}</span>}
+                             {p.user.nickname || p.user.name}
+                           </span>
                            <div className="flex bg-white rounded-full p-1 border border-gray-200 shadow-sm shrink-0">
                               <button 
                                  type="button"
