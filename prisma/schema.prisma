@@ -34,6 +34,8 @@ model User {
   team2Player2Matches Match[]        @relation("Team2Player2")
   poolPlayers         PoolPlayer[]
   registrations       Registration[]
+
+  @@index([averagePoints(sort: Desc)])
 }
 
 model Season {
@@ -59,6 +61,8 @@ model Session {
   pools             Pool[]
   registrations     Registration[]
   season            Season             @relation(fields: [seasonId], references: [id])
+
+  @@index([seasonId])
 }
 
 model Registration {
@@ -71,6 +75,8 @@ model Registration {
   session               Session  @relation(fields: [sessionId], references: [id])
   user                  User     @relation(fields: [userId], references: [id])
 
+  @@index([sessionId])
+  @@index([userId])
   @@unique([userId, sessionId])
 }
 
@@ -85,6 +91,8 @@ model Pool {
   courtReservation   CourtReservation? @relation(fields: [courtReservationId], references: [id])
   session            Session           @relation(fields: [sessionId], references: [id])
   players            PoolPlayer[]
+
+  @@index([sessionId])
 }
 
 model PoolPlayer {
@@ -94,6 +102,8 @@ model PoolPlayer {
   pool   Pool   @relation(fields: [poolId], references: [id])
   user   User   @relation(fields: [userId], references: [id])
 
+  @@index([poolId])
+  @@index([userId])
   @@unique([poolId, userId])
 }
 
@@ -113,6 +123,12 @@ model Match {
   team1Player2   User   @relation("Team1Player2", fields: [team1Player2Id], references: [id])
   team2Player1   User   @relation("Team2Player1", fields: [team2Player1Id], references: [id])
   team2Player2   User   @relation("Team2Player2", fields: [team2Player2Id], references: [id])
+
+  @@index([poolId])
+  @@index([team1Player1Id])
+  @@index([team1Player2Id])
+  @@index([team2Player1Id])
+  @@index([team2Player2Id])
 }
 
 model Club {
@@ -133,6 +149,9 @@ model CourtReservation {
   club             Club    @relation(fields: [clubId], references: [id])
   session          Session @relation(fields: [sessionId], references: [id])
   pool             Pool?
+
+  @@index([clubId])
+  @@index([sessionId])
 }
 
 model News {
@@ -173,4 +192,6 @@ model ActivityLog {
   message   String
   createdAt DateTime @default(now())
   session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
 }

@@ -10,6 +10,7 @@ import NavButton from '@/components/NavButton';
 import NextTopLoader from 'nextjs-toploader';
 import ProfileSettingsModal from '@/components/ProfileSettingsModal';
 import { Home, Trophy, CalendarDays, Users, ScrollText, Settings } from 'lucide-react';
+import Image from 'next/image';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,11 +24,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await getSessionUser();
-  const sponsors = await prisma.sponsor.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } });
+  const [user, sponsors, latestNews] = await Promise.all([
+    getSessionUser(),
+    prisma.sponsor.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } }),
+    prisma.news.findFirst({ where: { isActive: true }, orderBy: { date: 'desc' }, select: { date: true } })
+  ]);
   
   // Check for unread news
-  const latestNews = await prisma.news.findFirst({ where: { isActive: true }, orderBy: { date: 'desc' }, select: { date: true } });
   let hasUnreadNews = false;
   if (user && latestNews) {
     if (!user.lastNewsSeenAt || new Date(user.lastNewsSeenAt) < new Date(latestNews.date)) {
@@ -50,10 +53,9 @@ export default async function RootLayout({
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center font-bold shadow-sm overflow-hidden p-1">
+                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center font-bold shadow-sm overflow-hidden p-1 relative">
                     {/* Placeholder for the logo. The user must put their logo.png in the public folder */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/logo.png" alt="APT Logo" className="w-full h-full object-contain" />
+                    <Image src="/logo.png" alt="APT Logo" fill sizes="48px" className="object-contain p-1" priority />
                   </div>
                   <span className="font-black tracking-widest text-lg uppercase hidden sm:block">ATLANTIC PADEL TEAM</span>
                 </div>
@@ -118,10 +120,9 @@ export default async function RootLayout({
                  {sponsors.map(sp => (
                     <div key={sp.id} className="flex flex-col justify-center items-center hover:scale-105 transition-transform opacity-80 hover:opacity-100">
                        {sp.logoUrl ? (
-                         <>
-                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                           <img src={sp.logoUrl} alt={sp.name} className="h-8 w-auto object-contain mb-1" />
-                         </>
+                         <div className="relative h-8 w-32 mb-1">
+                           <Image src={sp.logoUrl} alt={sp.name} fill sizes="128px" className="object-contain" />
+                         </div>
                        ) : (
                          <span className="text-2xl mb-1 opacity-50">🤝</span>
                        )}

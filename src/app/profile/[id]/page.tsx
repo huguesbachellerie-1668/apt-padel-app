@@ -3,8 +3,10 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import BackButton from "@/components/BackButton";
-import PlayerStatsChart from "@/components/PlayerStatsChart";
-import PlayerRankChart from "@/components/PlayerRankChart";
+import dynamic from "next/dynamic";
+
+const PlayerStatsChart = dynamic(() => import("@/components/PlayerStatsChart"));
+const PlayerRankChart = dynamic(() => import("@/components/PlayerRankChart"));
 import { Prisma } from "@prisma/client";
 
 export default async function PlayerProfilePage({ params }: { params: Promise<{ id: string }> }) {
