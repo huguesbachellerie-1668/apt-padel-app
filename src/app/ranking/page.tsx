@@ -95,7 +95,7 @@ export default async function RankingPage() {
                       )}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-center">
-                      <div className="text-xl font-black text-blue-700">{player.averagePoints.toFixed(2)}</div>
+                      <div className="text-xl font-black text-blue-700 tabular-nums">{player.averagePoints.toFixed(2)}</div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-700 font-bold hidden sm:table-cell">
                       {player.tops > 0 ? <span className="text-green-600">{player.tops}</span> : '-'}
@@ -103,13 +103,13 @@ export default async function RankingPage() {
                     <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-700 font-bold hidden sm:table-cell">
                       {player.flops > 0 ? <span className="text-red-600">{player.flops}</span> : '-'}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-500 font-bold hidden md:table-cell">
+                    <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-500 font-bold hidden md:table-cell tabular-nums">
                       {Math.round(player.totalMatches / 3)}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-500 font-bold hidden md:table-cell">
+                    <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-500 font-bold hidden md:table-cell tabular-nums">
                       {player.totalMatches}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-500 font-bold hidden md:table-cell">
+                    <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-500 font-bold hidden md:table-cell tabular-nums">
                       {Math.floor(player.points)}
                     </td>
                   </tr>

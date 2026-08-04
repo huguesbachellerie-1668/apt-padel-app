@@ -9,6 +9,7 @@ import SubmitButton from '@/components/SubmitButton';
 import NavButton from '@/components/NavButton';
 import NextTopLoader from 'nextjs-toploader';
 import ProfileSettingsModal from '@/components/ProfileSettingsModal';
+import { Home, Trophy, CalendarDays, Users, ScrollText, Settings } from 'lucide-react';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -73,18 +74,32 @@ export default async function RootLayout({
                 </div>
               </div>
             </div>
-            {/* Nav */}
-            <nav className="flex flex-wrap justify-around items-center max-w-3xl mx-auto py-3 px-2 text-sm font-medium gap-y-2">
-              <NavButton href="/" icon="🏠" label="Accueil" />
-              <NavButton href="/ranking" icon="🏆" label="Classement" />
-              <NavButton href="/history" icon="📅" label="Historique" />
-              <NavButton href="/directory" icon="👥" label="Annuaire" />
-              <NavButton href="/rules" icon="📜" label="APT" hasNotification={hasUnreadNews} />
+            {/* Nav Desktop */}
+            <nav className="hidden sm:flex justify-around items-center max-w-3xl mx-auto py-3 px-2 text-sm font-medium gap-y-2">
+              <NavButton href="/" icon={<Home size={20} />} label="Accueil" />
+              <NavButton href="/ranking" icon={<Trophy size={20} />} label="Classement" />
+              <NavButton href="/history" icon={<CalendarDays size={20} />} label="Historique" />
+              <NavButton href="/directory" icon={<Users size={20} />} label="Annuaire" />
+              <NavButton href="/rules" icon={<ScrollText size={20} />} label="APT" hasNotification={hasUnreadNews} />
               {['PRESIDENT', 'ORGA', 'TRESORIER'].includes(user.role) && (
-                <NavButton href="/admin" icon="⚙️" label="Admin" className="text-orange-300" />
+                <NavButton href="/admin" icon={<Settings size={20} />} label="Admin" className="text-orange-300" />
               )}
             </nav>
           </header>
+        )}
+        
+        {/* Nav Mobile Bottom Bar */}
+        {user && (
+          <nav className="sm:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-50 flex justify-around items-center h-16 pb-[env(safe-area-inset-bottom)] text-gray-500">
+            <NavButton href="/" icon={<Home size={24} />} label="Accueil" isMobile={true} />
+            <NavButton href="/ranking" icon={<Trophy size={24} />} label="Classement" isMobile={true} />
+            <NavButton href="/history" icon={<CalendarDays size={24} />} label="Historique" isMobile={true} />
+            <NavButton href="/directory" icon={<Users size={24} />} label="Annuaire" isMobile={true} />
+            <NavButton href="/rules" icon={<ScrollText size={24} />} label="APT" hasNotification={hasUnreadNews} isMobile={true} />
+            {['PRESIDENT', 'ORGA', 'TRESORIER'].includes(user.role) && (
+              <NavButton href="/admin" icon={<Settings size={24} />} label="Admin" isMobile={true} className="text-orange-500" />
+            )}
+          </nav>
         )}
         
         <main className="max-w-5xl mx-auto mt-6 px-4">

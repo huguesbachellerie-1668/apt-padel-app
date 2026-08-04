@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import StatsCard from "@/components/dashboard/StatsCard";
 import SessionCard from "@/components/dashboard/SessionCard";
+import { Moon, AlertTriangle } from 'lucide-react';
 
 export default async function Dashboard() {
   const user = await getSessionUser();
@@ -118,15 +119,17 @@ export default async function Dashboard() {
         </div>
       ) : (
         <section className="bg-white border border-gray-100 p-12 rounded-3xl shadow-sm text-center">
-          <div className="text-6xl mb-4">💤</div>
+          <div className="mb-4 flex justify-center">
+             <Moon size={48} className="text-gray-300" />
+          </div>
           <p className="text-gray-500 font-bold text-lg">Aucune session n'est planifiée par le Board pour le moment.</p>
         </section>
       )}
       
       {/* Quick stats / info */}
       <section className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex items-center justify-between mt-6">
-         <div className="flex bg-orange-50 rounded-full w-12 h-12 items-center justify-center text-orange-500 text-xl font-bold">
-            ⚠️
+         <div className="flex bg-orange-50 rounded-full w-12 h-12 items-center justify-center">
+            <AlertTriangle size={24} className="text-orange-500" />
          </div>
          <div className="flex-1 ml-4">
             <h3 className="text-gray-800 font-bold">Cartons Jaunes</h3>
