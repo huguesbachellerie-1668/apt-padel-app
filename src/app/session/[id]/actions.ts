@@ -65,6 +65,7 @@ export async function updatePoolSettings(poolId: string, sessionId: string, form
     if (reservationId !== "") {
       await prisma.pool.updateMany({
         where: { courtReservationId: reservationId },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data: { courtReservationId: null } as any
       });
     }
