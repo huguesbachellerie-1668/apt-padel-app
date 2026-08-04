@@ -12,7 +12,7 @@ interface PlayerStatsChartProps {
   data: ChartDataPoint[];
 }
 
-const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
+const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white p-4 border border-blue-100 shadow-lg rounded-xl">

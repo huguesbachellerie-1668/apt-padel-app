@@ -12,7 +12,7 @@ interface PlayerRankChartProps {
   data: ChartDataPoint[];
 }
 
-const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
+const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const rankValue = payload[0].value;
     return (
