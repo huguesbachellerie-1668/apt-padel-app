@@ -51,7 +51,7 @@ export default async function AdminClubsPage() {
       </div>
 
       {/* LIST OF CLUBS */}
-      <AdminClubList clubs={clubs} />
+      <AdminClubList initialClubs={clubs} />
 
     </div>
   );

@@ -1,4 +1,5 @@
 import { getSessionUser } from "@/lib/auth";
+import { Prisma } from "@prisma/client";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { manualRegisterForSession, manualUnregisterForSession, updatePoolSettings, swapRegistrationOrder } from "./actions";

@@ -138,11 +138,11 @@ export default async function HistoryPage() {
                      )}
                      <div className="flex gap-4">
                        <div className="bg-blue-50 px-3 py-2 rounded-xl text-center flex-1 border border-blue-100">
-                         <div className="text-xl font-black text-blue-800">{session.pools.length}</div>
+                         <div className="text-xl font-black text-blue-800">{(session as any).pools?.length || 0}</div>
                          <div className="text-[10px] uppercase font-bold text-blue-400">Terrains</div>
                        </div>
                        <div className="bg-orange-50 px-3 py-2 rounded-xl text-center flex-1 border border-orange-100">
-                         <div className="text-xl font-black text-orange-800">{session.pools.length * 4}</div>
+                         <div className="text-xl font-black text-orange-800">{((session as any).pools?.length || 0) * 4}</div>
                          <div className="text-[10px] uppercase font-bold text-orange-400">Joueurs</div>
                        </div>
                      </div>

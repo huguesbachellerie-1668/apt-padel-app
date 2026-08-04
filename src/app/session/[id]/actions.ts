@@ -55,13 +55,17 @@ export async function updatePoolSettings(poolId: string, sessionId: string, form
   
   const dataToUpdate: Prisma.PoolUpdateInput = {};
   if (reservationId !== undefined) {
-    dataToUpdate.courtReservationId = reservationId === "" ? null : reservationId;
+    if (reservationId === "") {
+      dataToUpdate.courtReservation = { disconnect: true };
+    } else {
+      dataToUpdate.courtReservation = { connect: { id: reservationId } };
+    }
     
     // BUG FIX: Prevent @unique constraint violation if this reservation is already assigned to another pool.
-    if (dataToUpdate.courtReservationId !== null) {
+    if (reservationId !== "") {
       await prisma.pool.updateMany({
-        where: { courtReservationId: dataToUpdate.courtReservationId },
-        data: { courtReservationId: null }
+        where: { courtReservationId: reservationId },
+        data: { courtReservationId: null } as any
       });
     }
   }

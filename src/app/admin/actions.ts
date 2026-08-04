@@ -593,7 +593,7 @@ export async function updateGlobalSettings(formData: FormData) {
      await prisma.settings.upsert({
         where: { id: 'global' },
         update: dataToUpdate,
-        create: { id: 'global', ...dataToUpdate }
+        create: { id: 'global', ...(dataToUpdate as Prisma.SettingsCreateInput) }
      });
   }
 

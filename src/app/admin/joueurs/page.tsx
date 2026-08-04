@@ -73,7 +73,7 @@ export default async function AdminPlayersPage() {
         </form>
       </div>
 
-      <AdminPlayerList players={players} user={user} />
+      <AdminPlayerList initialPlayers={players} initialClubs={[]} />
     </div>
   );
 }
