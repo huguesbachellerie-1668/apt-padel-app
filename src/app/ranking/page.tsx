@@ -40,7 +40,8 @@ export default async function RankingPage() {
                 <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-orange-300 uppercase tracking-wider">Moyenne pts</th>
                 <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-green-300 uppercase tracking-wider hidden sm:table-cell">Tops</th>
                 <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-red-300 uppercase tracking-wider hidden sm:table-cell">Flops</th>
-                <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-blue-200 uppercase tracking-wider hidden md:table-cell">Matchs Joués</th>
+                <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-blue-200 uppercase tracking-wider hidden md:table-cell">Sessions</th>
+                <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-blue-200 uppercase tracking-wider hidden md:table-cell">Matchs</th>
                 <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-blue-200 uppercase tracking-wider hidden md:table-cell">Points Totaux</th>
               </tr>
             </thead>
@@ -101,6 +102,9 @@ export default async function RankingPage() {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-700 font-bold hidden sm:table-cell">
                       {player.flops > 0 ? <span className="text-red-600">{player.flops}</span> : '-'}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-500 font-bold hidden md:table-cell">
+                      {Math.round(player.totalMatches / 3)}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-500 font-bold hidden md:table-cell">
                       {player.totalMatches}

@@ -28,10 +28,13 @@ export async function archiveSeason() {
     const historicalStats = user.historicalStats ? (typeof user.historicalStats === 'object' ? { ...user.historicalStats } : JSON.parse(user.historicalStats as string)) : {};
     
     if (user.totalMatches >= 30) {
+      // Check if this season was already archived for this user
+      const isAlreadyArchived = historicalStats[activeSeason.name] !== undefined;
+      
       historicalStats[activeSeason.name] = user.averagePoints || 0;
       
       const updateData: Prisma.UserUpdateInput = { historicalStats };
-      if (winner && user.id === winner.id) {
+      if (winner && user.id === winner.id && !isAlreadyArchived) {
          updateData.stars = { increment: 1 };
       }
       
@@ -43,6 +46,7 @@ export async function archiveSeason() {
   }
   revalidatePath('/admin');
   revalidatePath('/');
+  redirect('/admin?success=archived');
 }
 
 export async function createSeason(formData: FormData) {

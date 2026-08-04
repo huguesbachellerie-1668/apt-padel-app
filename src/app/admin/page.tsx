@@ -5,7 +5,8 @@ import { createSeason, archiveSeason, createSession, updateSessionStatus, genera
 import SubmitButton from "@/components/SubmitButton";
 import DeleteSessionButton from "./DeleteSessionButton";
 
-export default async function AdminDashboard() {
+export default async function AdminDashboard({ searchParams }: { searchParams: Promise<{ success?: string }> }) {
+  const resolvedSearchParams = await searchParams;
   const user = await getSessionUser();
   if (!user || user.role === 'JOUEUR') redirect("/");
 
@@ -32,6 +33,23 @@ export default async function AdminDashboard() {
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-10">
+      {resolvedSearchParams?.success === 'archived' && (
+        <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-r-lg shadow-sm">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <span className="text-green-500 text-xl">✅</span>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-green-700 font-bold">
+                Le classement de la saison en cours a été archivé avec succès !
+              </p>
+              <p className="text-xs text-green-600 mt-1">
+                Le meilleur joueur (plus de 30 matchs) a reçu une étoile ⭐. Vous pouvez maintenant démarrer la nouvelle saison pour remettre les compteurs à zéro.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="flex justify-between items-end mb-6">
         <div>
           <h1 className="text-3xl font-black text-blue-900 flex items-center gap-3">
