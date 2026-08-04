@@ -95,7 +95,7 @@ export default async function RankingPage() {
                       )}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-center">
-                      <div className="text-xl font-black text-blue-700 tabular-nums">{player.averagePoints.toFixed(2)}</div>
+                      <div className="text-xl font-black text-blue-700 tabular-nums">{player.averagePoints.toFixed(2).replace('.', ',')}</div>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-gray-700 font-bold hidden sm:table-cell">
                       {player.tops > 0 ? <span className="text-green-600">{player.tops}</span> : '-'}

@@ -361,14 +361,14 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
                    {totalSessions} Sessions
                  </span>
                  <span className="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-blue-200 flex items-center gap-1">
-                   Actuelle : {(player.averagePoints || 0).toFixed(2)} pts
+                   Actuelle : {(player.averagePoints || 0).toFixed(2).replace('.', ',')} pts
                    {(totalSessions < 4 && ghostAverage > 0) && (
                        <span title="Bouclier de classement actif (Moyenne lissée avec la saison précédente)" className="cursor-help">🛡️</span>
                    )}
                  </span>
                  {typeof player.historicalStats === 'object' && player.historicalStats !== null && !Array.isArray(player.historicalStats) && Object.entries(player.historicalStats as Record<string, number>).map(([season, pts]) => (
                     <span key={season} className="bg-gray-50 border border-gray-200 text-gray-600 font-bold px-3 py-1 rounded-full text-sm flex items-center gap-1 shadow-sm" title={`Ancienne moyenne enregistrée pour ${season}`}>
-                      <span className="text-xs opacity-50">📜</span> {season} : {Number(pts).toFixed(2)} pts
+                      <span className="text-xs opacity-50">📜</span> {season} : {Number(pts).toFixed(2).replace('.', ',')} pts
                     </span>
                  ))}
                  <span className="bg-purple-50 text-purple-800 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-purple-200">

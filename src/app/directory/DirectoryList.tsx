@@ -59,7 +59,7 @@ export default function DirectoryList({ players, user }: { players: Prisma.UserG
                 <div className="text-[10px] font-bold text-blue-600 uppercase">Sessions</div>
               </div>
               <div className="bg-orange-50 p-2 rounded-xl border border-orange-100">
-                <div className="text-xl font-black text-orange-900">{(player.averagePoints || 0).toFixed(2)}</div>
+                <div className="text-xl font-black text-orange-900">{(player.averagePoints || 0).toFixed(2).replace('.', ',')}</div>
                 <div className="text-[10px] font-bold text-orange-600 uppercase">Moyenne</div>
               </div>
               <div className="bg-green-50 p-2 rounded-xl border border-green-100">

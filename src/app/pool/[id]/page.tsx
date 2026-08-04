@@ -93,7 +93,7 @@ export default async function PoolPage({ params }: { params: Promise<{ id: strin
                                   {p.user.nickname || p.user.name.split(' ')[0]} {p.userId === user.id && "(Vous)"}
                               </span>
                           </div>
-                          <span className="text-blue-500 text-sm font-bold bg-blue-100 px-2 py-1 rounded">{p.user.averagePoints.toFixed(2)} pts</span>
+                          <span className="text-blue-500 text-sm font-bold bg-blue-100 px-2 py-1 rounded">{p.user.averagePoints.toFixed(2).replace('.', ',')} pts</span>
                       </li>
                   ))}
               </ul>

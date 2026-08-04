@@ -212,7 +212,7 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                            {pt.user.nickname && <span className="text-xs font-medium text-gray-500">{pt.user.name}</span>}
                          </div>
                          <div className="text-xs font-bold text-blue-500 bg-blue-100 px-2 py-1 rounded-lg">
-                           {(pt.user.averagePoints || 0).toFixed(2)} pts
+                           {(pt.user.averagePoints || 0).toFixed(2).replace('.', ',')} pts
                          </div>
                       </div>
                    ))}

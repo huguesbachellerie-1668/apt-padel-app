@@ -127,8 +127,8 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
       
       if (topPlayer || flopPlayer) {
           text += `\n`;
-          if (topPlayer) text += `🏆 *TOP* : ${topPlayer.player.nickname || topPlayer.player.name.split(' ')[0]} (Moy: ${(topPlayer.sessionPoints / 3).toFixed(2)})\n`;
-          if (flopPlayer) text += `💩 *FLOP* : ${flopPlayer.player.nickname || flopPlayer.player.name.split(' ')[0]} (Moy: ${(flopPlayer.sessionPoints / 3).toFixed(2)})\n`;
+          if (topPlayer) text += `🏆 *TOP* : ${topPlayer.player.nickname || topPlayer.player.name.split(' ')[0]} (Moy: ${(topPlayer.sessionPoints / 3).toFixed(2).replace('.', ',')})\n`;
+          if (flopPlayer) text += `💩 *FLOP* : ${flopPlayer.player.nickname || flopPlayer.player.name.split(' ')[0]} (Moy: ${(flopPlayer.sessionPoints / 3).toFixed(2).replace('.', ',')})\n`;
       }
 
       if (nextSession) {

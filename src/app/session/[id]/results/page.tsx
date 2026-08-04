@@ -66,8 +66,8 @@ export default async function SessionResultsPage({ params }: { params: Promise<{
 
           if (topPlayer || flopPlayer) {
               finalWhatsAppText += `\n🎾 *Poule ${pool.level}* :\n`;
-              if (topPlayer) finalWhatsAppText += `🏆 TOP : ${topPlayer.player.nickname || topPlayer.player.name.split(' ')[0]} (Moy: ${(topPlayer.sessionPoints / 3).toFixed(2)})\n`;
-              if (flopPlayer) finalWhatsAppText += `💩 FLOP : ${flopPlayer.player.nickname || flopPlayer.player.name.split(' ')[0]} (Moy: ${(flopPlayer.sessionPoints / 3).toFixed(2)})\n`;
+              if (topPlayer) finalWhatsAppText += `🏆 TOP : ${topPlayer.player.nickname || topPlayer.player.name.split(' ')[0]} (Moy: ${(topPlayer.sessionPoints / 3).toFixed(2).replace('.', ',')})\n`;
+              if (flopPlayer) finalWhatsAppText += `💩 FLOP : ${flopPlayer.player.nickname || flopPlayer.player.name.split(' ')[0]} (Moy: ${(flopPlayer.sessionPoints / 3).toFixed(2).replace('.', ',')})\n`;
           }
       });
   }
@@ -230,7 +230,7 @@ export default async function SessionResultsPage({ params }: { params: Promise<{
                               <td className="px-4 py-3 text-center font-bold text-red-500">{s.losses}</td>
                               <td className="px-4 py-3 text-center text-gray-500 font-medium">{s.gamesWon}</td>
                               <td className="px-4 py-3 text-center font-bold text-indigo-600">+{s.sessionPoints}</td>
-                              <td className="px-4 py-3 text-right font-black text-blue-600 bg-blue-50/30 rounded-r-xl">{(s.sessionPoints / 3).toFixed(2)}</td>
+                              <td className="px-4 py-3 text-right font-black text-blue-600 bg-blue-50/30 rounded-r-xl">{(s.sessionPoints / 3).toFixed(2).replace('.', ',')}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -270,7 +270,7 @@ export default async function SessionResultsPage({ params }: { params: Promise<{
                            <div>
                               <span className="font-bold text-gray-400 uppercase text-xs tracking-wider">TOP</span><br/>
                               <span className="font-black text-gray-800 text-lg">{topPlayer.player.nickname || topPlayer.player.name.split(' ')[0]}</span>
-                              <span className="text-green-600 font-bold ml-2">(Moy: {(topPlayer.sessionPoints / 3).toFixed(2)})</span>
+                              <span className="text-green-600 font-bold ml-2">(Moy: {(topPlayer.sessionPoints / 3).toFixed(2).replace('.', ',')})</span>
                            </div>
                         </div>
                       ) : <div className="flex-1"></div>}
@@ -280,7 +280,7 @@ export default async function SessionResultsPage({ params }: { params: Promise<{
                            <div>
                               <span className="font-bold text-gray-400 uppercase text-xs tracking-wider">FLOP</span><br/>
                               <span className="font-black text-gray-800 text-lg">{flopPlayer.player.nickname || flopPlayer.player.name.split(' ')[0]}</span>
-                              <span className="text-red-500 font-bold ml-2">(Moy: {(flopPlayer.sessionPoints / 3).toFixed(2)})</span>
+                              <span className="text-red-500 font-bold ml-2">(Moy: {(flopPlayer.sessionPoints / 3).toFixed(2).replace('.', ',')})</span>
                            </div>
                            <span className="text-3xl">💩</span>
                         </div>
