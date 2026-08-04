@@ -17,6 +17,12 @@ interface NavButtonProps {
 export default function NavButton({ href, icon, label, className = '', isMobile = false, hasNotification = false }: NavButtonProps) {
   const [isPendingPath, setIsPendingPath] = useState<string | null>(null);
   const pathname = usePathname();
+  const [prevPathname, setPrevPathname] = useState(pathname);
+
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setIsPendingPath(null);
+  }
 
   const isPending = isPendingPath !== null && isPendingPath !== pathname;
   const isActive = pathname === href || (href !== '/' && pathname.startsWith(href));
