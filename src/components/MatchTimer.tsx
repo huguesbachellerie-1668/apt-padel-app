@@ -9,13 +9,14 @@ export default function MatchTimer({ initialMinutes }: { initialMinutes: number 
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
-  const wakeLockRef = useRef<any>(null);
+  const wakeLockRef = useRef<{ release: () => Promise<void> } | null>(null);
 
   const requestWakeLock = async () => {
     try {
-      if ('wakeLock' in navigator) {
+      const nav = navigator as Navigator & { wakeLock?: { request: (type: string) => Promise<{ release: () => Promise<void> }> } };
+      if (nav.wakeLock) {
         if (!wakeLockRef.current) {
-           wakeLockRef.current = await (navigator as any).wakeLock.request('screen');
+           wakeLockRef.current = await nav.wakeLock.request('screen');
         }
       }
     } catch (err) {
@@ -38,7 +39,8 @@ export default function MatchTimer({ initialMinutes }: { initialMinutes: number 
   const initAudio = () => {
     try {
       if (!audioCtxRef.current) {
-        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+        const win = window as Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext };
+        const AudioCtx = window.AudioContext || win.webkitAudioContext;
         audioCtxRef.current = new AudioCtx();
       }
       if (audioCtxRef.current.state === 'suspended') {

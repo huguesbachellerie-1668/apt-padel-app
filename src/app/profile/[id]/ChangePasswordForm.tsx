@@ -14,7 +14,7 @@ export default function ChangePasswordForm({ userId }: { userId: string }) {
          await changePassword(formData);
          setStatus('success');
          (document.getElementById('pwdForm') as HTMLFormElement).reset();
-      } catch (e) {
+      } catch {
          setStatus('error');
       } finally {
          setIsPending(false);

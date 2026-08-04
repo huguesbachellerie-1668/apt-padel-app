@@ -3,9 +3,11 @@
 import { useState } from "react";
 import SubmitButton from "@/components/SubmitButton";
 import { updateClub, deleteClub } from "./actions";
+import { Prisma } from '@prisma/client';
 
-export default function AdminClubList({ clubs }: { clubs: any[] }) {
+export default function AdminClubList({ initialClubs }: { initialClubs: Prisma.ClubGetPayload<Record<string, never>>[] }) {
   const [editingId, setEditingId] = useState<string | null>(null);
+  const clubs = initialClubs;
 
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
@@ -95,8 +97,8 @@ export default function AdminClubList({ clubs }: { clubs: any[] }) {
                         if (confirm) {
                           try {
                             await deleteClub(formData);
-                          } catch (e: any) {
-                            alert(e.message);
+                          } catch (e) {
+                            alert(e instanceof Error ? e.message : String(e));
                           }
                         }
                       }}>

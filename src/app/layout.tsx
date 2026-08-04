@@ -51,6 +51,7 @@ export default async function RootLayout({
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center font-bold shadow-sm overflow-hidden p-1">
                     {/* Placeholder for the logo. The user must put their logo.png in the public folder */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/logo.png" alt="APT Logo" className="w-full h-full object-contain" />
                   </div>
                   <span className="font-black tracking-widest text-lg uppercase hidden sm:block">ATLANTIC PADEL TEAM</span>
@@ -99,10 +100,13 @@ export default async function RootLayout({
                </div>
                
                <div className="flex flex-wrap justify-center gap-8">
-                 {sponsors.map((sp: any) => (
+                 {sponsors.map(sp => (
                     <div key={sp.id} className="flex flex-col justify-center items-center hover:scale-105 transition-transform opacity-80 hover:opacity-100">
                        {sp.logoUrl ? (
-                         <img src={sp.logoUrl} alt={sp.name} className="h-8 w-auto object-contain mb-1" />
+                         <>
+                           {/* eslint-disable-next-line @next/next/no-img-element */}
+                           <img src={sp.logoUrl} alt={sp.name} className="h-8 w-auto object-contain mb-1" />
+                         </>
                        ) : (
                          <span className="text-2xl mb-1 opacity-50">🤝</span>
                        )}

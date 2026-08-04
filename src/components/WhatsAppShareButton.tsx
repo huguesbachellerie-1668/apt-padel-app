@@ -70,7 +70,7 @@ export default function WhatsAppShareButton({ elementId, elementIds, text, fileN
         } catch (clipError) {
            console.error("Erreur copie", clipError);
            // Fallback téléchargement multiple
-           for(let f of files) {
+           for(const f of files) {
              const imgUrl = URL.createObjectURL(f);
              const a = document.createElement("a");
              a.href = imgUrl;
@@ -83,9 +83,9 @@ export default function WhatsAppShareButton({ elementId, elementIds, text, fileN
             : "L'image a été téléchargée. Vous pouvez maintenant la glisser manuellement.");
         }
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
-      alert("Erreur détaillée : " + (error?.message || String(error)));
+      alert("Erreur détaillée : " + (error instanceof Error ? error.message : String(error)));
     } finally {
       setIsSharing(false);
     }

@@ -1,13 +1,12 @@
 import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import BackButton from "@/components/BackButton";
 import WhatsAppShareButton from "@/components/WhatsAppShareButton";
 import { finishSessionAndCalculatePoints } from "@/app/admin/actions";
 import SubmitButton from "@/components/SubmitButton";
 
-export default async function SessionResultsPage({ params }: { params: any }) {
+export default async function SessionResultsPage({ params }: { params: Promise<{ id: string }> }) {
   const p = await params;
   const user = await getSessionUser();
   if (!user) redirect("/login");
@@ -36,7 +35,7 @@ export default async function SessionResultsPage({ params }: { params: any }) {
   if (!session) return <div className="text-center p-10 font-bold text-gray-500">Session introuvable</div>;
 
   const finishedPools = session.pools.filter(
-    (pool: any) => pool.matches.length === 3 && pool.matches.every((m: any) => m.team1Games !== null && m.team2Games !== null)
+    pool => pool.matches.length === 3 && pool.matches.every(m => m.team1Games !== null && m.team2Games !== null)
   );
 
   const allPoolsFinished = session.pools.length > 0 && finishedPools.length === session.pools.length;
@@ -44,8 +43,8 @@ export default async function SessionResultsPage({ params }: { params: any }) {
 
   let finalWhatsAppText = `🏆 *Résultats de la session du ${new Date(session.date).toLocaleDateString('fr-FR')}*\n\nVoici les classements de toutes les poules !\n`;
   if (session.status === 'TERMINEE') {
-      finishedPools.forEach((pool: any) => {
-          const standings = pool.players.map((pt: any) => {
+      finishedPools.forEach(pool => {
+          const standings = pool.players.map(pt => {
               let sessionPoints = 0; let wins = 0; let draws = 0; let losses = 0;
               for (const match of pool.matches) {
                   const isTeam1 = match.team1Player1Id === pt.userId || match.team1Player2Id === pt.userId;
@@ -61,9 +60,9 @@ export default async function SessionResultsPage({ params }: { params: any }) {
               }
               return { player: pt.user, wins, draws, losses, sessionPoints };
           });
-          standings.sort((a: any, b: any) => b.sessionPoints - a.sessionPoints);
-          const topPlayer = standings.find((s: any) => s.wins === 3 || (s.wins === 2 && s.draws === 1));
-          const flopPlayer = [...standings].reverse().find((s: any) => s.losses === 3);
+          standings.sort((a, b) => b.sessionPoints - a.sessionPoints);
+          const topPlayer = standings.find(s => s.wins === 3 || (s.wins === 2 && s.draws === 1));
+          const flopPlayer = [...standings].reverse().find(s => s.losses === 3);
 
           if (topPlayer || flopPlayer) {
               finalWhatsAppText += `\n🎾 *Poule ${pool.level}* :\n`;
@@ -101,7 +100,7 @@ export default async function SessionResultsPage({ params }: { params: any }) {
         {isBoard && session.status === 'TERMINEE' && (
            <div data-html2canvas-ignore>
                <WhatsAppShareButton 
-                   elementIds={finishedPools.map((p: any) => `capture-pool-${p.id}`)}
+                   elementIds={finishedPools.map(p => `capture-pool-${p.id}`)}
                    text={finalWhatsAppText}
                    fileName="resultats.png"
                />
@@ -136,9 +135,9 @@ export default async function SessionResultsPage({ params }: { params: any }) {
         </div>
       ) : (
         <div className="space-y-8">
-          {finishedPools.map((pool: any) => {
+          {finishedPools.map(pool => {
             // Calculate standings
-            const standings = pool.players.map((pt: any) => {
+            const standings = pool.players.map(pt => {
               let sessionPoints = 0;
               let wins = 0;
               let draws = 0;
@@ -170,10 +169,10 @@ export default async function SessionResultsPage({ params }: { params: any }) {
               return { player: pt.user, wins, draws, losses, gamesWon, sessionPoints };
             });
 
-            standings.sort((a: any, b: any) => b.sessionPoints - a.sessionPoints);
+            standings.sort((a, b) => b.sessionPoints - a.sessionPoints);
 
-            const topPlayer = standings.find((s: any) => s.wins === 3 || (s.wins === 2 && s.draws === 1));
-            const flopPlayer = [...standings].reverse().find((s: any) => s.losses === 3);
+            const topPlayer = standings.find(s => s.wins === 3 || (s.wins === 2 && s.draws === 1));
+            const flopPlayer = [...standings].reverse().find(s => s.losses === 3);
 
             return (
               <div key={pool.id} id={`capture-pool-${pool.id}`} className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden mb-8">
@@ -215,7 +214,7 @@ export default async function SessionResultsPage({ params }: { params: any }) {
                           </tr>
                         </thead>
                         <tbody>
-                          {standings.map((s: any, idx: number) => (
+                          {standings.map((s, idx: number) => (
                             <tr key={s.player.id} className="border-b border-gray-50 last:border-0 hover:bg-orange-50/30 transition-colors">
                               <td className="px-4 py-3 font-bold text-gray-900 flex items-center gap-2">
                                 <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${idx === 0 ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-500'}`}>
@@ -243,7 +242,7 @@ export default async function SessionResultsPage({ params }: { params: any }) {
                   <div>
                     <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">⚔️ Scores finaux</h3>
                     <div className="space-y-3">
-                      {pool.matches.map((m: any) => ( // assuming matches are naturally complete if pool is here
+                      {pool.matches.map(m => ( // assuming matches are naturally complete if pool is here
                         <div key={m.id} className="bg-gray-50 p-3 rounded-xl border border-gray-100 flex items-center justify-between text-sm">
                           <div className="flex-1 text-right font-medium text-gray-700">
                             {m.team1Player1.nickname || m.team1Player1.name.split(' ')[0]} / {m.team1Player2.nickname || m.team1Player2.name.split(' ')[0]}

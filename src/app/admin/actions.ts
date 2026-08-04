@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import { Prisma } from "@prisma/client"
 import { getSessionUser } from "@/lib/auth"
 
 export async function archiveSeason() {
@@ -29,7 +30,7 @@ export async function archiveSeason() {
     if (user.totalMatches >= 30) {
       historicalStats[activeSeason.name] = user.averagePoints || 0;
       
-      const updateData: any = { historicalStats };
+      const updateData: Prisma.UserUpdateInput = { historicalStats };
       if (winner && user.id === winner.id) {
          updateData.stars = { increment: 1 };
       }
@@ -164,7 +165,7 @@ export async function generatePools(formData: FormData) {
   });
   const lastSessionUserIds = new Set<string>();
   if (lastSession) {
-    lastSession.pools.forEach((p: any) => p.players.forEach((pp: any) => lastSessionUserIds.add(pp.userId)));
+    lastSession.pools.forEach(p => p.players.forEach(pp => lastSessionUserIds.add(pp.userId)));
   }
 
   // --- Step 8: Tri des sélectionnés
@@ -184,7 +185,7 @@ export async function generatePools(formData: FormData) {
   const N = maxPlayers;
 
   // --- Tri par points généraux (Initial Point Seed)
-  const electedUsers = selectedRegistrations.map((r: any) => r.user).sort((a: any, b: any) => b.averagePoints - a.averagePoints);
+  const electedUsers = selectedRegistrations.map(r => r.user).sort((a, b) => b.averagePoints - a.averagePoints);
   const userToReg = new Map(selectedRegistrations.map(r => [r.userId, r]));
 
   // --- Clear previous pools
@@ -203,7 +204,7 @@ export async function generatePools(formData: FormData) {
   const userLastPoolMap = new Map<string, number>();
   const pastPoolPlayers = await prisma.poolPlayer.findMany({
     where: {
-      userId: { in: electedUsers.map((u: any) => u.id) },
+      userId: { in: electedUsers.map(u => u.id) },
       pool: { session: { status: 'TERMINEE' } }
     },
     include: { pool: { include: { session: true } } },
@@ -354,7 +355,7 @@ export async function generatePools(formData: FormData) {
     const poolUsers = finalUsers.slice((level - 1) * 4, level * 4);
     
     // Ultime étape : classer les joueurs par points dans chaque poule (du plus grand au plus petit)
-    poolUsers.sort((a: any, b: any) => b.averagePoints - a.averagePoints);
+    poolUsers.sort((a, b) => b.averagePoints - a.averagePoints);
     
     const matchingRes = sessionReservations.find(r => r.defaultPoolLevel === level);
     
@@ -367,7 +368,7 @@ export async function generatePools(formData: FormData) {
       }
     });
 
-    await Promise.all(poolUsers.map(async (u: any, idx: number) => {
+    await Promise.all(poolUsers.map(async (u, idx: number) => {
       return prisma.poolPlayer.create({
         data: { poolId: pool.id, userId: u.id, seed: idx + 1 }
       });
@@ -572,7 +573,7 @@ export async function updateGlobalSettings(formData: FormData) {
   
   const lockUnregisterTime = formData.get('lockUnregisterTime') as string;
 
-  const dataToUpdate: any = {};
+  const dataToUpdate: Prisma.SettingsUpdateInput = {};
   if (!isNaN(duration) && duration > 0 && duration <= 120) {
     dataToUpdate.matchDuration = duration;
   }

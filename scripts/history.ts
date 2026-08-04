@@ -15,7 +15,7 @@ async function traceLucienHistory() {
     sessionId: p.pool.session.id,
     poolLevel: p.pool.level,
     seed: p.seed
-  })).sort((a:any, b:any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   pools.forEach(p => console.log(`Session ${p.date.toISOString().split('T')[0]}: Pool ${p.poolLevel} Seed ${p.seed}`));
   

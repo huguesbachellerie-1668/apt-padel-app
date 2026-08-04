@@ -27,9 +27,9 @@ export default function WhatsAppShareTextButton({ textToShare, className, label 
         const encodedText = encodeURIComponent(textToShare);
         window.open(`https://wa.me/?text=${encodedText}`, '_blank');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
-      alert("Erreur détaillée : " + (error?.message || String(error)));
+      alert("Erreur détaillée : " + (error instanceof Error ? error.message : String(error)));
     } finally {
       setIsSharing(false);
     }

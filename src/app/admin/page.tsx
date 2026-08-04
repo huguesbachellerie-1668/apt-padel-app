@@ -241,7 +241,7 @@ export default async function AdminDashboard() {
                       <div className="mt-4 px-1">
                         {session.reservations && session.reservations.length > 0 && (
                           <div className="mb-4 flex flex-col gap-2">
-                            {session.reservations.map((res: any) => (
+                            {session.reservations.map(res => (
                               <div key={res.id} className="flex flex-col sm:flex-row justify-between sm:items-center bg-white p-3 rounded-xl border border-indigo-100 shadow-sm gap-3">
                                 <div className="flex flex-col">
                                   <span className="font-bold text-indigo-900">{res.club.name} - {res.name}</span>
@@ -276,7 +276,7 @@ export default async function AdminDashboard() {
                             <label className="text-[10px] font-bold text-gray-500 uppercase">Club</label>
                             <select name="clubId" required className="w-full p-2 rounded-lg border border-gray-200 text-xs focus:outline-none bg-white">
                               <option value="">Sélectionner...</option>
-                              {allClubs.map((c: any) => (
+                              {allClubs.map(c => (
                                 <option key={c.id} value={c.id}>{c.name}</option>
                               ))}
                             </select>
@@ -308,7 +308,7 @@ export default async function AdminDashboard() {
                       </summary>
                       <div className="mt-3 bg-white border border-gray-100 rounded-xl p-4 text-sm max-h-60 overflow-y-auto space-y-2">
                         {session.activityLogs && session.activityLogs.length > 0 ? (
-                          session.activityLogs.map((log: any) => (
+                          session.activityLogs.map(log => (
                             <div key={log.id} className="flex gap-3 items-start border-b border-gray-50 pb-2 last:border-0 last:pb-0">
                               <span className="text-gray-400 min-w-[110px] whitespace-nowrap text-xs mt-0.5 bg-gray-50 px-2 py-0.5 rounded font-mono">
                                 {log.createdAt.toLocaleString('fr-FR', { timeZone: 'Europe/Paris', day: '2-digit', month: '2-digit', hour: '2-digit', minute:'2-digit' }).replace(',', ' -')}

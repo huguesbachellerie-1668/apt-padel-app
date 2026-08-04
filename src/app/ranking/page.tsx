@@ -45,7 +45,7 @@ export default async function RankingPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
-              {players.map((player: any, index: number) => {
+              {players.map((player, index: number) => {
                 const isCurrentUser = player.id === user.id;
                 
                 return (

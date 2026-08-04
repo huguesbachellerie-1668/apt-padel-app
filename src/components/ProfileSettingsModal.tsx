@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { updateMyProfile, updateMyPassword } from '@/app/profileActions';
-import SubmitButton from './SubmitButton';
+import { Prisma } from '@prisma/client';
+import SubmitButton from '@/components/SubmitButton';
 
-export default function ProfileSettingsModal({ user }: { user: any }) {
+export default function ProfileSettingsModal({ user }: { user: Prisma.UserGetPayload<Record<string, never>> }) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('infos');
   const [profileMsg, setProfileMsg] = useState({ text: '', type: '' });
@@ -109,7 +110,7 @@ export default function ProfileSettingsModal({ user }: { user: any }) {
                             </button>
                         </div>
                         <div className="bg-orange-50 border border-orange-100 p-3 rounded-xl mt-2">
-                            <p className="text-xs text-orange-800 font-medium">En cas d'oubli critique, un membre du Bureau peut toujours réinitialiser votre compte sur le mot de passe standard.</p>
+                            <p className="text-xs text-orange-800 font-medium">En cas d&apos;oubli critique, un membre du Bureau peut toujours réinitialiser votre compte sur le mot de passe standard.</p>
                         </div>
                         <SubmitButton pendingText="Modification..." className="mt-2 w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl shadow-md transition-transform hover:scale-[1.02]">
                             Changer le mot de passe

@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, TooltipProps } from 'recharts';
 
 interface ChartDataPoint {
   name: string;
@@ -11,6 +11,20 @@ interface ChartDataPoint {
 interface PlayerStatsChartProps {
   data: ChartDataPoint[];
 }
+
+const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-4 border border-blue-100 shadow-lg rounded-xl">
+        <p className="font-bold text-gray-800 mb-1">{label}</p>
+        <p className="text-blue-600 font-black text-lg">
+          {payload[0].value.toFixed(2)} <span className="text-sm text-gray-500 font-medium">pts</span>
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
 
 export default function PlayerStatsChart({ data }: PlayerStatsChartProps) {
   if (!data || data.length === 0) {
@@ -27,20 +41,6 @@ export default function PlayerStatsChart({ data }: PlayerStatsChartProps) {
     Math.max(0, Math.floor(minAvg - 1)), 
     Math.ceil(maxAvg + 1)
   ];
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white p-4 border border-blue-100 shadow-lg rounded-xl">
-          <p className="font-bold text-gray-800 mb-1">{label}</p>
-          <p className="text-blue-600 font-black text-lg">
-            {payload[0].value.toFixed(2)} <span className="text-sm text-gray-500 font-medium">pts</span>
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm w-full">

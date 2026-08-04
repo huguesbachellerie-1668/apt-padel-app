@@ -5,8 +5,9 @@ import Link from "next/link";
 import BackButton from "@/components/BackButton";
 import PlayerStatsChart from "@/components/PlayerStatsChart";
 import PlayerRankChart from "@/components/PlayerRankChart";
+import { Prisma } from "@prisma/client";
 
-export default async function PlayerProfilePage({ params }: { params: any }) {
+export default async function PlayerProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const p = await params;
   const currentUser = await getSessionUser();
   if (!currentUser) redirect("/login");
@@ -69,8 +70,8 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
   let totalGamesWon = 0;
   let bestPoolReached = Infinity;
 
-  const teammateStats = new Map<string, { user: any, totalPoints: number, matchesPlayed: number, winsTogether: number }>();
-  const opponentStats = new Map<string, { user: any, lossesAgainst: number, matchesAgainst: number }>();
+  const teammateStats = new Map<string, { user: Prisma.UserGetPayload<Record<string, never>>, totalPoints: number, matchesPlayed: number, winsTogether: number }>();
+  const opponentStats = new Map<string, { user: Prisma.UserGetPayload<Record<string, never>>, lossesAgainst: number, matchesAgainst: number }>();
 
   const countedPoolPlayers = poolPlayers.filter(pp => pp.pool.session.isCounted);
 
@@ -138,7 +139,7 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
      ghostAverage = Number(histStats[keys[keys.length - 1]]) || 0;
   }
 
-  const chartData: any[] = [];
+  const chartData: {name: string, average: number}[] = [];
   if (ghostAverage > 0) {
     chartData.push({
       name: "Saison prec.",
@@ -246,11 +247,11 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
   const dbSessionsCount = countedPoolPlayers.length;
   const historicalSessions = Math.max(0, playerTotalSessions - dbSessionsCount);
 
-  const rankChartData: any[] = [];
+  const rankChartData: {name: string, rank: number}[] = [];
   
   if (historicalSessions > 0) {
-      const sortedUsers = Array.from(userStats.values()).sort((a: any, b: any) => b.trackingAverage - a.trackingAverage);
-      const startRank = sortedUsers.findIndex((u: any) => u.id === player.id) + 1;
+      const sortedUsers = Array.from(userStats.values()).sort((a, b) => b.trackingAverage - a.trackingAverage);
+      const startRank = sortedUsers.findIndex(u => u.id === player.id) + 1;
       rankChartData.push({
          name: "Départ",
          rank: startRank
@@ -304,10 +305,10 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
          st.trackingAverage = st.trackingSessions > 0 ? st.trackingPoints / st.trackingSessions : 0;
      }
      
-     const sortedUsers = Array.from(userStats.values()).sort((a: any, b: any) => b.trackingAverage - a.trackingAverage);
-     const rank = sortedUsers.findIndex((u: any) => u.id === player.id) + 1;
+     const sortedUsers = Array.from(userStats.values()).sort((a, b) => b.trackingAverage - a.trackingAverage);
+     const rank = sortedUsers.findIndex(u => u.id === player.id) + 1;
      
-     const playedInSession = session.pools.some((p: any) => p.matches.some((m: any) => m.team1Player1Id === player.id || m.team1Player2Id === player.id || m.team2Player1Id === player.id || m.team2Player2Id === player.id));
+     const playedInSession = session.pools.some(p => p.matches.some(m => m.team1Player1Id === player.id || m.team1Player2Id === player.id || m.team2Player1Id === player.id || m.team2Player2Id === player.id));
      
      if (playedInSession) {
         const dateStr = new Date(session.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
@@ -365,9 +366,9 @@ export default async function PlayerProfilePage({ params }: { params: any }) {
                        <span title="Bouclier de classement actif (Moyenne lissée avec la saison précédente)" className="cursor-help">🛡️</span>
                    )}
                  </span>
-                 {typeof (player as any).historicalStats === 'object' && (player as any).historicalStats !== null && Object.entries((player as any).historicalStats).map(([season, pts]: any) => (
+                 {typeof player.historicalStats === 'object' && player.historicalStats !== null && !Array.isArray(player.historicalStats) && Object.entries(player.historicalStats as Record<string, number>).map(([season, pts]) => (
                     <span key={season} className="bg-gray-50 border border-gray-200 text-gray-600 font-bold px-3 py-1 rounded-full text-sm flex items-center gap-1 shadow-sm" title={`Ancienne moyenne enregistrée pour ${season}`}>
-                      <span className="text-xs opacity-50">📜</span> {season} : {pts.toFixed(2)} pts
+                      <span className="text-xs opacity-50">📜</span> {season} : {Number(pts).toFixed(2)} pts
                     </span>
                  ))}
                  <span className="bg-purple-50 text-purple-800 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-purple-200">

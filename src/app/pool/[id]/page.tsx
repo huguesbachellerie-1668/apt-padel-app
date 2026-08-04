@@ -1,12 +1,12 @@
 import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+
 import BackButton from "@/components/BackButton";
 import MatchTimer from "@/components/MatchTimer";
 import PoolScoreForm from "@/components/PoolScoreForm";
 
-export default async function PoolPage({ params }: { params: { id: string } }) {
+export default async function PoolPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const user = await getSessionUser();
   if (!user) redirect("/login");
@@ -85,7 +85,7 @@ export default async function PoolPage({ params }: { params: { id: string } }) {
           <div className="bg-white rounded-3xl shadow-sm border border-blue-100 p-6">
               <h2 className="text-xl font-bold text-blue-900 mb-4">👥 Joueurs</h2>
               <ul className="space-y-3">
-                  {pool.players.map((p: any) => (
+                  {pool.players.map(p => (
                       <li key={p.userId} className="flex justify-between items-center font-medium bg-gray-50 p-3 rounded-xl border border-gray-100">
                           <div className="flex items-center gap-3">
                               <span className="w-6 h-6 bg-blue-800 text-white rounded-full flex items-center justify-center text-xs">{p.seed}</span>

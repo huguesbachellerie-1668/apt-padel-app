@@ -1,5 +1,6 @@
 import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
@@ -23,7 +24,7 @@ export default async function HistoryPage() {
      if (!acc[sName]) acc[sName] = [];
      acc[sName].push(session);
      return acc;
-  }, {} as Record<string, any[]>);
+  }, {} as Record<string, Prisma.SessionGetPayload<Record<string, never>>[]>);
 
   // 2. Compute Global Stats
   const totalSessions = pastSessions.length;
@@ -45,7 +46,7 @@ export default async function HistoryPage() {
     include: { user: true }
   });
 
-  const participationCount = new Map<string, { count: number, user: any }>();
+  const participationCount = new Map<string, { count: number, user: Prisma.UserGetPayload<Record<string, never>> }>();
   for (const pp of allPoolPlayers) {
     const existing = participationCount.get(pp.userId) || { count: 0, user: pp.user };
     existing.count++;

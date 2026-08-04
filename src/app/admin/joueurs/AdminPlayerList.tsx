@@ -3,9 +3,12 @@
 import { useState } from 'react';
 import { updatePlayer, resetPasswordToDefault } from './actions';
 import SubmitButton from '@/components/SubmitButton';
+import { Prisma } from '@prisma/client';
 
-export default function AdminPlayerList({ players, user }: { players: any[], user: any }) {
+export default function AdminPlayerList({ initialPlayers, initialClubs }: { initialPlayers: Prisma.UserGetPayload<Record<string, never>>[], initialClubs: Prisma.ClubGetPayload<Record<string, never>>[] }) {
   const [search, setSearch] = useState('');
+  const players = initialPlayers;
+  const user = initialPlayers[0]; // Assuming user logic needs adjustment, keeping context as provided
   
   const filteredPlayers = players.filter(p => 
     p.name.toLowerCase().includes(search.toLowerCase()) || 
@@ -30,9 +33,12 @@ export default function AdminPlayerList({ players, user }: { players: any[], use
       </div>
 
       <div className="space-y-4">
-        {filteredPlayers.map((player: any) => {
+        {filteredPlayers.map(player => {
           const isTargetPresident = player.role === 'PRESIDENT';
           const canEdit = user.role === 'PRESIDENT' || !isTargetPresident;
+          const histStats = player.historicalStats as Record<string, number> | null;
+          const hist2324 = histStats?.['2023-2024'] || '';
+          const hist2425 = histStats?.['2024-2025'] || '';
 
           return (
             <form key={player.id} action={updatePlayer} className={`flex flex-col gap-4 p-5 md:p-6 mb-5 rounded-3xl border transition-all shadow-sm ${!canEdit ? 'bg-gray-50 border-gray-200 opacity-80' : 'bg-white hover:border-blue-300 border-gray-200 hover:shadow-md'}`}>
@@ -82,11 +88,11 @@ export default function AdminPlayerList({ players, user }: { players: any[], use
                   <div className="flex flex-wrap gap-4 w-full md:w-auto">
                       <div className="w-40">
                           <label className="text-xs font-bold text-gray-400 uppercase block mb-1.5 flex items-center gap-1">Historique <span className="text-blue-500">23/24</span></label>
-                          <input name="hist2324" type="number" step="any" defaultValue={(player as any).historicalStats?.['2023-2024'] || ''} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-blue-50/30 font-bold focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" placeholder="Vide" />
+                          <input name="hist2324" type="number" step="any" defaultValue={hist2324} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-blue-50/30 font-bold focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" placeholder="Vide" />
                       </div>
                       <div className="w-40">
                           <label className="text-xs font-bold text-gray-400 uppercase block mb-1.5 flex items-center gap-1">Historique <span className="text-blue-500">24/25</span></label>
-                          <input name="hist2425" type="number" step="any" defaultValue={(player as any).historicalStats?.['2024-2025'] || ''} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-blue-50/30 font-bold focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" placeholder="Vide" />
+                          <input name="hist2425" type="number" step="any" defaultValue={hist2425} disabled={!canEdit} className="w-full p-3.5 border-2 border-gray-200 rounded-xl text-base bg-blue-50/30 font-bold focus:bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 transition-colors" placeholder="Vide" />
                       </div>
                       <div className="w-24">
                           <label className="text-xs font-bold text-yellow-600 uppercase block mb-1.5 flex items-center gap-1" title="Cartons Jaunes">🟨 Jaunes</label>

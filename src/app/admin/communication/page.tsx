@@ -34,7 +34,7 @@ export default async function CommunicationAdmin() {
           </form>
 
           <div className="space-y-4">
-             {news.map((item: any) => (
+             {news.map(item => (
                 <div key={item.id} className={`p-5 rounded-2xl border transition-colors ${item.isActive ? 'border-blue-300 bg-white shadow-sm' : 'border-gray-200 bg-gray-50 opacity-60'}`}>
                    <div className="flex justify-between items-start mb-3">
                      <div>
@@ -74,7 +74,7 @@ export default async function CommunicationAdmin() {
             </form>
             
             <div className="space-y-3">
-               {sponsors.map((sp: any) => (
+               {sponsors.map(sp => (
                   <div key={sp.id} className={`flex justify-between items-center p-4 rounded-2xl border transition-colors ${sp.isActive ? 'border-gray-200 bg-white' : 'border-gray-200 bg-gray-50 opacity-60'}`}>
                      <div>
                        <span className={`font-bold block ${!sp.isActive && 'line-through text-gray-400'}`}>{sp.name}</span>
@@ -111,7 +111,7 @@ export default async function CommunicationAdmin() {
             </form>
             
             <div className="space-y-3">
-               {goodies.map((gd: any) => (
+               {goodies.map(gd => (
                   <div key={gd.id} className={`flex justify-between items-center p-4 rounded-2xl border transition-colors ${gd.isActive ? 'border-gray-200 bg-white' : 'border-gray-200 bg-gray-50 opacity-60'}`}>
                      <div>
                        <span className={`font-bold ${!gd.isActive && 'line-through text-gray-400'}`}>{gd.name}</span>

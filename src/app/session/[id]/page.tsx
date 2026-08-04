@@ -1,14 +1,13 @@
 import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { manualRegisterForSession, manualUnregisterForSession, updatePoolSettings, swapRegistrationOrder } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
 import BackButton from "@/components/BackButton";
 import WhatsAppShareButton from "@/components/WhatsAppShareButton";
 import WhatsAppShareTextButton from "@/components/WhatsAppShareTextButton";
 
-export default async function SessionDetailsPage({ params }: { params: any }) {
+export default async function SessionDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const p = await params;
   const user = await getSessionUser();
   if (!user) redirect("/login");
@@ -53,9 +52,9 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
   const placesLeft = Math.max(0, totalPlaces - registeredCount);
   const waitlistCount = Math.max(0, registeredCount - totalPlaces);
 
-  let availableUsers: any[] = [];
+  let availableUsers: Prisma.UserGetPayload<Record<string, never>>[] = [];
   if (isBoard) {
-    const registeredIds = session.registrations.map((r: any) => r.userId);
+    const registeredIds = session.registrations.map(r => r.userId);
     const usersList = await prisma.user.findMany({
       where: { id: { notIn: registeredIds } }
     });
@@ -68,10 +67,13 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
   const remplaCount = registeredCount % 4;
   const lastSessionUserIds = new Set<string>();
   if (lastSession) {
-    lastSession.pools.forEach((p: any) => p.players.forEach((pp: any) => lastSessionUserIds.add(pp.userId)));
+    lastSession.pools.forEach(p => p.players.forEach(pp => lastSessionUserIds.add(pp.userId)));
   }
 
-  session.registrations.forEach((reg: any) => {
+  type RegistrationWithPriority = typeof session.registrations[0] & { priorityType?: number };
+  const registrations = session.registrations as RegistrationWithPriority[];
+
+  registrations.forEach(reg => {
      if (lastSessionUserIds.has(reg.userId)) {
          reg.priorityType = 1;
      } else if (reg.user.totalMatches && reg.user.totalMatches > 0) {
@@ -81,15 +83,15 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
      }
   });
 
-  session.registrations.sort((a: any, b: any) => {
-      if (a.priorityType !== b.priorityType) return a.priorityType - b.priorityType;
+  registrations.sort((a, b) => {
+      if (a.priorityType !== b.priorityType) return (a.priorityType || 3) - (b.priorityType || 3);
       return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
   });
 
   let listText = `🎾 Session du ${new Date(session.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}\n\n`;
   listText += `👥 ${registeredCount} inscrit(s)\n`;
   listText += `▶️ ${poulesCount} poule(s) + ${remplaCount} remplaçant(s)\n\n`;
-  session.registrations.forEach((reg: any, idx: number) => {
+  registrations.forEach((reg, idx: number) => {
     listText += `${idx + 1} - ${reg.user.nickname || reg.user.name}\n`;
   });
 
@@ -148,7 +150,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
             {isBoard && (
               <div data-html2canvas-ignore>
                 <WhatsAppShareButton 
-                  elementIds={session.pools.map((p: any) => `capture-pool-${p.id}`)}
+                  elementIds={session.pools.map(p => `capture-pool-${p.id}`)}
                   text="🎾 Les Poules de la session sont prêtes !" 
                   fileName="poules.png" 
                 />
@@ -156,8 +158,8 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
             )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {session.pools.map((pool: any) => {
-              const allMatchesFinished = pool.matches && pool.matches.length === 3 && pool.matches.every((m: any) => m.team1Games !== null && m.team2Games !== null);
+            {session.pools.map(pool => {
+              const allMatchesFinished = pool.matches && pool.matches.length === 3 && pool.matches.every(m => m.team1Games !== null && m.team2Games !== null);
               return (
               <div key={pool.id} id={`capture-pool-${pool.id}`} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                  <div className="bg-blue-900 px-5 py-3 flex flex-wrap justify-between items-center text-white gap-2">
@@ -182,7 +184,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                        <div className="flex items-center gap-1 pl-2">
                          <select key={pool.courtReservationId || 'none'} name="reservationId" defaultValue={pool.courtReservationId || ""} className="bg-white text-gray-900 rounded px-2 py-1 text-xs font-bold w-64 border-0 focus:ring-2 focus:ring-orange-500 truncate">
                            <option value="">A définir...</option>
-                           {session.reservations && session.reservations.map((res: any) => (
+                           {session.reservations && session.reservations.map(res => (
                              <option key={res.id} value={res.id}>{res.club.name} Terrain {res.name} ({res.startTime})</option>
                            ))}
                          </select>
@@ -196,7 +198,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                    )}
                 </div>
                 <div className="p-4 flex flex-col gap-3">
-                   {pool.players.map((pt: any) => (
+                   {pool.players.map(pt => (
                       <div key={pt.userId} className={`flex items-center gap-3 p-2 rounded-xl border ${pt.userId === user.id ? 'border-orange-400 bg-orange-50' : 'border-gray-100 bg-gray-50'}`}>
                          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-800 font-bold flex items-center justify-center flex-shrink-0 text-xs">
                            {pt.seed}
@@ -248,7 +250,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
              <div className="flex gap-3 w-full">
                <select name="userId" required className="flex-1 p-2.5 rounded-xl border border-orange-200 text-sm focus:outline-none">
                  <option value="">-- Sélectionner un joueur --</option>
-                 {availableUsers.map((u: any) => (
+                 {availableUsers.map(u => (
                    <option key={u.id} value={u.id}>
                      {u.nickname ? `${u.nickname} (${u.name})` : u.name}
                    </option>
@@ -281,7 +283,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
            )}
          </div>
          <div className="divide-y divide-gray-100">
-           {session.registrations.map((reg: any, idx: number) => {
+           {registrations.map((reg, idx: number) => {
              const isCurrentUser = reg.userId === user.id;
              let priorityStyles = '';
              let priorityBadge = null;
@@ -322,7 +324,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                 </div>
                 {isBoard && session.status !== 'TERMINEE' && (
                   <div className="flex items-center gap-2">
-                    {idx > 0 && (session.registrations[idx - 1] as any).priorityType === reg.priorityType && (
+                    {idx > 0 && registrations[idx - 1].priorityType === reg.priorityType && (
                       <form action={swapRegistrationOrder.bind(null, session.id)}>
                         <input type="hidden" name="userId" value={reg.userId} />
                         <input type="hidden" name="direction" value="up" />
@@ -331,7 +333,7 @@ export default async function SessionDetailsPage({ params }: { params: any }) {
                         </SubmitButton>
                       </form>
                     )}
-                    {idx < session.registrations.length - 1 && (session.registrations[idx + 1] as any).priorityType === reg.priorityType && (
+                    {idx < registrations.length - 1 && registrations[idx + 1].priorityType === reg.priorityType && (
                       <form action={swapRegistrationOrder.bind(null, session.id)}>
                         <input type="hidden" name="userId" value={reg.userId} />
                         <input type="hidden" name="direction" value="down" />

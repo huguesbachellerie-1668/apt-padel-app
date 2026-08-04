@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import { Prisma } from "@prisma/client"
 import { getSessionUser } from "@/lib/auth"
 
 export async function manualRegisterForSession(sessionId: string, formData: FormData) {
@@ -52,7 +53,7 @@ export async function updatePoolSettings(poolId: string, sessionId: string, form
   const reservationId = formData.get('reservationId') as string;
   const courtNumberStr = formData.get('courtNumber') as string;
   
-  const dataToUpdate: any = {};
+  const dataToUpdate: Prisma.PoolUpdateInput = {};
   if (reservationId !== undefined) {
     dataToUpdate.courtReservationId = reservationId === "" ? null : reservationId;
     
@@ -106,10 +107,13 @@ export async function swapRegistrationOrder(sessionId: string, formData: FormDat
   });
   const lastSessionUserIds = new Set<string>();
   if (lastSession) {
-    lastSession.pools.forEach((p: any) => p.players.forEach((pp: any) => lastSessionUserIds.add(pp.userId)));
+    lastSession.pools.forEach(p => p.players.forEach(pp => lastSessionUserIds.add(pp.userId)));
   }
 
-  registrations.forEach((reg: any) => {
+  type RegistrationWithPriority = typeof registrations[0] & { priorityType?: number };
+  const regs = registrations as RegistrationWithPriority[];
+
+  regs.forEach(reg => {
      if (lastSessionUserIds.has(reg.userId)) {
          reg.priorityType = 1;
      } else if (reg.user.totalMatches && reg.user.totalMatches > 0) {
@@ -119,23 +123,23 @@ export async function swapRegistrationOrder(sessionId: string, formData: FormDat
      }
   });
 
-  registrations.sort((a: any, b: any) => {
-      if (a.priorityType !== b.priorityType) return a.priorityType - b.priorityType;
+  regs.sort((a, b) => {
+      if (a.priorityType !== b.priorityType) return (a.priorityType || 3) - (b.priorityType || 3);
       return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
   });
 
 
-  const currentIndex = registrations.findIndex(r => r.userId === userId);
+  const currentIndex = regs.findIndex(r => r.userId === userId);
   if (currentIndex === -1) return;
 
   const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
   
-  if (targetIndex >= 0 && targetIndex < registrations.length) {
-    const currentReg = registrations[currentIndex];
-    const targetReg = registrations[targetIndex];
+  if (targetIndex >= 0 && targetIndex < regs.length) {
+    const currentReg = regs[currentIndex];
+    const targetReg = regs[targetIndex];
 
     let newCurrentCreatedAt = new Date(targetReg.createdAt.getTime());
-    let newTargetCreatedAt = new Date(currentReg.createdAt.getTime());
+    const newTargetCreatedAt = new Date(currentReg.createdAt.getTime());
 
     // Anti-collision au cas où les dates seraient identiques à la milliseconde près
     if (newCurrentCreatedAt.getTime() === newTargetCreatedAt.getTime()) {

@@ -17,10 +17,10 @@ export default async function RulesPage() {
   });
 
   const roleOrder: Record<string, number> = { 'PRESIDENT': 1, 'ORGA': 2, 'TRESORIER': 3 };
-  const boardMembers = rawBoardMembers.sort((a: any, b: any) => roleOrder[a.role] - roleOrder[b.role]);
+  const boardMembers = rawBoardMembers.sort((a, b) => roleOrder[a.role] - roleOrder[b.role]);
 
   const news = await prisma.news.findMany({ where: { isActive: true }, orderBy: { date: 'desc' } });
-  const sponsors = await prisma.sponsor.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } });
+
   const goodies = await prisma.goodie.findMany({ where: { isActive: true }, orderBy: { name: 'asc' } });
 
   return (
@@ -38,7 +38,7 @@ export default async function RulesPage() {
         <div className="space-y-4">
           <h2 className="text-xl font-black text-blue-900 px-2 flex items-center gap-2">📢 Annonces de la direction</h2>
           <div className="grid grid-cols-1 gap-5">
-             {news.map((item: any) => (
+             {news.map(item => (
                 <div key={item.id} className="bg-gradient-to-r from-blue-700 to-indigo-800 text-white p-6 md:p-8 rounded-3xl shadow-md border-l-8 border-orange-500 relative overflow-hidden">
                    <div className="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
                    <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
@@ -63,7 +63,7 @@ export default async function RulesPage() {
          <div className="flex-1 w-full bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
             <h3 className="text-xs font-bold text-gray-400 uppercase mb-4 text-center md:text-left">Le Board Administratif</h3>
             <div className="flex flex-col md:flex-row flex-wrap gap-4 justify-center md:justify-start">
-              {boardMembers.map((member: any) => (
+              {boardMembers.map(member => (
                  <div key={member.id} className="flex items-center gap-2 bg-gray-50 pr-4 rounded-full border border-gray-100">
                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase ${member.role === 'PRESIDENT' ? 'bg-orange-500 text-white shadow-sm' : 'bg-blue-100 text-blue-800'}`}>
                      {member.role === 'ORGA' ? 'Vice-Président' : member.role}
@@ -79,7 +79,7 @@ export default async function RulesPage() {
          <div className="space-y-4 pt-4">
            <h2 className="text-xl font-black text-blue-900 px-2 flex items-center gap-2">👕 La Boutique APT</h2>
            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-             {goodies.map((gd: any) => (
+             {goodies.map(gd => (
                 <div key={gd.id} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-md transition-shadow">
                    <div>
                      <div className="flex justify-between items-start mb-5">
@@ -87,7 +87,10 @@ export default async function RulesPage() {
                          {gd.price}€
                        </div>
                        {gd.imageUrl && (
-                         <img src={gd.imageUrl} alt={gd.name} className="h-20 w-20 object-contain drop-shadow-sm ml-4" />
+                         <>
+                           {/* eslint-disable-next-line @next/next/no-img-element */}
+                           <img src={gd.imageUrl} alt={gd.name} className="h-20 w-20 object-contain drop-shadow-sm ml-4" />
+                         </>
                        )}
                      </div>
                      <h3 className="font-black text-gray-900 text-lg leading-tight mb-2">{gd.name}</h3>

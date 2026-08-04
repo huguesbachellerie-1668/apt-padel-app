@@ -2,7 +2,6 @@ import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import DirectoryList from "./DirectoryList";
-import { updateContactInfo } from "./actions";
 
 export default async function DirectoryPage() {
   const user = await getSessionUser();

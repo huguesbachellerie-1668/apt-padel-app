@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { updateContactInfo } from './actions';
 import Link from 'next/link';
 import SubmitButton from '@/components/SubmitButton';
+import { Prisma } from '@prisma/client';
 
-export default function DirectoryList({ players, user }: { players: any[], user: any }) {
+export default function DirectoryList({ players, user }: { players: Prisma.UserGetPayload<Record<string, never>>[], user: Prisma.UserGetPayload<Record<string, never>> }) {
   const [search, setSearch] = useState('');
   
   const filteredPlayers = players.filter(p => 
@@ -27,7 +28,7 @@ export default function DirectoryList({ players, user }: { players: any[], user:
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredPlayers.map((player: any) => (
+        {filteredPlayers.map(player => (
           <div key={player.id} className={`bg-white rounded-2xl shadow-sm border p-5 transition-shadow ${player.id === user.id ? 'border-orange-300 ring-2 ring-orange-100' : 'border-gray-100 hover:shadow-md'}`}>
             <div className="flex items-center gap-4 mb-4">
               <Link href={`/profile/${player.id}`} className="shrink-0 w-12 h-12 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center font-bold text-xl shadow-sm border border-blue-200 hover:bg-blue-200 hover:scale-105 transition-all">

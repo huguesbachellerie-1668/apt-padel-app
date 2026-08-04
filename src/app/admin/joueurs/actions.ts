@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import { Prisma } from "@prisma/client"
 import { getSessionUser } from "@/lib/auth"
 
 import bcrypt from 'bcryptjs';
@@ -93,7 +94,7 @@ export async function updatePlayer(formData: FormData) {
       role = targetUser.role; // Reset to what it was
   }
 
-  const updateData: any = {
+  const updateData: Prisma.UserUpdateInput = {
     name,
     nickname,
     points,
@@ -107,8 +108,9 @@ export async function updatePlayer(formData: FormData) {
   if (emailInput) updateData.email = emailInput;
   if (phoneInput !== null) updateData.phone = phoneInput;
 
-  const currentHistoricalStats = typeof (targetUser as any).historicalStats === 'object' && (targetUser as any).historicalStats !== null ? (targetUser as any).historicalStats : {};
-  let newHistoricalStats: any = { ...currentHistoricalStats };
+  const targetStats = targetUser.historicalStats as Record<string, number> | null;
+  const currentHistoricalStats = targetStats && typeof targetStats === 'object' ? targetStats : {};
+  const newHistoricalStats: Record<string, number> = { ...currentHistoricalStats };
   if (hist2324Str && hist2324Str.trim() !== '') newHistoricalStats['2023-2024'] = parseFloat(hist2324Str.trim());
   if (hist2425Str && hist2425Str.trim() !== '') newHistoricalStats['2024-2025'] = parseFloat(hist2425Str.trim());
   if (Object.keys(newHistoricalStats).length > 0) {

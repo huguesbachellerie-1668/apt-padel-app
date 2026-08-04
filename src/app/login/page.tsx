@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import SubmitButton from '@/components/SubmitButton';
 import PasswordInput from '@/components/PasswordInput';
 
-export default async function LoginPage({ searchParams }: { searchParams: any }) {
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const sp = await searchParams;
   const error = sp.error;
 
@@ -40,6 +40,7 @@ export default async function LoginPage({ searchParams }: { searchParams: any })
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="max-w-md w-full p-8 bg-white rounded-3xl shadow-xl border-t-8 border-orange-500">
         <div className="flex justify-center mb-6">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="Logo de l'APT Padel Club" className="w-28 h-auto object-contain drop-shadow-md" />
         </div>
         <h1 className="text-2xl font-bold text-center text-blue-900 mb-2">Atlantic Padel Team</h1>

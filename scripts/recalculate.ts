@@ -53,7 +53,7 @@ async function main() {
     let totalPoints = 0;
     let tops = 0;
     let flops = 0;
-    let sessionsPlayed = participations.length;
+    const sessionsPlayed = Array.from(new Set(participations.map(pp => pp.pool.sessionId))).length;
 
     for (const part of participations) {
       const pool = part.pool;

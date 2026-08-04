@@ -3,20 +3,37 @@
 import { useState, useEffect, useRef } from 'react';
 import SubmitButton from '@/components/SubmitButton';
 import { saveScoresAction, registerPlayersNextSession } from '@/app/pool/[id]/actions';
-import WhatsAppShareTextButton from '@/components/WhatsAppShareTextButton';
+import { Prisma } from '@prisma/client';
+
+type PoolWithDetails = Prisma.PoolGetPayload<{
+  include: {
+    session: true;
+    players: {
+      include: { user: true };
+    };
+    matches: {
+      include: {
+        team1Player1: true;
+        team1Player2: true;
+        team2Player1: true;
+        team2Player2: true;
+      };
+    };
+  };
+}>;
 
 type PoolScoreFormProps = {
-  pool: any;
+  pool: PoolWithDetails;
   nextSession: { id: string; date: Date } | null;
   canEditScores: boolean;
 };
 
 export default function PoolScoreForm({ pool, nextSession, canEditScores }: PoolScoreFormProps) {
-  const allMatchesFinishedInitial = pool.matches.length === 3 && pool.matches.every((m: any) => m.team1Games !== null && m.team2Games !== null);
+  const allMatchesFinishedInitial = pool.matches.length === 3 && pool.matches.every(m => m.team1Games !== null && m.team2Games !== null);
   
   const [currentScores, setCurrentScores] = useState<Record<string, {t1: string, t2: string}>>(() => {
      const init: Record<string, {t1: string, t2: string}> = {};
-     pool.matches.forEach((m: any) => {
+     pool.matches.forEach(m => {
          if (m.team1Games !== null && m.team2Games !== null) {
              init[m.order] = { t1: String(m.team1Games), t2: String(m.team2Games) };
          }
@@ -33,7 +50,7 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
   // Initialize checklist state securely
   useEffect(() => {
      const st: Record<string, boolean> = {};
-     pool.players.forEach((p: any) => {
+     pool.players.forEach(p => {
         st[p.userId] = true; // Par défaut: inscrits
      });
      setPlayersNextStatus(st);
@@ -66,7 +83,7 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
 
   const generateWhatsAppText = () => {
       let text = `🎾 *Scores Poule ${pool.level}*\n\n`;
-      pool.matches.forEach((m: any) => {
+      pool.matches.forEach(m => {
           const s = currentScores[m.order];
           if (s) {
               const p1 = m.team1Player1.nickname || m.team1Player1.name.split(' ')[0];
@@ -76,13 +93,13 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
               text += `${p1} & ${p2}  *${s.t1} - ${s.t2}*  ${p3} & ${p4}\n`;
           }
       });
-      const standings = pool.players.map((pt: any) => {
+      const standings = pool.players.map(pt => {
           let sessionPoints = 0;
           let wins = 0;
           let draws = 0;
           let losses = 0;
           
-          pool.matches.forEach((m: any) => {
+          pool.matches.forEach(m => {
               const s = currentScores[m.order];
               if (!s) return;
               
@@ -104,9 +121,9 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
           return { player: pt.user, wins, draws, losses, sessionPoints };
       });
       
-      standings.sort((a: any, b: any) => b.sessionPoints - a.sessionPoints);
-      const topPlayer = standings.find((s: any) => s.wins === 3 || (s.wins === 2 && s.draws === 1));
-      const flopPlayer = [...standings].reverse().find((s: any) => s.losses === 3);
+      standings.sort((a, b) => b.sessionPoints - a.sessionPoints);
+      const topPlayer = standings.find(s => s.wins === 3 || (s.wins === 2 && s.draws === 1));
+      const flopPlayer = [...standings].reverse().find(s => s.losses === 3);
       
       if (topPlayer || flopPlayer) {
           text += `\n`;
@@ -117,7 +134,7 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
       if (nextSession) {
           text += `\n📅 *Présents prochaine session (${new Date(nextSession.date).toLocaleDateString('fr-FR')})* :\n`;
           let hasPresences = false;
-          pool.players.forEach((p: any) => {
+          pool.players.forEach(p => {
               if (playersNextStatus[p.userId]) {
                   text += `- ${p.user.nickname || p.user.name.split(' ')[0]}\n`;
                   hasPresences = true;
@@ -166,7 +183,7 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
           <input type="hidden" name="poolId" value={pool.id} />
           <input type="hidden" name="sessionId" value={pool.sessionId} />
           
-          {pool.matches.map((m: any) => (
+          {pool.matches.map(m => (
               <div key={m.id} className="border-2 border-gray-100 rounded-2xl overflow-hidden hover:border-orange-200 transition-colors">
                   <div className="bg-gradient-to-r from-blue-900 to-blue-800 px-5 py-3 font-bold text-white flex justify-between">
                     <span>Match {m.order}</span>
@@ -241,7 +258,7 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
                </div>
                
                <div className="p-6 space-y-4 overflow-y-auto">
-                  {nextSession && pool.players.map((p: any) => {
+                  {nextSession && pool.players.map(p => {
                      const isYes = playersNextStatus[p.userId] === true;
                      return (
                         <div key={p.userId} className="flex justify-between items-center p-3 sm:p-4 border border-gray-100 rounded-2xl bg-gray-50">

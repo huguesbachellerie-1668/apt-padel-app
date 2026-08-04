@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, ReactNode } from 'react';
 
 interface NavButtonProps {
   href: string;
@@ -14,18 +14,15 @@ interface NavButtonProps {
 }
 
 export default function NavButton({ href, icon, label, className = '', hasNotification = false }: NavButtonProps) {
-  const [isPending, setIsPending] = useState(false);
+  const [isPendingPath, setIsPendingPath] = useState<string | null>(null);
   const pathname = usePathname();
 
-  // Reset loading state when navigation completes
-  useEffect(() => {
-    setIsPending(false);
-  }, [pathname]);
+  const isPending = isPendingPath !== null && isPendingPath !== pathname;
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = () => {
     // If it's the exact same page, don't show loading
     if (pathname !== href) {
-      setIsPending(true);
+      setIsPendingPath(href);
     }
   };
 

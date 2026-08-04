@@ -6,7 +6,7 @@ import { ButtonHTMLAttributes, ReactNode } from 'react';
 interface SubmitButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   pendingText?: string;
-  formAction?: any;
+  formAction?: string | ((formData: FormData) => void | Promise<void>);
 }
 
 export default function SubmitButton({ children, pendingText, className, formAction, ...props }: SubmitButtonProps) {
@@ -17,7 +17,7 @@ export default function SubmitButton({ children, pendingText, className, formAct
       type="submit"
       disabled={pending || props.disabled}
       className={`${className} ${pending ? 'opacity-70 cursor-wait' : ''}`}
-      formAction={formAction as any}
+      formAction={formAction as string | ((formData: FormData) => void | Promise<void>)}
       {...props}
     >
       <span className="flex items-center justify-center gap-2 w-full h-full">
