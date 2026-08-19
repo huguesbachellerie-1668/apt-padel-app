@@ -66,6 +66,11 @@ export default async function HistoryPage() {
           </h1>
           <p className="text-gray-500 mt-2 font-medium">L'archive complète du club et de vos records.</p>
         </div>
+        <div>
+          <Link href="/history/archives" className="inline-flex bg-blue-100 text-blue-800 hover:bg-blue-200 hover:text-blue-900 font-bold py-2.5 px-5 rounded-xl transition-colors shadow-sm border border-blue-200 items-center justify-center gap-2 text-sm w-full md:w-auto">
+             <span>Voir les classements annuels 🏆</span>
+          </Link>
+        </div>
       </div>
 
       {/* KPI Section */}
