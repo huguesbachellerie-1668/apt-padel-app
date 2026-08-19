@@ -21,92 +21,107 @@ export default async function ArchivesPage({ searchParams }: { searchParams: Pro
   let ranking: any[] = [];
   
   if (selectedSeason) {
-    const sessionData = await prisma.session.findMany({
-      where: { seasonId: selectedSeason.id, status: 'TERMINEE', isCounted: true },
-      include: {
-        pools: {
-          include: {
-            players: { include: { user: true } },
-            matches: true
-          }
-        }
-      }
-    });
-
-    const userStats: Record<string, any> = {};
-
-    for (const session of sessionData) {
-      for (const pool of session.pools) {
-        for (const poolPlayer of pool.players) {
-          const userId = poolPlayer.userId;
-          if (!userStats[userId]) {
-            userStats[userId] = {
-              id: userId,
-              name: poolPlayer.user.name,
-              nickname: poolPlayer.user.nickname,
-              stars: poolPlayer.user.stars,
-              totalMatches: 0,
-              validMatches: 0,
-              wins: 0,
-              points: 0,
-              tops: 0,
-              flops: 0,
-              sessionsCount: 0
-            };
-          }
-
-          const stats = userStats[userId];
-          stats.sessionsCount++;
-
-          let sessionPoints = 0;
-          let wins = 0;
-          let draws = 0;
-          let losses = 0;
-          let validMatches = 0;
-
-          for (const match of pool.matches) {
-            const isTeam1 = match.team1Player1Id === userId || match.team1Player2Id === userId;
-            const isTeam2 = match.team2Player1Id === userId || match.team2Player2Id === userId;
-
-            if (!isTeam1 && !isTeam2) continue;
-
-            const myGames = isTeam1 ? match.team1Games : match.team2Games;
-            const theirGames = isTeam1 ? match.team2Games : match.team1Games;
-
-            if (myGames === null || theirGames === null) continue;
-            if (myGames === 0 && theirGames === 0) continue; // forfait
-
-            validMatches++;
-            sessionPoints += myGames;
-
-            if (myGames > theirGames) {
-              sessionPoints += 30; wins++;
-            } else if (myGames === theirGames) {
-              sessionPoints += 20; draws++;
-            } else {
-              sessionPoints += 10; losses++;
-            }
-          }
-
-          stats.validMatches += validMatches;
-          stats.totalMatches += validMatches;
-          stats.points += sessionPoints / 3;
-          stats.wins += wins;
-
-          const isTop = validMatches === 3 && (wins === 3 || (wins === 2 && draws === 1));
-          const isFlop = validMatches === 3 && losses === 3;
-
-          if (isTop) stats.tops++;
-          if (isFlop) stats.flops++;
-        }
-      }
+    let usedPrecomputed = false;
+    
+    // First, check if precomputed final stats exist for this season
+    const allUsers = await prisma.user.findMany({ select: { id: true, historicalStats: true } });
+    for (const u of allUsers) {
+       const hist = u.historicalStats ? (typeof u.historicalStats === 'object' ? u.historicalStats : JSON.parse(u.historicalStats as string)) : {};
+       const finalStats = hist[`${selectedSeason.name}_Final`];
+       if (finalStats) {
+          usedPrecomputed = true;
+          ranking.push(finalStats);
+       }
     }
 
-    ranking = Object.values(userStats).map(s => {
-      s.averagePoints = s.sessionsCount > 0 ? (s.points / s.sessionsCount) : 0;
-      return s;
-    }).filter(s => s.totalMatches > 0);
+    if (!usedPrecomputed) {
+      const sessionData = await prisma.session.findMany({
+        where: { seasonId: selectedSeason.id, status: 'TERMINEE', isCounted: true },
+        include: {
+          pools: {
+            include: {
+              players: { include: { user: true } },
+              matches: true
+            }
+          }
+        }
+      });
 
+      const userStats: Record<string, any> = {};
+
+      for (const session of sessionData) {
+        for (const pool of session.pools) {
+          for (const poolPlayer of pool.players) {
+            const userId = poolPlayer.userId;
+            if (!userStats[userId]) {
+              userStats[userId] = {
+                id: userId,
+                name: poolPlayer.user.name,
+                nickname: poolPlayer.user.nickname,
+                stars: poolPlayer.user.stars,
+                totalMatches: 0,
+                validMatches: 0,
+                wins: 0,
+                points: 0,
+                tops: 0,
+                flops: 0,
+                sessionsCount: 0
+              };
+            }
+
+            const stats = userStats[userId];
+            stats.sessionsCount++;
+
+            let sessionPoints = 0;
+            let wins = 0;
+            let draws = 0;
+            let losses = 0;
+            let validMatches = 0;
+
+            for (const match of pool.matches) {
+              const isTeam1 = match.team1Player1Id === userId || match.team1Player2Id === userId;
+              const isTeam2 = match.team2Player1Id === userId || match.team2Player2Id === userId;
+
+              if (!isTeam1 && !isTeam2) continue;
+
+              const myGames = isTeam1 ? match.team1Games : match.team2Games;
+              const theirGames = isTeam1 ? match.team2Games : match.team1Games;
+
+              if (myGames === null || theirGames === null) continue;
+              if (myGames === 0 && theirGames === 0) continue; // forfait
+
+              validMatches++;
+              sessionPoints += myGames;
+
+              if (myGames > theirGames) {
+                sessionPoints += 30; wins++;
+              } else if (myGames === theirGames) {
+                sessionPoints += 20; draws++;
+              } else {
+                sessionPoints += 10; losses++;
+              }
+            }
+
+            stats.validMatches += validMatches;
+            stats.totalMatches += validMatches;
+            stats.points += sessionPoints / 3;
+            stats.wins += wins;
+
+            const isTop = validMatches === 3 && (wins === 3 || (wins === 2 && draws === 1));
+            const isFlop = validMatches === 3 && losses === 3;
+
+            if (isTop) stats.tops++;
+            if (isFlop) stats.flops++;
+          }
+        }
+      }
+
+      ranking = Object.values(userStats).map(s => {
+        s.averagePoints = s.sessionsCount > 0 ? (s.points / s.sessionsCount) : 0;
+        return s;
+      }).filter(s => s.totalMatches > 0);
+    }
+    
     ranking.sort((a, b) => b.averagePoints - a.averagePoints);
   }
 
