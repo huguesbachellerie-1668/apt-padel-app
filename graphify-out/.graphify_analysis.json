@@ -1,0 +1,568 @@
+{
+  "communities": {
+    "0": [
+      "src_app_admin_communication_actions",
+      "src_app_admin_communication_actions_creategoodie",
+      "src_app_admin_communication_actions_createnews",
+      "src_app_admin_communication_actions_createsponsor",
+      "src_app_admin_communication_actions_deletegoodie",
+      "src_app_admin_communication_actions_deletenews",
+      "src_app_admin_communication_actions_deletesponsor",
+      "src_app_admin_communication_actions_togglegoodie",
+      "src_app_admin_communication_actions_togglenews",
+      "src_app_admin_communication_actions_togglesponsor",
+      "src_app_admin_communication_page",
+      "src_app_admin_communication_page_communicationadmin",
+      "src_app_directory_actions",
+      "src_app_directory_actions_updatecontactinfo",
+      "src_app_directory_directorylist",
+      "src_app_directory_directorylist_directorylist",
+      "src_app_directory_page",
+      "src_app_directory_page_directorypage",
+      "src_app_history_page",
+      "src_app_history_page_historypage",
+      "src_app_profile_actions",
+      "src_app_profile_actions_changepassword",
+      "src_app_profile_id_changepasswordform",
+      "src_app_profile_id_changepasswordform_changepasswordform",
+      "src_app_profile_id_changepasswordform_changepasswordform_handlesubmit",
+      "src_app_ranking_page",
+      "src_app_ranking_page_rankingpage",
+      "src_app_rules_page",
+      "src_app_rules_page_rulespage",
+      "src_app_session_id_actions",
+      "src_app_session_id_actions_manualregisterforsession",
+      "src_app_session_id_actions_manualunregisterforsession",
+      "src_app_session_id_actions_swapregistrationorder",
+      "src_app_session_id_actions_updatepoolsettings",
+      "src_app_session_id_page",
+      "src_app_session_id_page_sessiondetailspage",
+      "src_components_whatsappsharetextbutton",
+      "src_components_whatsappsharetextbutton_props",
+      "src_components_whatsappsharetextbutton_whatsappsharetextbutton",
+      "src_lib_auth",
+      "src_lib_auth_getsessionuser",
+      "src_lib_prisma",
+      "src_lib_prisma_prismaclientsingleton"
+    ],
+    "1": [
+      "bcryptjs",
+      "framer_motion",
+      "html2canvas",
+      "html_to_image",
+      "lucide_react",
+      "next",
+      "nextjs_toploader",
+      "package",
+      "package_dependencies",
+      "package_dependencies_bcryptjs",
+      "package_dependencies_framer_motion",
+      "package_dependencies_html2canvas",
+      "package_dependencies_html_to_image",
+      "package_dependencies_lucide_react",
+      "package_dependencies_next",
+      "package_dependencies_nextjs_toploader",
+      "package_dependencies_prisma_client",
+      "package_dependencies_react",
+      "package_dependencies_react_dom",
+      "package_dependencies_recharts",
+      "package_name",
+      "package_private",
+      "package_scripts",
+      "package_scripts_build",
+      "package_scripts_dev",
+      "package_scripts_lint",
+      "package_scripts_postinstall",
+      "package_scripts_start",
+      "package_version",
+      "prisma_client",
+      "react",
+      "react_dom",
+      "recharts"
+    ],
+    "2": [
+      "ref_dom",
+      "ref_dom_iterable",
+      "ref_esnext",
+      "ref_mts",
+      "ref_next_dev_types_ts",
+      "ref_next_env_d_ts",
+      "ref_next_types_ts",
+      "ref_node_modules",
+      "ref_scripts",
+      "ref_ts",
+      "ref_tsx",
+      "tsconfig",
+      "tsconfig_compileroptions",
+      "tsconfig_compileroptions_allowjs",
+      "tsconfig_compileroptions_esmoduleinterop",
+      "tsconfig_compileroptions_incremental",
+      "tsconfig_compileroptions_isolatedmodules",
+      "tsconfig_compileroptions_jsx",
+      "tsconfig_compileroptions_lib",
+      "tsconfig_compileroptions_module",
+      "tsconfig_compileroptions_moduleresolution",
+      "tsconfig_compileroptions_noemit",
+      "tsconfig_compileroptions_paths",
+      "tsconfig_compileroptions_plugins",
+      "tsconfig_compileroptions_resolvejsonmodule",
+      "tsconfig_compileroptions_skiplibcheck",
+      "tsconfig_compileroptions_strict",
+      "tsconfig_compileroptions_target",
+      "tsconfig_exclude",
+      "tsconfig_include"
+    ],
+    "3": [
+      "src_app_admin_clubs_actions",
+      "src_app_admin_clubs_actions_createclub",
+      "src_app_admin_clubs_actions_deleteclub",
+      "src_app_admin_clubs_actions_updateclub",
+      "src_app_admin_clubs_adminclublist",
+      "src_app_admin_clubs_adminclublist_adminclublist",
+      "src_app_admin_clubs_page",
+      "src_app_admin_clubs_page_adminclubspage",
+      "src_app_admin_deletesessionbutton",
+      "src_app_admin_deletesessionbutton_deletesessionbutton",
+      "src_app_admin_joueurs_actions",
+      "src_app_admin_joueurs_actions_createplayer",
+      "src_app_admin_joueurs_actions_resetpasswordtodefault",
+      "src_app_admin_joueurs_actions_updateplayer",
+      "src_app_admin_joueurs_adminplayerlist",
+      "src_app_admin_joueurs_adminplayerlist_adminplayerlist",
+      "src_app_admin_joueurs_page",
+      "src_app_admin_joueurs_page_adminplayerspage",
+      "src_app_login_page",
+      "src_app_login_page_loginpage",
+      "src_app_login_page_loginpage_login",
+      "src_components_passwordinput",
+      "src_components_passwordinput_passwordinput",
+      "src_components_submitbutton",
+      "src_components_submitbutton_submitbutton",
+      "src_components_submitbutton_submitbuttonprops"
+    ],
+    "4": [
+      "eslint",
+      "eslint_config_next",
+      "package_devdependencies",
+      "package_devdependencies_eslint",
+      "package_devdependencies_eslint_config_next",
+      "package_devdependencies_prisma",
+      "package_devdependencies_tailwindcss",
+      "package_devdependencies_tailwindcss_postcss",
+      "package_devdependencies_tsx",
+      "package_devdependencies_types_bcryptjs",
+      "package_devdependencies_types_node",
+      "package_devdependencies_types_react",
+      "package_devdependencies_types_react_dom",
+      "package_devdependencies_typescript",
+      "prisma",
+      "tailwindcss",
+      "tailwindcss_postcss",
+      "tsx",
+      "types_bcryptjs",
+      "types_node",
+      "types_react",
+      "types_react_dom",
+      "typescript"
+    ],
+    "5": [
+      "src_app_profile_id_page",
+      "src_app_profile_id_page_playerprofilepage",
+      "src_app_profile_id_page_playerrankchart",
+      "src_app_profile_id_page_playerstatschart",
+      "src_app_session_id_results_page",
+      "src_app_session_id_results_page_sessionresultspage",
+      "src_components_backbutton",
+      "src_components_backbutton_backbutton",
+      "src_components_playerrankchart",
+      "src_components_playerrankchart_chartdatapoint",
+      "src_components_playerrankchart_customtooltip",
+      "src_components_playerrankchart_playerrankchart",
+      "src_components_playerrankchart_playerrankchartprops",
+      "src_components_playerstatschart",
+      "src_components_playerstatschart_chartdatapoint",
+      "src_components_playerstatschart_customtooltip",
+      "src_components_playerstatschart_playerstatschart",
+      "src_components_playerstatschart_playerstatschartprops",
+      "src_components_whatsappsharebutton",
+      "src_components_whatsappsharebutton_props",
+      "src_components_whatsappsharebutton_whatsappsharebutton"
+    ],
+    "6": [
+      "src_app_actions",
+      "src_app_actions_registerforsession",
+      "src_app_actions_unregisterfromsession",
+      "src_app_page",
+      "src_app_page_dashboard",
+      "src_components_dashboard_sessioncard",
+      "src_components_dashboard_sessioncard_sessioncard",
+      "src_components_dashboard_sessioncard_sessioncardprops",
+      "src_components_dashboard_sessioncard_sessionwithpools",
+      "src_components_dashboard_sessioncard_userpoolplayer",
+      "src_components_dashboard_sessioncard_userregistration",
+      "src_components_dashboard_statscard",
+      "src_components_dashboard_statscard_statscard",
+      "src_components_dashboard_statscard_statscardprops",
+      "src_components_unregisterbuttonwithwhatsapp",
+      "src_components_unregisterbuttonwithwhatsapp_props",
+      "src_components_unregisterbuttonwithwhatsapp_unregisterbuttonwithwhatsapp"
+    ],
+    "7": [
+      "src_app_admin_actions",
+      "src_app_admin_actions_archiveseason",
+      "src_app_admin_actions_createcourtreservation",
+      "src_app_admin_actions_createseason",
+      "src_app_admin_actions_createsession",
+      "src_app_admin_actions_deletecourtreservation",
+      "src_app_admin_actions_deletesession",
+      "src_app_admin_actions_finishsessionandcalculatepoints",
+      "src_app_admin_actions_generatepools",
+      "src_app_admin_actions_reopensession",
+      "src_app_admin_actions_updateglobalsettings",
+      "src_app_admin_actions_updatereservationdefaultlevel",
+      "src_app_admin_actions_updatesessioncourtsaction",
+      "src_app_admin_actions_updatesessionstatus",
+      "src_app_admin_page",
+      "src_app_admin_page_admindashboard"
+    ],
+    "8": [
+      "src_app_layout",
+      "src_app_layout_inter",
+      "src_app_layout_metadata",
+      "src_app_layout_rootlayout",
+      "src_app_layout_rootlayout_logout",
+      "src_app_profileactions",
+      "src_app_profileactions_updatemypassword",
+      "src_app_profileactions_updatemyprofile",
+      "src_components_navbutton",
+      "src_components_navbutton_navbutton",
+      "src_components_navbutton_navbuttonprops",
+      "src_components_profilesettingsmodal",
+      "src_components_profilesettingsmodal_profilesettingsmodal",
+      "src_components_profilesettingsmodal_profilesettingsmodal_handlepassword",
+      "src_components_profilesettingsmodal_profilesettingsmodal_handleprofile"
+    ],
+    "9": [
+      "src_app_pool_id_actions",
+      "src_app_pool_id_actions_registerplayersnextsession",
+      "src_app_pool_id_actions_savescoresaction",
+      "src_app_pool_id_page",
+      "src_app_pool_id_page_poolpage",
+      "src_components_matchtimer",
+      "src_components_matchtimer_matchtimer",
+      "src_components_poolscoreform",
+      "src_components_poolscoreform_poolscoreform",
+      "src_components_poolscoreform_poolscoreformprops",
+      "src_components_poolscoreform_poolwithdetails"
+    ],
+    "10": [
+      "check_jp",
+      "check_jp_main",
+      "check_jp_printchartdata",
+      "check_jp_prisma"
+    ],
+    "11": [
+      "replace_decimals",
+      "replace_decimals_files",
+      "replace_decimals_fs",
+      "replace_decimals_path"
+    ],
+    "12": [
+      "check_session_status",
+      "check_session_status_checksession",
+      "check_session_status_prisma"
+    ],
+    "13": [
+      "check_tomz",
+      "check_tomz_checktomz",
+      "check_tomz_prisma"
+    ],
+    "14": [
+      "check_tomz_details",
+      "check_tomz_details_checkdetails",
+      "check_tomz_details_prisma"
+    ],
+    "15": [
+      "check_vero",
+      "check_vero_checkusers",
+      "check_vero_prisma"
+    ],
+    "16": [
+      "close_season",
+      "close_season_main",
+      "close_season_prisma"
+    ],
+    "17": [
+      "prisma_seed",
+      "prisma_seed_main",
+      "prisma_seed_prisma"
+    ],
+    "18": [
+      "scripts_check",
+      "scripts_check_main",
+      "scripts_check_prisma"
+    ],
+    "19": [
+      "scripts_check_admin",
+      "scripts_check_admin_main",
+      "scripts_check_admin_prisma"
+    ],
+    "20": [
+      "scripts_check_db",
+      "scripts_check_db_main",
+      "scripts_check_db_prisma"
+    ],
+    "21": [
+      "scripts_check_historical",
+      "scripts_check_historical_main",
+      "scripts_check_historical_prisma"
+    ],
+    "22": [
+      "scripts_check_logs",
+      "scripts_check_logs_checklog",
+      "scripts_check_logs_prisma"
+    ],
+    "23": [
+      "scripts_check_pools",
+      "scripts_check_pools_checkpools",
+      "scripts_check_pools_prisma"
+    ],
+    "24": [
+      "scripts_check_tom",
+      "scripts_check_tom_checktomz",
+      "scripts_check_tom_prisma"
+    ],
+    "25": [
+      "scripts_delete_fictifs",
+      "scripts_delete_fictifs_main",
+      "scripts_delete_fictifs_prisma"
+    ],
+    "26": [
+      "scripts_dump_data",
+      "scripts_dump_data_main",
+      "scripts_dump_data_prisma"
+    ],
+    "27": [
+      "scripts_fix_roles",
+      "scripts_fix_roles_main",
+      "scripts_fix_roles_prisma"
+    ],
+    "28": [
+      "scripts_history",
+      "scripts_history_prisma",
+      "scripts_history_tracelucienhistory"
+    ],
+    "29": [
+      "scripts_import_csv",
+      "scripts_import_csv_main",
+      "scripts_import_csv_prisma"
+    ],
+    "30": [
+      "scripts_import_csv2",
+      "scripts_import_csv2_main",
+      "scripts_import_csv2_prisma"
+    ],
+    "31": [
+      "scripts_recalculate",
+      "scripts_recalculate_main",
+      "scripts_recalculate_prisma"
+    ],
+    "32": [
+      "scripts_reset",
+      "scripts_reset_prisma",
+      "scripts_reset_resetdb"
+    ],
+    "33": [
+      "scripts_restore_data",
+      "scripts_restore_data_main",
+      "scripts_restore_data_prisma"
+    ],
+    "34": [
+      "scripts_seed_auth",
+      "scripts_seed_auth_main",
+      "scripts_seed_auth_prisma"
+    ],
+    "35": [
+      "scripts_undo_24",
+      "scripts_undo_24_main",
+      "scripts_undo_24_prisma"
+    ],
+    "36": [
+      "test_rankings",
+      "test_rankings_main",
+      "test_rankings_prisma"
+    ],
+    "37": [
+      "eslint_config",
+      "eslint_config_eslintconfig"
+    ],
+    "38": [
+      "next_config",
+      "next_config_nextconfig"
+    ],
+    "39": [
+      "postcss_config",
+      "postcss_config_config"
+    ],
+    "40": [
+      "scripts_check_issam",
+      "scripts_check_issam_main"
+    ]
+  },
+  "cohesion": {
+    "0": 0.11517165005537099,
+    "1": 0.06060606060606061,
+    "2": 0.06666666666666667,
+    "3": 0.14153846153846153,
+    "4": 0.08695652173913043,
+    "5": 0.11904761904761904,
+    "6": 0.16911764705882354,
+    "7": 0.23333333333333334,
+    "8": 0.19047619047619047,
+    "9": 0.2909090909090909,
+    "10": 0.6666666666666666,
+    "11": 0.5,
+    "12": 0.6666666666666666,
+    "13": 0.6666666666666666,
+    "14": 0.6666666666666666,
+    "15": 0.6666666666666666,
+    "16": 0.6666666666666666,
+    "17": 0.6666666666666666,
+    "18": 0.6666666666666666,
+    "19": 0.6666666666666666,
+    "20": 0.6666666666666666,
+    "21": 0.6666666666666666,
+    "22": 0.6666666666666666,
+    "23": 0.6666666666666666,
+    "24": 0.6666666666666666,
+    "25": 0.6666666666666666,
+    "26": 0.6666666666666666,
+    "27": 0.6666666666666666,
+    "28": 0.6666666666666666,
+    "29": 0.6666666666666666,
+    "30": 0.6666666666666666,
+    "31": 0.6666666666666666,
+    "32": 0.6666666666666666,
+    "33": 0.6666666666666666,
+    "34": 0.6666666666666666,
+    "35": 0.6666666666666666,
+    "36": 0.6666666666666666,
+    "37": 1.0,
+    "38": 1.0,
+    "39": 1.0,
+    "40": 1.0
+  },
+  "gods": [
+    {
+      "id": "src_lib_auth_getsessionuser",
+      "label": "getSessionUser()",
+      "degree": 62
+    },
+    {
+      "id": "src_components_submitbutton_submitbutton",
+      "label": "SubmitButton()",
+      "degree": 16
+    },
+    {
+      "id": "tsconfig_compileroptions",
+      "label": "compilerOptions",
+      "degree": 16
+    },
+    {
+      "id": "src_components_backbutton_backbutton",
+      "label": "BackButton()",
+      "degree": 8
+    },
+    {
+      "id": "tsconfig_include",
+      "label": "include",
+      "degree": 7
+    },
+    {
+      "id": "package_scripts",
+      "label": "scripts",
+      "degree": 6
+    },
+    {
+      "id": "src_app_actions_unregisterfromsession",
+      "label": "unregisterFromSession()",
+      "degree": 4
+    },
+    {
+      "id": "src_app_admin_clubs_adminclublist_adminclublist",
+      "label": "AdminClubList()",
+      "degree": 4
+    },
+    {
+      "id": "src_app_profileactions_updatemyprofile",
+      "label": "updateMyProfile()",
+      "degree": 4
+    },
+    {
+      "id": "src_app_profileactions_updatemypassword",
+      "label": "updateMyPassword()",
+      "degree": 4
+    }
+  ],
+  "surprises": [
+    {
+      "source": "AdminClubsPage()",
+      "target": "getSessionUser()",
+      "source_files": [
+        "src/app/admin/clubs/page.tsx",
+        "src/lib/auth.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities; peripheral node `AdminClubsPage()` unexpectedly reaches hub `getSessionUser()`"
+    },
+    {
+      "source": "AdminPlayersPage()",
+      "target": "getSessionUser()",
+      "source_files": [
+        "src/app/admin/joueurs/page.tsx",
+        "src/lib/auth.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities; peripheral node `AdminPlayersPage()` unexpectedly reaches hub `getSessionUser()`"
+    },
+    {
+      "source": "AdminDashboard()",
+      "target": "getSessionUser()",
+      "source_files": [
+        "src/app/admin/page.tsx",
+        "src/lib/auth.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities; peripheral node `AdminDashboard()` unexpectedly reaches hub `getSessionUser()`"
+    },
+    {
+      "source": "Dashboard()",
+      "target": "getSessionUser()",
+      "source_files": [
+        "src/app/page.tsx",
+        "src/lib/auth.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities; peripheral node `Dashboard()` unexpectedly reaches hub `getSessionUser()`"
+    },
+    {
+      "source": "PoolPage()",
+      "target": "getSessionUser()",
+      "source_files": [
+        "src/app/pool/[id]/page.tsx",
+        "src/lib/auth.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities; peripheral node `PoolPage()` unexpectedly reaches hub `getSessionUser()`"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}

@@ -19,6 +19,10 @@ export default async function RankingPage() {
     orderBy: { averagePoints: 'desc' }
   });
 
+  const activeSeason = await prisma.season.findFirst({
+    where: { isActive: true }
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-end mb-6">
@@ -26,7 +30,9 @@ export default async function RankingPage() {
           <h1 className="text-3xl font-black text-blue-900 flex items-center gap-3">
             <span className="text-4xl">🏆</span> Classement APT
           </h1>
-          <p className="text-gray-500 mt-2 font-medium">Saison en cours - Actualisé après chaque session</p>
+          <p className="text-gray-500 mt-2 font-medium">
+            {activeSeason?.name || 'Saison en cours'} - Actualisé après chaque session
+          </p>
         </div>
       </div>
 
