@@ -18,7 +18,7 @@ export default async function CommunicationAdmin() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <BackButton fallback="/admin" />
-          <h1 className="text-3xl font-black text-blue-900 flex items-center gap-2"><span className="text-4xl">📢</span> Communication & Club</h1>
+          <h1 className="text-3xl font-black text-club-green flex items-center gap-2"><span className="text-4xl">📢</span> Communication & Club</h1>
         </div>
       </div>
 
@@ -27,10 +27,10 @@ export default async function CommunicationAdmin() {
         {/* SECTION NEWS */}
         <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
           <h2 className="text-xl font-bold mb-4 flex items-center gap-2">📰 Gestion des News</h2>
-          <form action={createNews} className="bg-blue-50 p-4 md:p-5 rounded-2xl mb-6 flex flex-col gap-3 border border-blue-100">
+          <form action={createNews} className="bg-slate-50 p-4 md:p-5 rounded-2xl mb-6 flex flex-col gap-3 border border-slate-200">
             <input type="text" name="title" placeholder="Titre de la news (ex: Inscription Tournoi)" required className="p-3 rounded-xl border border-gray-300 w-full font-bold focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
             <textarea name="content" placeholder="Texte de votre annonce..." required className="p-3 rounded-xl border border-gray-300 w-full h-28 resize-y focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
-            <SubmitButton pendingText="Publication..." className="bg-blue-600 text-white font-bold py-3 mt-1 rounded-xl shadow-sm hover:bg-blue-700 hover:-translate-y-0.5 transition-transform border-b-4 border-blue-800 active:border-b-0 active:mt-[5px]">Publier la News</SubmitButton>
+            <SubmitButton pendingText="Publication..." className="bg-club-green text-white font-bold py-3 mt-1 rounded-xl shadow-sm hover:bg-emerald-700 hover:-translate-y-0.5 transition-transform border-b-4 border-blue-800 active:border-b-0 active:mt-[5px]">Publier la News</SubmitButton>
           </form>
 
           <div className="space-y-4">

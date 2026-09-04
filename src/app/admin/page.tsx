@@ -52,7 +52,7 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
       )}
       <div className="flex justify-between items-end mb-6">
         <div>
-          <h1 className="text-3xl font-black text-blue-900 flex items-center gap-3">
+          <h1 className="text-3xl font-black text-club-green flex items-center gap-3">
             <span className="text-4xl">⚙️</span> Administration Board APT
           </h1>
           <p className="text-gray-500 mt-2 font-medium">Interface centralisée de gestion du club APT</p>
@@ -112,15 +112,15 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
       ) : (
         <div className="space-y-8">
           {/* Season Info */}
-          <div className="bg-gradient-to-r from-blue-900 to-blue-800 p-6 rounded-3xl shadow-lg flex justify-between items-center text-white">
+          <div className="bg-gradient-to-r from-club-green to-emerald-800 p-6 rounded-3xl shadow-lg flex justify-between items-center text-white">
             <div>
-              <p className="text-blue-200 text-sm font-bold uppercase tracking-wider mb-1">Saison Active</p>
+              <p className="text-green-100 text-sm font-bold uppercase tracking-wider mb-1">Saison Active</p>
               <h2 className="text-3xl font-black">{activeSeason.name}</h2>
               <p className="text-sm mt-2 text-blue-100">Démarrée le {activeSeason.startDate.toLocaleDateString('fr-FR')}</p>
             </div>
             <div className="text-right">
               <div className="text-4xl font-black text-orange-500">{sessions.length}</div>
-              <div className="text-sm text-blue-200 font-medium">Session(s)</div>
+              <div className="text-sm text-green-100 font-medium">Session(s)</div>
             </div>
           </div>
 
@@ -130,23 +130,23 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
               📅 Gestion des Sessions
             </h2>
             
-            <form action={createSession} className="flex flex-wrap gap-4 mb-8 bg-blue-50/50 p-6 rounded-2xl border border-blue-100 items-end">
+            <form action={createSession} className="flex flex-wrap gap-4 mb-8 bg-slate-50/50 p-6 rounded-2xl border border-slate-200 items-end">
               <input type="hidden" name="seasonId" value={activeSeason.id} />
-              <div className="flex-1 flex flex-col sm:flex-row gap-4 min-w-[250px] bg-white p-3 rounded-2xl border border-blue-200/50 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]">
+              <div className="flex-1 flex flex-col sm:flex-row gap-4 min-w-[250px] bg-white p-3 rounded-2xl border border-slate-200/50 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]">
                 <div className="flex-1">
-                  <label className="text-xs font-black text-blue-600 uppercase tracking-widest block mb-2 px-1">📅 Date</label>
+                  <label className="text-xs font-black text-club-green uppercase tracking-widest block mb-2 px-1">📅 Date</label>
                   <input name="date_part" type="date" className="border-2 border-gray-100 bg-gray-50 p-2.5 rounded-xl w-full text-gray-800 font-bold focus:bg-white focus:border-blue-500 transition-colors" required />
                 </div>
                 <div className="flex-1">
-                  <label className="text-xs font-black text-blue-600 uppercase tracking-widest block mb-2 px-1">🕒 Heure</label>
+                  <label className="text-xs font-black text-club-green uppercase tracking-widest block mb-2 px-1">🕒 Heure</label>
                   <input name="time_part" type="time" defaultValue="18:30" className="border-2 border-gray-100 bg-gray-50 p-2.5 rounded-xl w-full text-gray-800 font-bold focus:bg-white focus:border-blue-500 transition-colors" required />
                 </div>
               </div>
               <div className="w-[140px]">
-                <label className="block text-sm font-bold text-blue-900 mb-2">Terrains</label>
+                <label className="block text-sm font-bold text-club-green mb-2">Terrains</label>
                 <input name="courts" type="number" min="1" max="20" defaultValue="1" className="border-2 border-gray-200 p-3 rounded-xl w-full text-gray-700 bg-white focus:border-blue-500 focus:ring-0" required />
               </div>
-              <SubmitButton pendingText="Création..." className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 shadow-md transition-colors whitespace-nowrap">
+              <SubmitButton pendingText="Création..." className="bg-club-green text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-700 shadow-md transition-colors whitespace-nowrap">
                 + Créer la session
               </SubmitButton>
             </form>
@@ -173,7 +173,7 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                         session.status === 'INSCRIPTIONS_OUVERTES' ? 'bg-green-500 text-white animate-pulse' : 
                         session.status === 'POULES_GENEREES' ? 'bg-orange-500 text-white' : 
                         session.status === 'POULES_EN_ATTENTE' ? 'bg-red-600 text-white animate-pulse' : 
-                        'bg-blue-100 text-blue-800'
+                        'bg-slate-100 text-emerald-800'
                       }`}>
                         {session.status.replace('_', ' ')} 🔗
                       </a>
@@ -190,13 +190,13 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                     )}
                     {session.status === 'INSCRIPTIONS_OUVERTES' && (
                       <div className="flex flex-col gap-2 w-full sm:w-auto">
-                        <form action={updateSessionCourtsAction} className="flex items-center gap-2 bg-blue-50 p-2 rounded-xl border border-blue-200">
+                        <form action={updateSessionCourtsAction} className="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
                            <input type="hidden" name="sessionId" value={session.id} />
                            <div>
-                             <label className="text-xs font-bold text-blue-800 block mb-1">✏️ Terrains</label>
+                             <label className="text-xs font-bold text-emerald-800 block mb-1">✏️ Terrains</label>
                              <input name="courts" type="number" min="1" max="20" defaultValue={session.courts > 0 ? session.courts : 1} className="w-20 p-2 border border-blue-300 rounded-lg text-sm font-bold text-center" />
                            </div>
-                           <SubmitButton pendingText="Sauvegarde..." className="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-blue-700 transition-colors h-full">
+                           <SubmitButton pendingText="Sauvegarde..." className="bg-club-green text-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-emerald-700 transition-colors h-full">
                              Sauver 💾
                            </SubmitButton>
                         </form>
@@ -219,10 +219,10 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                         </form>
                         <form action={finishSessionAndCalculatePoints.bind(null, session.id)} className="flex flex-col gap-2">
                           <label className="flex items-center gap-2 cursor-pointer bg-white p-2 rounded-lg border border-gray-200 shadow-sm">
-                            <input type="checkbox" name="countPoints" value="true" defaultChecked className="w-4 h-4 text-blue-600" />
+                            <input type="checkbox" name="countPoints" value="true" defaultChecked className="w-4 h-4 text-club-green" />
                             <span className="text-[10px] font-bold text-gray-700 leading-tight">Comptabiliser pour le classement général</span>
                           </label>
-                          <SubmitButton pendingText="Fermeture..." className="w-full bg-blue-600 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-sm hover:bg-blue-700 transition-colors">
+                          <SubmitButton pendingText="Fermeture..." className="w-full bg-club-green text-white px-5 py-3 rounded-xl text-sm font-bold shadow-sm hover:bg-emerald-700 transition-colors">
                             Terminer session 🏁
                           </SubmitButton>
                         </form>
@@ -250,7 +250,7 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                   {/* Gestion des Terrains Accordion */}
                   <div className="w-full mt-6 pt-4 border-t border-gray-100">
                     <details className="group" open>
-                      <summary className="flex cursor-pointer items-center justify-between font-bold text-sm text-indigo-800 bg-indigo-50 hover:bg-indigo-100 p-3 rounded-xl transition-colors select-none">
+                      <summary className="flex cursor-pointer items-center justify-between font-bold text-sm text-indigo-800 bg-slate-100 hover:bg-indigo-100 p-3 rounded-xl transition-colors select-none">
                         <span>🏟️ Terrains assignés & Poules par défaut ({session.reservations?.length || 0})</span>
                         <span className="transition transform group-open:rotate-180">
                           <svg fill="none" height="20" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="20"><path d="M6 9l6 6 6-6"></path></svg>
@@ -263,18 +263,18 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                               <div key={res.id} className="flex flex-col sm:flex-row justify-between sm:items-center bg-white p-3 rounded-xl border border-indigo-100 shadow-sm gap-3">
                                 <div className="flex flex-col">
                                   <span className="font-bold text-indigo-900">{res.club.name} - {res.name}</span>
-                                  <span className="text-xs text-gray-500">{res.club.city} | Heure: <strong className="text-indigo-600">{res.startTime}</strong></span>
+                                  <span className="text-xs text-gray-500">{res.club.city} | Heure: <strong className="text-slate-800">{res.startTime}</strong></span>
                                 </div>
                                 
                                 <div className="flex items-center gap-2 self-end sm:self-auto">
                                   <form action={updateReservationDefaultLevel.bind(null, res.id)} className="flex items-center gap-1">
-                                    <select name="defaultPoolLevel" defaultValue={res.defaultPoolLevel || ""} className="p-1.5 rounded-lg border border-indigo-200 text-xs font-bold text-indigo-800 bg-indigo-50 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                    <select name="defaultPoolLevel" defaultValue={res.defaultPoolLevel || ""} className="p-1.5 rounded-lg border border-indigo-200 text-xs font-bold text-indigo-800 bg-slate-100 focus:outline-none focus:ring-1 focus:ring-indigo-500">
                                       <option value="">-- Générique --</option>
                                       {[...Array(12)].map((_, i) => (
                                         <option key={i+1} value={i+1}>Poule {i+1}</option>
                                       ))}
                                     </select>
-                                    <SubmitButton pendingText="..." className="bg-indigo-600 text-white rounded px-2 py-1.5 text-xs font-bold hover:bg-indigo-700">OK</SubmitButton>
+                                    <SubmitButton pendingText="..." className="bg-slate-800 text-white rounded px-2 py-1.5 text-xs font-bold hover:bg-slate-700">OK</SubmitButton>
                                   </form>
                                   
                                   <form action={deleteCourtReservation.bind(null, session.id)}>
@@ -372,7 +372,7 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                     </div>
                     <div className="text-xs text-gray-500 font-bold bg-gray-100 px-2 py-0.5 rounded inline-block mt-1">Session {session.status.toLowerCase()}</div>
                   </div>
-                  <a href={`/session/${session.id}/results`} className="text-blue-700 font-bold bg-blue-50 px-4 py-2 rounded-xl text-sm border border-blue-100 hover:bg-blue-100 transition-colors shadow-sm">
+                  <a href={`/session/${session.id}/results`} className="text-club-clay font-bold bg-slate-50 px-4 py-2 rounded-xl text-sm border border-club-clay hover:bg-orange-700 transition-colors shadow-sm">
                      Résultats 🏆
                   </a>
                 </div>
@@ -430,7 +430,7 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                 </div>
 
                 <div className="w-full md:w-auto self-end mt-4 md:mt-0">
-                  <SubmitButton pendingText="Sauvegarde..." className="bg-blue-900 text-white font-bold py-4 px-8 rounded-xl hover:bg-blue-800 transition-colors shadow-sm whitespace-nowrap w-full">
+                  <SubmitButton pendingText="Sauvegarde..." className="bg-club-green text-white font-bold py-4 px-8 rounded-xl hover:bg-emerald-800 transition-colors shadow-sm whitespace-nowrap w-full">
                     Enregistrer
                   </SubmitButton>
                 </div>
@@ -466,7 +466,7 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                     <input type="text" name="name" placeholder="ex: Saison 2026-2027" required className="w-full p-4 border border-gray-300 bg-white text-gray-900 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none transition-all font-bold" />
                   </div>
                   <div className="w-full md:w-auto mt-4 md:mt-0">
-                    <SubmitButton pendingText="Création..." className="bg-blue-600 text-white font-bold py-4 px-8 rounded-xl hover:bg-blue-700 transition-colors shadow-sm whitespace-nowrap w-full">
+                    <SubmitButton pendingText="Création..." className="bg-club-green text-white font-bold py-4 px-8 rounded-xl hover:bg-emerald-700 transition-colors shadow-sm whitespace-nowrap w-full">
                       Démarrer la Saison
                     </SubmitButton>
                   </div>

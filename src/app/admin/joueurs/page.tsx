@@ -19,7 +19,7 @@ export default async function AdminPlayersPage() {
     <div className="space-y-8 max-w-6xl mx-auto pb-10">
       <div className="flex flex-col gap-2 mb-6">
         <BackButton fallback="/admin" />
-        <h1 className="text-3xl font-black text-blue-900 flex items-center gap-3 mt-4">
+        <h1 className="text-3xl font-black text-club-green flex items-center gap-3 mt-4">
           <span className="text-4xl">👥</span> Gestion des Joueurs ({players.length} membres)
         </h1>
       </div>

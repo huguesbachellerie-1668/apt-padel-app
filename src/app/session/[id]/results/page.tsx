@@ -77,7 +77,7 @@ export default async function SessionResultsPage({ params }: { params: Promise<{
       <div className="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-6">
         <div>
           <BackButton />
-          <h1 className="text-3xl font-black text-blue-900 flex items-center gap-3">
+          <h1 className="text-3xl font-black text-club-green flex items-center gap-3">
             <span className="text-4xl">🏆</span> Résultats de la Session
           </h1>
           <p className="text-gray-500 mt-2 font-medium capitalize">
@@ -176,10 +176,10 @@ export default async function SessionResultsPage({ params }: { params: Promise<{
 
             return (
               <div key={pool.id} id={`capture-pool-${pool.id}`} className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden mb-8">
-                <div className="bg-indigo-900 px-6 py-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4 text-white">
+                <div className="bg-slate-800 px-6 py-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4 text-white">
                    <div className="flex items-center gap-4">
                      <h2 className="font-black text-xl">Poule #{pool.level}</h2>
-                     <span className="bg-indigo-800 px-4 py-1 rounded-full text-sm font-bold border border-indigo-700 flex items-center gap-1">
+                     <span className="bg-emerald-800 px-4 py-1 rounded-full text-sm font-bold border border-indigo-700 flex items-center gap-1">
                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5h16M4 19h16M4 5v14M20 5v14M12 5v14M4 12h16"></path></svg>
                        Terrain {pool.courtNumber}
                      </span>
@@ -229,8 +229,8 @@ export default async function SessionResultsPage({ params }: { params: Promise<{
                               <td className="px-4 py-3 text-center font-bold text-yellow-600">{s.draws}</td>
                               <td className="px-4 py-3 text-center font-bold text-red-500">{s.losses}</td>
                               <td className="px-4 py-3 text-center text-gray-500 font-medium">{s.gamesWon}</td>
-                              <td className="px-4 py-3 text-center font-bold text-indigo-600">+{s.sessionPoints}</td>
-                              <td className="px-4 py-3 text-right font-black text-blue-600 bg-blue-50/30 rounded-r-xl">{(s.sessionPoints / 3).toFixed(2).replace('.', ',')}</td>
+                              <td className="px-4 py-3 text-center font-bold text-slate-800">+{s.sessionPoints}</td>
+                              <td className="px-4 py-3 text-right font-black text-club-green bg-slate-50/30 rounded-r-xl">{(s.sessionPoints / 3).toFixed(2).replace('.', ',')}</td>
                             </tr>
                           ))}
                         </tbody>

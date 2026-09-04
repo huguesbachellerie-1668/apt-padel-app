@@ -130,7 +130,7 @@ export default async function ArchivesPage({ searchParams }: { searchParams: Pro
       <div className="mb-6">
         <BackButton />
         <div className="mt-4">
-          <h1 className="text-3xl font-black text-blue-900 flex items-center gap-3">
+          <h1 className="text-3xl font-black text-club-green flex items-center gap-3">
             <span className="text-4xl">📜</span> Archives des Saisons
           </h1>
           <p className="text-gray-500 mt-2 font-medium">Consultez les statistiques finales et les classements des années passées.</p>
@@ -150,7 +150,7 @@ export default async function ArchivesPage({ searchParams }: { searchParams: Pro
                 href={`/history/archives?season=${s.id}`}
                 className={`px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-sm border ${
                   selectedSeasonId === s.id 
-                    ? 'bg-blue-600 text-white border-blue-700' 
+                    ? 'bg-club-green text-white border-emerald-700' 
                     : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
                 }`}
               >
@@ -161,10 +161,10 @@ export default async function ArchivesPage({ searchParams }: { searchParams: Pro
 
           {selectedSeason && (
             <div className="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
-              <div className="p-6 bg-gradient-to-r from-blue-900 to-blue-800 text-white flex justify-between items-center">
+              <div className="p-6 bg-gradient-to-r from-club-green to-emerald-800 text-white flex justify-between items-center">
                  <div>
                     <h2 className="text-2xl font-black">{selectedSeason.name}</h2>
-                    <p className="text-blue-200 text-sm mt-1">{ranking.length} joueurs classés</p>
+                    <p className="text-green-100 text-sm mt-1">{ranking.length} joueurs classés</p>
                  </div>
                  <div className="text-5xl opacity-20">🏆</div>
               </div>
@@ -174,9 +174,9 @@ export default async function ArchivesPage({ searchParams }: { searchParams: Pro
                     <tr>
                       <th scope="col" className="px-4 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Rang</th>
                       <th scope="col" className="px-4 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Joueur</th>
-                      <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-blue-600 uppercase tracking-wider">Moyenne</th>
+                      <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-club-green uppercase tracking-wider">Moyenne</th>
                       <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-green-600 uppercase tracking-wider">Victoires</th>
-                      <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-indigo-600 uppercase tracking-wider">Win Rate</th>
+                      <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-slate-800 uppercase tracking-wider">Win Rate</th>
                       <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-orange-500 uppercase tracking-wider hidden sm:table-cell">Tops</th>
                       <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-red-500 uppercase tracking-wider hidden sm:table-cell">Flops</th>
                       <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-wider hidden md:table-cell">Sessions</th>
@@ -192,21 +192,21 @@ export default async function ArchivesPage({ searchParams }: { searchParams: Pro
                       return (
                         <tr 
                           key={player.id} 
-                          className={`${isCurrentUser ? 'bg-orange-50' : 'hover:bg-blue-50'} transition-colors`}
+                          className={`${isCurrentUser ? 'bg-orange-50' : 'hover:bg-slate-50'} transition-colors`}
                         >
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className={`flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm shadow-sm border ${
                                index === 0 ? 'bg-yellow-100 text-yellow-700 border-yellow-200' :
                                index === 1 ? 'bg-gray-200 text-gray-700 border-gray-300' :
                                index === 2 ? 'bg-orange-100 text-orange-800 border-orange-200' :
-                               'bg-blue-100 text-blue-800 border-blue-200'
+                               'bg-slate-100 text-emerald-800 border-slate-200'
                             }`}>
                               {index + 1}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <Link href={`/profile/${player.id}`} className="flex flex-col group">
-                                <span className={`text-sm font-black uppercase ${isCurrentUser ? 'text-orange-700 group-hover:text-orange-900' : 'text-gray-900 group-hover:text-blue-700'} transition-colors`}>
+                                <span className={`text-sm font-black uppercase ${isCurrentUser ? 'text-orange-700 group-hover:text-orange-900' : 'text-gray-900 group-hover:text-club-green'} transition-colors`}>
                                     {(player.stars || 0) > 0 && <span className="text-yellow-400 mr-1">{'⭐'.repeat(player.stars)}</span>}
                                     {player.nickname || player.name}
                                 </span>
@@ -214,7 +214,7 @@ export default async function ArchivesPage({ searchParams }: { searchParams: Pro
                             </Link>
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-center">
-                            <div className="text-lg font-black text-blue-700 tabular-nums">{player.averagePoints.toFixed(2).replace('.', ',')}</div>
+                            <div className="text-lg font-black text-club-green tabular-nums">{player.averagePoints.toFixed(2).replace('.', ',')}</div>
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-center text-sm font-bold text-green-700">
                             {player.wins}

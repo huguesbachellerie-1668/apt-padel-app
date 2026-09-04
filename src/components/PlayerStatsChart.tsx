@@ -16,9 +16,9 @@ interface PlayerStatsChartProps {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-4 border border-blue-100 shadow-lg rounded-xl">
+      <div className="bg-white p-4 border border-slate-200 shadow-lg rounded-xl">
         <p className="font-bold text-gray-800 mb-1">{label}</p>
-        <p className="text-blue-600 font-black text-lg">
+        <p className="text-club-green font-black text-lg">
           {payload[0].value.toFixed(2).replace('.', ',')} <span className="text-sm text-gray-500 font-medium">pts</span>
         </p>
       </div>

@@ -349,11 +349,11 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
       <div className="mb-8">
         <BackButton />
         <div className="flex items-center gap-6 mt-4">
-           <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 text-blue-800 rounded-full flex items-center justify-center font-black text-4xl shadow-sm border-4 border-white">
+           <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-200 text-emerald-800 rounded-full flex items-center justify-center font-black text-4xl shadow-sm border-4 border-white">
              {player.name.charAt(0)}
            </div>
            <div>
-              <h1 className="text-4xl font-black text-blue-900 flex items-center gap-3">
+              <h1 className="text-4xl font-black text-club-green flex items-center gap-3">
                 {(player.stars || 0) > 0 && <span className="text-yellow-400 drop-shadow-sm">{'⭐'.repeat(player.stars)}</span>}
                 {player.name}
               </h1>
@@ -362,7 +362,7 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
                  <span className="bg-orange-100 text-orange-800 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-orange-200">
                    {totalSessions} Sessions
                  </span>
-                 <span className="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-blue-200 flex items-center gap-1">
+                 <span className="bg-slate-100 text-emerald-800 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-slate-200 flex items-center gap-1">
                    Actuelle : {(player.averagePoints || 0).toFixed(2).replace('.', ',')} pts
                    {(totalSessions < 4 && ghostAverage > 0) && (
                        <span title="Bouclier de classement actif (Moyenne lissée avec la saison précédente)" className="cursor-help">🛡️</span>
@@ -396,7 +396,7 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
             <h3 className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-2">Meilleure Poule</h3>
             {bestPoolReached !== Infinity ? (
               <>
-                <div className="text-4xl font-black text-blue-600 flex items-end gap-1">
+                <div className="text-4xl font-black text-club-green flex items-end gap-1">
                   #{bestPoolReached}
                 </div>
                 <p className="text-xs text-gray-400 mt-2 font-medium">Niveau le plus élevé atteint</p>
@@ -472,9 +472,9 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
         ) : (
           <div className="space-y-4">
              {poolPlayers.map(pp => (
-               <Link href={`/session/${pp.pool.sessionId}/results`} key={pp.poolId} className="bg-white border border-gray-100 p-5 rounded-2xl flex items-center justify-between hover:border-blue-300 hover:shadow-md transition-all group">
+               <Link href={`/session/${pp.pool.sessionId}/results`} key={pp.poolId} className="bg-white border border-gray-100 p-5 rounded-2xl flex items-center justify-between hover:border-slate-300 hover:shadow-md transition-all group">
                   <div className="flex items-center gap-6">
-                    <div className="bg-blue-50 text-blue-800 font-black text-xl px-4 py-3 rounded-xl">
+                    <div className="bg-slate-50 text-emerald-800 font-black text-xl px-4 py-3 rounded-xl">
                       Poule #{pp.pool.level}
                     </div>
                     <div>

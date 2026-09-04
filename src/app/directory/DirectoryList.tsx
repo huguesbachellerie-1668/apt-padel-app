@@ -31,12 +31,12 @@ export default function DirectoryList({ players, user }: { players: Prisma.UserG
         {filteredPlayers.map(player => (
           <div key={player.id} className={`bg-white rounded-2xl shadow-sm border p-5 transition-shadow ${player.id === user.id ? 'border-orange-300 ring-2 ring-orange-100' : 'border-gray-100 hover:shadow-md'}`}>
             <div className="flex items-center gap-4 mb-4">
-              <Link href={`/profile/${player.id}`} className="shrink-0 w-12 h-12 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center font-bold text-xl shadow-sm border border-blue-200 hover:bg-blue-200 hover:scale-105 transition-all">
+              <Link href={`/profile/${player.id}`} className="shrink-0 w-12 h-12 bg-slate-100 text-emerald-800 rounded-full flex items-center justify-center font-bold text-xl shadow-sm border border-slate-200 hover:bg-blue-200 hover:scale-105 transition-all">
                 {(player.nickname || player.name).charAt(0).toUpperCase()}
               </Link>
               <div className="flex-1 px-1">
                 <h3 className="font-bold text-gray-900 flex flex-wrap items-center gap-2">
-                  <Link href={`/profile/${player.id}`} className="hover:text-blue-600 hover:underline transition-colors flex items-baseline gap-2">
+                  <Link href={`/profile/${player.id}`} className="hover:text-club-green hover:underline transition-colors flex items-baseline gap-2">
                     <span className="text-lg flex items-center gap-1">
                       {(player.stars || 0) > 0 && <span className="text-yellow-400">{'⭐'.repeat(player.stars)}</span>}
                       {player.nickname || player.name}
@@ -54,9 +54,9 @@ export default function DirectoryList({ players, user }: { players: Prisma.UserG
             </div>
 
             <div className="grid grid-cols-3 gap-2 mb-4 text-center">
-              <div className="bg-blue-50 p-2 rounded-xl border border-blue-100">
-                <div className="text-xl font-black text-blue-900">{Math.floor((player.totalMatches || 0) / 3)}</div>
-                <div className="text-[10px] font-bold text-blue-600 uppercase">Sessions</div>
+              <div className="bg-slate-50 p-2 rounded-xl border border-slate-200">
+                <div className="text-xl font-black text-club-green">{Math.floor((player.totalMatches || 0) / 3)}</div>
+                <div className="text-[10px] font-bold text-club-green uppercase">Sessions</div>
               </div>
               <div className="bg-orange-50 p-2 rounded-xl border border-orange-100">
                 <div className="text-xl font-black text-orange-900">{(player.averagePoints || 0).toFixed(2).replace('.', ',')}</div>
@@ -74,7 +74,7 @@ export default function DirectoryList({ players, user }: { players: Prisma.UserG
               <div className="flex items-center gap-3 text-gray-700">
                 <span className="text-lg">📱</span>
                 {player.phone ? (
-                  <a href={`tel:${player.phone}`} className="hover:text-blue-600 hover:underline font-medium">{player.phone}</a>
+                  <a href={`tel:${player.phone}`} className="hover:text-club-green hover:underline font-medium">{player.phone}</a>
                 ) : (
                   <span className="text-gray-400 italic text-xs">Non renseigné</span>
                 )}
@@ -82,7 +82,7 @@ export default function DirectoryList({ players, user }: { players: Prisma.UserG
               <div className="flex items-center gap-3 text-gray-700">
                 <span className="text-lg">📧</span>
                 {player.email ? (
-                  <a href={`mailto:${player.email}`} className="hover:text-blue-600 hover:underline font-medium break-all">{player.email}</a>
+                  <a href={`mailto:${player.email}`} className="hover:text-club-green hover:underline font-medium break-all">{player.email}</a>
                 ) : (
                   <span className="text-gray-400 italic text-xs">Non renseigné</span>
                 )}

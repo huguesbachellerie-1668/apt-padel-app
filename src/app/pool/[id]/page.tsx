@@ -57,9 +57,9 @@ export default async function PoolPage({ params }: { params: Promise<{ id: strin
       <div className="flex flex-wrap justify-between items-end mb-6 gap-4">
         <div>
           <BackButton />
-          <h1 className="text-3xl font-black text-blue-900 flex flex-wrap items-center gap-3">
+          <h1 className="text-3xl font-black text-club-green flex flex-wrap items-center gap-3">
             <span>🎾 Poule #{pool.level}</span>
-            <span className="text-xl bg-blue-100 text-blue-800 px-4 py-1.5 rounded-xl shadow-sm border border-blue-200 flex items-center gap-2">
+            <span className="text-xl bg-slate-100 text-emerald-800 px-4 py-1.5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-2">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5h16M4 19h16M4 5v14M20 5v14M12 5v14M4 12h16"></path></svg>
               {pool.courtReservation ? pool.courtReservation.name : `Terrain ${pool.courtNumber}`}
             </span>
@@ -82,18 +82,18 @@ export default async function PoolPage({ params }: { params: Promise<{ id: strin
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-3xl shadow-sm border border-blue-100 p-6">
-              <h2 className="text-xl font-bold text-blue-900 mb-4">👥 Joueurs</h2>
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6">
+              <h2 className="text-xl font-bold text-club-green mb-4">👥 Joueurs</h2>
               <ul className="space-y-3">
                   {pool.players.map(p => (
                       <li key={p.userId} className="flex justify-between items-center font-medium bg-gray-50 p-3 rounded-xl border border-gray-100">
                           <div className="flex items-center gap-3">
-                              <span className="w-6 h-6 bg-blue-800 text-white rounded-full flex items-center justify-center text-xs">{p.seed}</span>
+                              <span className="w-6 h-6 bg-emerald-800 text-white rounded-full flex items-center justify-center text-xs">{p.seed}</span>
                               <span className={p.userId === user.id ? 'text-orange-600 font-black' : 'text-gray-800'}>
                                   {p.user.nickname || p.user.name.split(' ')[0]} {p.userId === user.id && "(Vous)"}
                               </span>
                           </div>
-                          <span className="text-blue-500 text-sm font-bold bg-blue-100 px-2 py-1 rounded">{p.user.averagePoints.toFixed(2).replace('.', ',')} pts</span>
+                          <span className="text-blue-500 text-sm font-bold bg-slate-100 px-2 py-1 rounded">{p.user.averagePoints.toFixed(2).replace('.', ',')} pts</span>
                       </li>
                   ))}
               </ul>

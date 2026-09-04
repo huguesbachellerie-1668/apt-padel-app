@@ -17,10 +17,10 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const rankValue = payload[0].value;
     return (
-      <div className="bg-white p-4 border border-orange-100 shadow-lg rounded-xl">
-        <p className="font-bold text-gray-800 mb-1">{label}</p>
-        <p className="text-orange-600 font-black text-lg">
-          {rankValue}{rankValue === 1 ? 'er' : 'ème'} <span className="text-sm text-gray-500 font-medium">au classement</span>
+      <div className="bg-white p-4 border border-slate-200 shadow-md rounded-xl">
+        <p className="font-bold text-slate-800 mb-1">{label}</p>
+        <p className="text-club-green font-black text-lg">
+          {rankValue}{rankValue === 1 ? 'er' : 'ème'} <span className="text-sm text-slate-500 font-medium">au classement</span>
         </p>
       </div>
     );
@@ -45,11 +45,9 @@ export default function PlayerRankChart({ data }: PlayerRankChartProps) {
     maxRank + 2
   ];
 
-
-
   return (
-    <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm w-full">
-      <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+    <div className="card-club p-6 rounded-3xl w-full">
+      <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
         <span className="text-2xl">🏅</span> Évolution du classement
       </h3>
       <div className="h-64 w-full">
@@ -65,34 +63,34 @@ export default function PlayerRankChart({ data }: PlayerRankChartProps) {
           >
             <defs>
               <linearGradient id="colorRank" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+                <stop offset="5%" stopColor="#166534" stopOpacity={0.2}/>
+                <stop offset="95%" stopColor="#166534" stopOpacity={0}/>
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
             <XAxis 
               dataKey="name" 
               axisLine={false}
               tickLine={false}
-              tick={{ fill: '#9ca3af', fontSize: 12, fontWeight: 600 }}
+              tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }}
               dy={10}
             />
             <YAxis 
               domain={yDomain}
               axisLine={false}
               tickLine={false}
-              tick={{ fill: '#9ca3af', fontSize: 12, fontWeight: 600 }}
+              tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }}
               reversed={true} // Inversé : 1 en haut !
             />
             <Tooltip content={<CustomTooltip />} />
             <Area 
               type="stepAfter" 
               dataKey="rank" 
-              stroke="#f97316" 
+              stroke="#166534" 
               strokeWidth={4}
               fillOpacity={1} 
               fill="url(#colorRank)" 
-              activeDot={{ r: 6, strokeWidth: 0, fill: '#ea580c' }}
+              activeDot={{ r: 6, strokeWidth: 0, fill: '#166534' }}
             />
           </AreaChart>
         </ResponsiveContainer>

@@ -16,7 +16,7 @@ export default async function DirectoryPage() {
     <div className="space-y-6 max-w-5xl mx-auto pb-10">
       <div className="flex justify-between items-end mb-6">
         <div>
-          <h1 className="text-3xl font-black text-blue-900 flex items-center gap-3">
+          <h1 className="text-3xl font-black text-club-green flex items-center gap-3">
             <span className="text-4xl">👥</span> Annuaire APT ({players.length} membres)
           </h1>
           <p className="text-gray-500 mt-2 font-medium">Coordonnées de tous les joueurs du club</p>

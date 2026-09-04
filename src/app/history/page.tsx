@@ -61,13 +61,13 @@ export default async function HistoryPage() {
     <div className="max-w-5xl mx-auto space-y-8 pb-20">
       <div className="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-black text-blue-900 flex items-center gap-3">
+          <h1 className="text-3xl font-black text-club-green flex items-center gap-3">
             <span className="text-4xl">🏛️</span> Statistiques et Historique APT
           </h1>
           <p className="text-gray-500 mt-2 font-medium">L'archive complète du club et de vos records.</p>
         </div>
         <div>
-          <Link href="/history/archives" className="inline-flex bg-blue-100 text-blue-800 hover:bg-blue-200 hover:text-blue-900 font-bold py-2.5 px-5 rounded-xl transition-colors shadow-sm border border-blue-200 items-center justify-center gap-2 text-sm w-full md:w-auto">
+          <Link href="/history/archives" className="inline-flex bg-slate-100 text-emerald-800 hover:bg-blue-200 hover:text-club-green font-bold py-2.5 px-5 rounded-xl transition-colors shadow-sm border border-slate-200 items-center justify-center gap-2 text-sm w-full md:w-auto">
              <span>Voir les classements annuels 🏆</span>
           </Link>
         </div>
@@ -75,10 +75,10 @@ export default async function HistoryPage() {
 
       {/* KPI Section */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-gradient-to-br from-blue-900 to-indigo-900 p-6 rounded-3xl text-white shadow-md flex flex-col items-center justify-center text-center relative overflow-hidden">
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-3xl text-white shadow-md flex flex-col items-center justify-center text-center relative overflow-hidden">
           <div className="absolute top-2 right-2 opacity-10 text-6xl">📅</div>
           <span className="text-4xl font-black relative z-10">{totalSessions}</span>
-          <span className="text-sm text-blue-200 mt-1 font-bold uppercase tracking-wider relative z-10">Sessions</span>
+          <span className="text-sm text-green-100 mt-1 font-bold uppercase tracking-wider relative z-10">Sessions</span>
         </div>
         <div className="bg-gradient-to-br from-orange-500 to-red-500 p-6 rounded-3xl text-white shadow-md flex flex-col items-center justify-center text-center relative overflow-hidden">
           <div className="absolute top-2 right-2 opacity-10 text-6xl">🎾</div>
@@ -101,9 +101,9 @@ export default async function HistoryPage() {
                   <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${idx === 0 ? 'bg-yellow-100 text-yellow-700' : idx === 1 ? 'bg-gray-200 text-gray-700' : 'bg-orange-100 text-orange-700'}`}>
                     {idx + 1}
                   </span>
-                  <a href={`/profile/${tp.user.id}`} className="hover:text-blue-600 transition-colors truncate max-w-[80px]" title={tp.user.name}>{tp.user.nickname || tp.user.name.split(' ')[0]}</a>
+                  <a href={`/profile/${tp.user.id}`} className="hover:text-club-green transition-colors truncate max-w-[80px]" title={tp.user.name}>{tp.user.nickname || tp.user.name.split(' ')[0]}</a>
                 </span>
-                <span className="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md text-xs">{tp.count} sess.</span>
+                <span className="text-slate-800 bg-slate-100 px-2 py-0.5 rounded-md text-xs">{tp.count} sess.</span>
               </div>
             ))}
             {topPlayers.length === 0 && <span className="text-xs text-gray-400">Aucun historique</span>}
@@ -124,16 +124,16 @@ export default async function HistoryPage() {
         <div className="space-y-10">
           {Object.entries(sessionsBySeason).map(([seasonName, sessionsForSeason]) => (
             <div key={seasonName} className="space-y-6">
-              <h3 className="text-lg font-black text-blue-900 border-l-4 border-orange-500 pl-3">
+              <h3 className="text-lg font-black text-club-green border-l-4 border-orange-500 pl-3">
                  {seasonName}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {sessionsForSeason.map(session => (
-                  <Link key={session.id} href={`/session/${session.id}/results`} className="block bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-blue-200 transition-all group relative overflow-hidden">
+                  <Link key={session.id} href={`/session/${session.id}/results`} className="block bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-slate-200 transition-all group relative overflow-hidden">
                      <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity text-6xl transform group-hover:scale-110 group-hover:rotate-12">
                        🏆
                      </div>
-                     <div className="font-black text-xl text-blue-900 group-hover:text-blue-700 transition-colors mb-4 pr-10 capitalize">
+                     <div className="font-black text-xl text-club-green group-hover:text-club-green transition-colors mb-4 pr-10 capitalize">
                        {new Date(session.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                      </div>
                      {!session.isCounted && (
@@ -142,9 +142,9 @@ export default async function HistoryPage() {
                        </div>
                      )}
                      <div className="flex gap-4">
-                       <div className="bg-blue-50 px-3 py-2 rounded-xl text-center flex-1 border border-blue-100">
+                       <div className="bg-slate-50 px-3 py-2 rounded-xl text-center flex-1 border border-slate-200">
                          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                         <div className="text-xl font-black text-blue-800">{(session as any).pools?.length || 0}</div>
+                         <div className="text-xl font-black text-emerald-800">{(session as any).pools?.length || 0}</div>
                          <div className="text-[10px] uppercase font-bold text-blue-400">Terrains</div>
                        </div>
                        <div className="bg-orange-50 px-3 py-2 rounded-xl text-center flex-1 border border-orange-100">
@@ -153,7 +153,7 @@ export default async function HistoryPage() {
                          <div className="text-[10px] uppercase font-bold text-orange-400">Joueurs</div>
                        </div>
                      </div>
-                     <div className="mt-4 text-center text-sm font-bold text-indigo-600 bg-indigo-50 py-2 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                     <div className="mt-4 text-center text-sm font-bold text-slate-800 bg-slate-100 py-2 rounded-xl group-hover:bg-slate-800 group-hover:text-white transition-colors">
                        Voir le palmarès complet 👉
                      </div>
                   </Link>

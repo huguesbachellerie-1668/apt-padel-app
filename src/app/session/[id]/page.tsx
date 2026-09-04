@@ -101,7 +101,7 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
       <div className="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-6">
         <div>
           <BackButton fallback="/" />
-          <h1 className="text-3xl font-black text-blue-900 flex items-center gap-3">
+          <h1 className="text-3xl font-black text-club-green flex items-center gap-3">
             <span className="text-4xl">📅</span> Détails Session
           </h1>
           <p className="text-gray-500 mt-2 font-medium capitalize">
@@ -111,9 +111,9 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex flex-col items-center text-center">
-           <span className="text-sm font-bold text-blue-600 mb-1">Terrains Ouverts</span>
-           <span className="text-3xl font-black text-blue-900">{session.courts}</span>
+        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col items-center text-center">
+           <span className="text-sm font-bold text-club-green mb-1">Terrains Ouverts</span>
+           <span className="text-3xl font-black text-club-green">{session.courts}</span>
         </div>
         <div className="bg-green-50 p-4 rounded-2xl border border-green-100 flex flex-col items-center text-center">
            <span className="text-sm font-bold text-green-600 mb-1">Places Totales</span>
@@ -145,7 +145,7 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
       {(session.status === 'POULES_GENEREES' || session.status === 'TERMINEE') && session.pools && session.pools.length > 0 && (
         <div className="mt-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-            <h2 className="text-2xl font-black text-blue-900 flex items-center gap-3">
+            <h2 className="text-2xl font-black text-club-green flex items-center gap-3">
               <span className="text-3xl">🎾</span> Composition des Poules
             </h2>
             {isBoard && (
@@ -163,17 +163,17 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
               const allMatchesFinished = pool.matches && pool.matches.length === 3 && pool.matches.every(m => m.team1Games !== null && m.team2Games !== null);
               return (
               <div key={pool.id} id={`capture-pool-${pool.id}`} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                 <div className="bg-blue-900 px-5 py-3 flex flex-wrap justify-between items-center text-white gap-2">
+                 <div className="bg-club-green px-5 py-3 flex flex-wrap justify-between items-center text-white gap-2">
                    <div className="flex items-center gap-3">
                      <h3 className="font-bold text-lg">Poule #{pool.level}</h3>
                      {!isBoard && (
                         pool.courtReservation ? (
-                          <span className="text-sm font-medium bg-blue-800 px-3 py-1 rounded-full border border-blue-700 flex items-center gap-1">
+                          <span className="text-sm font-medium bg-emerald-800 px-3 py-1 rounded-full border border-emerald-700 flex items-center gap-1">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5h16M4 19h16M4 5v14M20 5v14M12 5v14M4 12h16"></path></svg>
                             {pool.courtReservation.club.name} Terrain {pool.courtReservation.name}
                           </span>
                         ) : (
-                          <span className="text-sm font-medium bg-blue-800 px-3 py-1 rounded-full border border-blue-700 flex items-center gap-1">
+                          <span className="text-sm font-medium bg-emerald-800 px-3 py-1 rounded-full border border-emerald-700 flex items-center gap-1">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5h16M4 19h16M4 5v14M20 5v14M12 5v14M4 12h16"></path></svg>
                             Terrain {pool.courtNumber}
                           </span>
@@ -181,7 +181,7 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                      )}
                    </div>
                    {isBoard ? (
-                     <form action={updatePoolSettings.bind(null, pool.id, session.id)} className="flex items-center gap-2 bg-blue-800/50 p-1.5 rounded-xl flex-wrap">
+                     <form action={updatePoolSettings.bind(null, pool.id, session.id)} className="flex items-center gap-2 bg-emerald-800/50 p-1.5 rounded-xl flex-wrap">
                        <div className="flex items-center gap-1 pl-2">
                          <select key={pool.courtReservationId || 'none'} name="reservationId" defaultValue={pool.courtReservationId || ""} className="bg-white text-gray-900 rounded px-2 py-1 text-xs font-bold w-64 border-0 focus:ring-2 focus:ring-orange-500 truncate">
                            <option value="">A définir...</option>
@@ -201,7 +201,7 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                 <div className="p-4 flex flex-col gap-3">
                    {pool.players.map(pt => (
                       <div key={pt.userId} className={`flex items-center gap-3 p-2 rounded-xl border ${pt.userId === user.id ? 'border-orange-400 bg-orange-50' : 'border-gray-100 bg-gray-50'}`}>
-                         <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-800 font-bold flex items-center justify-center flex-shrink-0 text-xs">
+                         <div className="w-8 h-8 rounded-full bg-slate-100 text-emerald-800 font-bold flex items-center justify-center flex-shrink-0 text-xs">
                            {pt.seed}
                          </div>
                          <div className="flex-1 flex items-baseline gap-2">
@@ -211,7 +211,7 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                            </span>
                            {pt.user.nickname && <span className="text-xs font-medium text-gray-500">{pt.user.name}</span>}
                          </div>
-                         <div className="text-xs font-bold text-blue-500 bg-blue-100 px-2 py-1 rounded-lg">
+                         <div className="text-xs font-bold text-blue-500 bg-slate-100 px-2 py-1 rounded-lg">
                            {(pt.user.averagePoints || 0).toFixed(2).replace('.', ',')} pts
                          </div>
                       </div>
@@ -293,8 +293,8 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                 priorityStyles = isCurrentUser ? 'bg-orange-50/50 border-l-4 border-green-500' : 'bg-green-50/40 border-l-4 border-green-500';
                 priorityBadge = <span className="text-[10px] uppercase font-bold bg-green-100 text-green-800 px-2 py-0.5 rounded-md border border-green-200">Session Précédente</span>;
              } else if (reg.priorityType === 2) {
-                priorityStyles = isCurrentUser ? 'bg-orange-50/50 border-l-4 border-blue-500' : 'bg-blue-50/40 border-l-4 border-blue-500';
-                priorityBadge = <span className="text-[10px] uppercase font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-md border border-blue-200">Inscrit</span>;
+                priorityStyles = isCurrentUser ? 'bg-orange-50/50 border-l-4 border-blue-500' : 'bg-slate-50/40 border-l-4 border-blue-500';
+                priorityBadge = <span className="text-[10px] uppercase font-bold bg-slate-100 text-emerald-800 px-2 py-0.5 rounded-md border border-slate-200">Inscrit</span>;
              } else {
                 priorityStyles = isCurrentUser ? 'bg-orange-50/50 border-l-4 border-purple-500' : 'bg-purple-50/40 border-l-4 border-purple-500';
                 priorityBadge = <span className="text-[10px] uppercase font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded-md border border-purple-200">Nouveau</span>;
@@ -305,7 +305,7 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                 <div className="flex-shrink-0 w-8 text-center font-black text-gray-400">
                   {idx + 1}
                 </div>
-                <div className="flex-shrink-0 w-10 h-10 bg-white text-blue-800 rounded-full flex items-center justify-center font-bold shadow-sm border border-gray-100">
+                <div className="flex-shrink-0 w-10 h-10 bg-white text-emerald-800 rounded-full flex items-center justify-center font-bold shadow-sm border border-gray-100">
                   {(reg.user.nickname || reg.user.name).charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1">
@@ -329,7 +329,7 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                       <form action={swapRegistrationOrder.bind(null, session.id)}>
                         <input type="hidden" name="userId" value={reg.userId} />
                         <input type="hidden" name="direction" value="up" />
-                        <SubmitButton pendingText="⏳" className="text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-600 hover:text-white p-2 text-sm rounded-lg transition-colors flex items-center justify-center shadow-sm" title="Monter ce joueur">
+                        <SubmitButton pendingText="⏳" className="text-club-green bg-slate-50 border border-slate-200 hover:bg-club-green hover:text-white p-2 text-sm rounded-lg transition-colors flex items-center justify-center shadow-sm" title="Monter ce joueur">
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 15l7-7 7 7"></path></svg>
                         </SubmitButton>
                       </form>
@@ -338,7 +338,7 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                       <form action={swapRegistrationOrder.bind(null, session.id)}>
                         <input type="hidden" name="userId" value={reg.userId} />
                         <input type="hidden" name="direction" value="down" />
-                        <SubmitButton pendingText="⏳" className="text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-600 hover:text-white p-2 text-sm rounded-lg transition-colors flex items-center justify-center shadow-sm" title="Descendre ce joueur">
+                        <SubmitButton pendingText="⏳" className="text-club-green bg-slate-50 border border-slate-200 hover:bg-club-green hover:text-white p-2 text-sm rounded-lg transition-colors flex items-center justify-center shadow-sm" title="Descendre ce joueur">
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7"></path></svg>
                         </SubmitButton>
                       </form>

@@ -47,16 +47,16 @@ export default function ProfileSettingsModal({ user }: { user: Prisma.UserGetPay
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm px-4">
           <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col text-gray-800 max-h-[90vh]">
-            <div className="bg-blue-900 text-white p-5 flex justify-between items-center shrink-0">
+            <div className="bg-club-green text-white p-5 flex justify-between items-center shrink-0">
                 <h2 className="font-black text-xl flex items-center gap-2">👤 Mon Espace Joueur</h2>
                 <button onClick={() => setIsOpen(false)} className="text-blue-300 hover:text-white text-3xl leading-none">&times;</button>
             </div>
 
             <div className="flex border-b border-gray-100 bg-gray-50 shrink-0">
-                <button onClick={() => setActiveTab('infos')} className={`flex-1 py-3 font-bold text-sm tracking-wide ${activeTab === 'infos' ? 'text-blue-600 border-b-2 border-blue-600 bg-white' : 'text-gray-500 hover:text-gray-700'}`}>
+                <button onClick={() => setActiveTab('infos')} className={`flex-1 py-3 font-bold text-sm tracking-wide ${activeTab === 'infos' ? 'text-club-green border-b-2 border-club-green bg-white' : 'text-gray-500 hover:text-gray-700'}`}>
                     Mes Infos
                 </button>
-                <button onClick={() => setActiveTab('security')} className={`flex-1 py-3 font-bold text-sm tracking-wide ${activeTab === 'security' ? 'text-blue-600 border-b-2 border-blue-600 bg-white' : 'text-gray-500 hover:text-gray-700'}`}>
+                <button onClick={() => setActiveTab('security')} className={`flex-1 py-3 font-bold text-sm tracking-wide ${activeTab === 'security' ? 'text-club-green border-b-2 border-club-green bg-white' : 'text-gray-500 hover:text-gray-700'}`}>
                     Mot de passe
                 </button>
             </div>
@@ -85,7 +85,7 @@ export default function ProfileSettingsModal({ user }: { user: Prisma.UserGetPay
                             <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Téléphone</label>
                             <input name="phone" type="tel" defaultValue={user.phone || ''} className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none bg-white text-gray-900 transition-colors" />
                         </div>
-                        <SubmitButton pendingText="Enregistrement..." className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-md transition-transform hover:scale-[1.02]">
+                        <SubmitButton pendingText="Enregistrement..." className="mt-2 w-full bg-club-green hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-md transition-transform hover:scale-[1.02]">
                             Sauvegarder
                         </SubmitButton>
                     </form>

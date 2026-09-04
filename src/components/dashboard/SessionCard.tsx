@@ -57,30 +57,30 @@ export default function SessionCard({
 
   return (
     <div className="space-y-6">
-      {index > 0 && <hr className="my-10 border-gray-200" />}
+      {index > 0 && <hr className="my-10 border-slate-200" />}
 
       {/* Card 1: Inscription & Présence */}
-      <section className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 relative overflow-hidden">
+      <section className="card-club rounded-3xl p-6 relative overflow-hidden">
         <div className="flex flex-wrap justify-between items-center mb-5 gap-4">
-          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
             <span className="text-2xl">📋</span> {sessionTitle}
           </h2>
           {activeSession.status !== 'POULES_GENEREES' && (
-            <span className={`px-3 py-1 text-xs font-bold rounded-full ${activeSession.status === 'INSCRIPTIONS_OUVERTES' ? 'bg-orange-500 text-white' : activeSession.status === 'POULES_EN_ATTENTE' ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-200 text-gray-700'}`}>
+            <span className={`px-3 py-1 text-xs font-bold rounded-full ${activeSession.status === 'INSCRIPTIONS_OUVERTES' ? 'bg-club-green text-white shadow-sm' : activeSession.status === 'POULES_EN_ATTENTE' ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
               {activeSession.status.replace(/_/g, ' ')}
             </span>
           )}
         </div>
         
         <div className="flex flex-wrap items-center gap-3 mb-5">
-          <p className="text-md text-blue-900 font-black capitalize bg-blue-50 p-3 rounded-xl border border-blue-100 inline-block m-0">
+          <p className="text-md text-club-green font-black capitalize bg-club-green-light/50 p-3 rounded-xl border border-club-green-light inline-block m-0">
              Dimanche {new Date(activeSession.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit' }).replace(':', 'h').replace(' à ', ' à partir de ')}
           </p>
         </div>
 
         {activeSession.status === 'INSCRIPTIONS_OUVERTES' && !isToday && (
           userRegistration ? (
-            <div className="bg-green-500/10 border border-green-200 p-5 rounded-2xl text-center mb-4">
+            <div className="bg-green-50 border border-green-200 shadow-sm p-5 rounded-2xl text-center mb-4">
               <p className="font-black text-green-700 flex items-center justify-center gap-2 mb-4 text-lg">
                 ✅ Vous êtes bien inscrit(e) sur la liste !
               </p>
@@ -99,14 +99,14 @@ export default function SessionCard({
               </UnregisterButtonWithWhatsApp>
             </div>
           ) : (
-            <form action={registerForSession.bind(null, activeSession.id)} className="bg-orange-50 p-5 rounded-2xl border border-orange-100 mb-4">
-              <div className="flex items-start gap-3 mb-5 text-left bg-white/50 p-3 rounded-xl">
-                <input type="checkbox" id={`injury-${activeSession.id}`} name="isReturningFromInjury" value="true" className="w-5 h-5 mt-0.5 text-orange-500 rounded border-orange-300 focus:ring-orange-500 cursor-pointer flex-shrink-0 shadow-sm" />
-                <label htmlFor={`injury-${activeSession.id}`} className="text-orange-900 text-sm font-bold cursor-pointer leading-tight">
-                  Signaler un &quot;retour de blessure&quot; <br/><span className="text-[11px] text-orange-700 font-medium uppercase tracking-wider block mt-1">Vous descendrez d&apos;une poule calculée pour ce dimanche.</span>
+            <form action={registerForSession.bind(null, activeSession.id)} className="bg-slate-50 p-5 rounded-2xl border border-slate-200 mb-4 shadow-inner">
+              <div className="flex items-start gap-3 mb-5 text-left bg-white p-3 rounded-xl border border-slate-200">
+                <input type="checkbox" id={`injury-${activeSession.id}`} name="isReturningFromInjury" value="true" className="w-5 h-5 mt-0.5 text-club-clay rounded border-slate-300 bg-white focus:ring-club-clay cursor-pointer flex-shrink-0 shadow-sm" />
+                <label htmlFor={`injury-${activeSession.id}`} className="text-slate-700 text-sm font-bold cursor-pointer leading-tight">
+                  Signaler un &quot;retour de blessure&quot; <br/><span className="text-[11px] text-slate-500 font-medium uppercase tracking-wider block mt-1">Vous descendrez d&apos;une poule calculée pour ce dimanche.</span>
                 </label>
               </div>
-              <SubmitButton pendingText="Inscription..." className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-4 px-4 rounded-xl transition-all shadow-md flex justify-center items-center gap-2 text-lg">
+              <SubmitButton pendingText="Inscription..." className="w-full bg-club-clay hover:bg-orange-700 text-white font-black py-4 px-4 rounded-xl transition-all shadow-md flex justify-center items-center gap-2 text-lg">
                 🎾 M'inscrire pour ce dimanche !
               </SubmitButton>
             </form>
@@ -115,7 +115,7 @@ export default function SessionCard({
 
         {(activeSession.status === 'POULES_GENEREES' || activeSession.status === 'POULES_EN_ATTENTE') && !isToday && (
             userPoolPlayer ? (
-              <div className="bg-green-50 text-green-700 p-4 rounded-xl border border-green-200 text-sm font-bold mb-4 flex items-center justify-between gap-3">
+              <div className="bg-green-50 text-green-700 p-4 rounded-xl border border-green-200 text-sm font-bold mb-4 flex items-center justify-between gap-3 shadow-sm">
                 <div className="flex items-center gap-3">
                   <span className="text-xl">✅</span> Inscrit
                 </div>
@@ -129,7 +129,7 @@ export default function SessionCard({
                 </UnregisterButtonWithWhatsApp>
               </div>
             ) : userRegistration ? (
-              <div className="bg-orange-50 text-orange-800 p-4 rounded-xl border border-orange-200 text-sm font-bold mb-4 flex items-center justify-between gap-3">
+              <div className="bg-yellow-50 text-yellow-700 p-4 rounded-xl border border-yellow-200 text-sm font-bold mb-4 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <span className="text-xl">⏳</span> Vous êtes sur liste d&apos;attente.
                 </div>
@@ -150,12 +150,12 @@ export default function SessionCard({
         )}
 
         {activeSession.status === 'PREVUE' && (
-          <div className="bg-blue-50 text-blue-800 p-5 rounded-2xl border border-blue-100 text-sm font-bold mb-4 text-center">
+          <div className="bg-slate-50 text-club-green p-5 rounded-2xl border border-slate-200 text-sm font-bold mb-4 text-center">
               L&apos;ouverture des inscriptions approche !
           </div>
         )}
         
-        <a href={`/session/${activeSession.id}`} className="block text-center text-lg font-black text-white bg-blue-600 hover:bg-blue-700 shadow-md py-4 rounded-xl transition-transform transform hover:scale-[1.02]">
+        <a href={`/session/${activeSession.id}`} className="block text-center text-lg font-black text-white bg-club-green hover:bg-emerald-700 shadow-md py-4 rounded-xl transition-all hover:scale-[1.02]">
             🔎  Voir la Session 👉
         </a>
       </section>
@@ -165,77 +165,80 @@ export default function SessionCard({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* Card 2: My Matches Input */}
-          <section className="bg-gradient-to-br from-orange-500 to-red-500 rounded-3xl shadow-lg p-6 text-white relative overflow-hidden group flex flex-col">
-              <div className="absolute -top-10 -right-10 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
-              <h2 className="text-xl font-black mb-6 flex items-center gap-2 relative z-10">
+          <section className="bg-emerald-50 border border-emerald-100 rounded-3xl shadow-sm p-6 text-slate-800 relative overflow-hidden group flex flex-col">
+              <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-200 opacity-20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+              <h2 className="text-xl font-black mb-6 flex items-center gap-2 relative z-10 text-emerald-800">
                 <span className="text-2xl">🎾</span> Saisie des Scores
               </h2>
               {userPoolPlayer ? (
                 <div className="space-y-4 relative z-10 flex flex-col h-full justify-between">
-                  <div className="bg-white/10 p-5 border border-white/20 rounded-2xl backdrop-blur-sm flex flex-col gap-1">
-                    <p className="text-3xl font-black text-white mb-2">Poule #{userPoolPlayer.pool.level}</p>
+                  <div className="bg-white/60 p-5 border border-emerald-100 rounded-2xl backdrop-blur-sm flex flex-col gap-1">
+                    <p className="text-3xl font-black text-emerald-800 mb-2">Poule #{userPoolPlayer.pool.level}</p>
                     {userPoolPlayer.pool.courtReservation && (
                       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-1">
-                          <div className="bg-white text-orange-600 px-4 py-3 rounded-xl shadow-md flex items-center justify-center gap-2 text-xl font-black">
+                          <div className="bg-white text-emerald-700 px-4 py-3 rounded-xl border border-emerald-100 shadow-sm flex items-center justify-center gap-2 text-xl font-black">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5h16M4 19h16M4 5v14M20 5v14M12 5v14M4 12h16"></path></svg> 
                             {userPoolPlayer.pool.courtReservation.name}
                           </div>
-                          <div className="bg-white text-orange-600 px-4 py-3 rounded-xl shadow-md flex items-center justify-center gap-2 text-xl font-black">
+                          <div className="bg-white text-emerald-700 px-4 py-3 rounded-xl border border-emerald-100 shadow-sm flex items-center justify-center gap-2 text-xl font-black">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 
                             {userPoolPlayer.pool.courtReservation.startTime}
                           </div>
                       </div>
                     )}
                   </div>
-                  <a href={`/pool/${userPoolPlayer.poolId}`} className="block text-center bg-white text-orange-600 font-black py-4 px-6 rounded-xl transition-transform transform hover:scale-105 shadow-md">
+                  <a href={`/pool/${userPoolPlayer.poolId}`} className="block text-center bg-club-green text-white font-black py-4 px-6 rounded-xl transition-all transform hover:scale-105 shadow-md hover:bg-emerald-700">
                     Voir Ma Poule 👉
                   </a>
                 </div>
               ) : (
-                <div className="bg-black/20 p-5 border border-white/10 rounded-2xl text-sm font-bold text-white/70 h-full flex items-center justify-center text-center backdrop-blur-sm">
+                <div className="bg-slate-100/50 p-5 border border-slate-200 rounded-2xl text-sm font-bold text-slate-500 h-full flex items-center justify-center text-center">
                   Reposez-vous bien. Revenez la semaine prochaine pour jouer sur les terrains !
                 </div>
               )}
           </section>
 
           {/* Card 3: Session Results / Rankings */}
-          <section className="bg-gradient-to-br from-blue-900 to-indigo-900 rounded-3xl shadow-lg p-6 text-white relative overflow-hidden group flex flex-col">
-              <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-cyan-400 opacity-20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
-              <h2 className="text-xl font-black mb-6 flex items-center gap-2 relative z-10">
-                <span className="text-2xl">🏆</span> Résultats de la Session
+          <section className="bg-slate-50 border border-slate-200 rounded-3xl shadow-sm p-6 text-slate-800 relative overflow-hidden group flex flex-col">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-slate-200 opacity-20 rounded-full blur-3xl group-hover:bg-slate-300 transition-colors"></div>
+            
+            <div className="relative z-10 flex-1 flex flex-col">
+              <h2 className="text-xl font-black mb-6 flex items-center gap-2 text-slate-800">
+                <span className="text-2xl">🏆</span> Résultats
               </h2>
               <div className="space-y-4 relative z-10 flex flex-col h-full justify-between">
                 {(hasFinishedPool || allPoolsFinished) && (
                   <div className="bg-white/10 p-5 border border-white/20 rounded-2xl backdrop-blur-sm flex items-center justify-center text-center flex-1">
                     {allPoolsFinished ? (
-                      <div className="font-bold text-green-300">
-                        <span className="text-4xl block mb-3">🎉</span>
+                      <div className="font-bold text-club-gold">
+                        <span className="text-4xl block mb-3 drop-shadow-[0_0_10px_rgba(251,191,36,0.5)]">🎉</span>
                         Tous les scores sont validés !<br/>Le classement final est prêt.
                       </div>
                     ) : (
-                      <div className="font-bold text-blue-200">
+                      <div className="font-bold text-slate-500">
                         Certaines poules se sont terminées.<br/>Les résultats tombent en direct !
                       </div>
                     )}
                   </div>
                 )}
-                {(hasFinishedPool || allPoolsFinished) ? (
-                  <a href={`/session/${activeSession.id}/results`} className={`block text-center font-black py-4 px-6 rounded-xl transition-transform transform hover:scale-105 shadow-md ${allPoolsFinished ? 'bg-green-500 text-white hover:bg-green-400' : 'bg-white text-indigo-700'}`}>
-                    Voir le Classement du Dimanche 👉
+                {allPoolsFinished ? (
+                  <a href={`/session/${activeSession.id}/results`} className={`block text-center font-black py-4 px-6 rounded-xl transition-transform transform hover:scale-105 shadow-sm bg-club-gold text-slate-900 hover:bg-yellow-500`}>
+                    Consulter les résultats définitifs
                   </a>
                 ) : (
-                  <div className="bg-black/20 text-center font-bold py-4 px-6 rounded-xl text-white/50 cursor-not-allowed border border-white/5">
-                    Résultats encore indisponibles
+                  <div className="bg-slate-100 text-center font-bold py-4 px-6 rounded-xl text-slate-400 cursor-not-allowed border border-slate-200">
+                    Les résultats seront disponibles à la fin de toutes les poules
                   </div>
                 )}
               </div>
+            </div>
           </section>
         </div>
       )}
 
       {/* Obsolete Pools Message */}
       {activeSession.status === 'POULES_EN_ATTENTE' && (
-        <div className="bg-red-50 border-2 border-red-500 rounded-3xl p-8 text-center text-red-700 shadow-sm relative overflow-hidden">
+        <div className="bg-red-50 border border-red-200 rounded-3xl p-8 text-center text-red-700 shadow-sm relative overflow-hidden">
             <div className="text-4xl mb-4 animate-bounce">🚨</div>
             <h2 className="text-2xl font-black mb-2">NOUVELLES POULES EN ATTENTE</h2>
             <p className="font-bold mb-1">Un ou plusieurs joueurs se sont désinscrits à la dernière minute.</p>

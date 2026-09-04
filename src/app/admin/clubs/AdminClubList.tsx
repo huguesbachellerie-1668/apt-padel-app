@@ -33,7 +33,7 @@ export default function AdminClubList({ initialClubs }: { initialClubs: Prisma.C
               
               if (editMode) {
                 return (
-                  <tr key={club.id} className="bg-indigo-50/30">
+                  <tr key={club.id} className="bg-slate-100/30">
                     <td colSpan={2} className="p-4 md:p-6">
                       <form action={async (formData) => {
                         await updateClub(formData);
@@ -60,7 +60,7 @@ export default function AdminClubList({ initialClubs }: { initialClubs: Prisma.C
                           <button type="button" onClick={() => setEditingId(null)} className="px-6 py-2.5 rounded-xl font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors">
                             Annuler
                           </button>
-                          <SubmitButton pendingText="Enregistrement..." className="px-6 py-2.5 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">
+                          <SubmitButton pendingText="Enregistrement..." className="px-6 py-2.5 rounded-xl font-bold text-white bg-slate-800 hover:bg-slate-700 transition-colors">
                             Enregistrer les modifications
                           </SubmitButton>
                         </div>
@@ -74,7 +74,7 @@ export default function AdminClubList({ initialClubs }: { initialClubs: Prisma.C
                 <tr key={club.id} className="hover:bg-gray-50 transition-colors group">
                   <td className="px-6 py-4">
                     <div className="flex gap-4 items-center">
-                      <div className="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-black text-xl shadow-sm border border-indigo-200 group-hover:scale-105 transition-transform">
+                      <div className="w-12 h-12 rounded-2xl bg-indigo-100 text-slate-800 flex items-center justify-center font-black text-xl shadow-sm border border-indigo-200 group-hover:scale-105 transition-transform">
                         {club.name.charAt(0)}
                       </div>
                       <div>
@@ -88,7 +88,7 @@ export default function AdminClubList({ initialClubs }: { initialClubs: Prisma.C
                     <div className="flex gap-2">
                       <button 
                         onClick={() => setEditingId(club.id)}
-                        className="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-4 py-2 rounded-xl font-bold text-sm transition-colors"
+                        className="bg-slate-100 hover:bg-indigo-100 text-slate-800 px-4 py-2 rounded-xl font-bold text-sm transition-colors"
                       >
                         ✏️
                       </button>

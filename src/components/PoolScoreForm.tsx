@@ -185,7 +185,7 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
           
           {pool.matches.map(m => (
               <div key={m.id} className="border-2 border-gray-100 rounded-2xl overflow-hidden hover:border-orange-200 transition-colors">
-                  <div className="bg-gradient-to-r from-blue-900 to-blue-800 px-5 py-3 font-bold text-white flex justify-between">
+                  <div className="bg-gradient-to-r from-club-green to-emerald-800 px-5 py-3 font-bold text-white flex justify-between">
                     <span>Match {m.order}</span>
                     {m.team1Games !== null ? <span className="text-orange-300 text-sm">Terminé</span> : <span className="text-blue-300 text-sm">En attente</span>}
                   </div>
@@ -246,7 +246,7 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
       {showModal && (
         <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl animate-fade-in-up max-h-[90vh] flex flex-col">
-               <div className="bg-gradient-to-r from-blue-900 to-blue-800 p-6 text-white text-center relative shrink-0">
+               <div className="bg-gradient-to-r from-club-green to-emerald-800 p-6 text-white text-center relative shrink-0">
                   <button onClick={() => setShowModal(false)} type="button" className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors">
                       <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                   </button>

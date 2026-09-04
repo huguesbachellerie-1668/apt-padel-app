@@ -18,7 +18,7 @@ export default async function AdminClubsPage() {
     <div className="space-y-8 max-w-6xl mx-auto pb-10">
       <div className="flex flex-col gap-2 mb-6">
         <BackButton fallback="/admin" />
-        <h1 className="text-3xl font-black text-blue-900 flex items-center gap-3 mt-4">
+        <h1 className="text-3xl font-black text-club-green flex items-center gap-3 mt-4">
           <span className="text-4xl">🏟️</span> Gestion des Clubs ({clubs.length})
         </h1>
         <p className="text-gray-500 font-medium font-sm mt-1">Gérez le dictionnaire des lieux de réservation récurrents.</p>
@@ -44,7 +44,7 @@ export default async function AdminClubsPage() {
             <input type="text" name="address" required placeholder="Ex: Décathlon Village, 5 Rue Hipparque" className="w-full p-3 rounded-xl border-2 border-indigo-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 outline-none transition-all" />
           </div>
           
-          <SubmitButton pendingText="Ajout..." className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-all h-[52px] w-full md:w-auto">
+          <SubmitButton pendingText="Ajout..." className="bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 px-8 rounded-xl shadow-md transition-all h-[52px] w-full md:w-auto">
             Ajouter
           </SubmitButton>
         </form>

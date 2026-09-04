@@ -1,28 +1,29 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: #f8fafc; /* slate-50 */
+  --color-surface: #ffffff;
+  --color-foreground: #334155; /* slate-700 */
+  
+  --color-club-green: #166534; /* green-800 */
+  --color-club-green-light: #dcfce7; /* green-100 */
+  --color-club-clay: #c2410c; /* orange-700 */
+  --color-club-navy: #1e293b; /* slate-800 */
+  --color-club-gold: #fbbf24; /* amber-400 */
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Global Click Effect for Links and Buttons */
@@ -37,4 +38,13 @@ a:active, button:active {
 
 a.inline-text-link:active {
   transform: none; /* Inline texts scale weirdly, let them only fade */
+}
+
+/* Custom utilities for the Country Club theme */
+@layer utilities {
+  .card-club {
+    background: var(--color-surface);
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  }
 }

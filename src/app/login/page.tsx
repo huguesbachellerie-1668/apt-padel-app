@@ -43,7 +43,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="Logo de l'APT Padel Club" className="w-28 h-auto object-contain drop-shadow-md" />
         </div>
-        <h1 className="text-2xl font-bold text-center text-blue-900 mb-2">Atlantic Padel Team</h1>
+        <h1 className="text-2xl font-bold text-center text-club-green mb-2">Atlantic Padel Team</h1>
         <p className="text-center text-gray-500 text-xs mb-8">Connectez-vous pour accéder à votre espace joueur</p>
         
         {error === 'invalid' && (

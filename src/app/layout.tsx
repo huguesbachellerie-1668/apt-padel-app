@@ -46,30 +46,29 @@ export default async function RootLayout({
 
   return (
     <html lang="fr">
-      <body suppressHydrationWarning className={`${inter.className} bg-gray-50 text-gray-900 min-h-screen pb-20`}>
-        <NextTopLoader color="#ea580c" showSpinner={false} height={4} />
+      <body suppressHydrationWarning className={`${inter.className} bg-slate-50 text-slate-800 min-h-screen pb-20`}>
+        <NextTopLoader color="var(--color-club-green)" showSpinner={false} height={4} />
         {user && (
-          <header className="bg-blue-900 text-white shadow-md rounded-b-3xl">
+          <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200 relative z-40 sticky top-0">
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center font-bold shadow-sm overflow-hidden p-1 relative">
-                    {/* Placeholder for the logo. The user must put their logo.png in the public folder */}
+                  <div className="w-12 h-12 bg-slate-50 border border-slate-200 rounded-full flex items-center justify-center font-bold overflow-hidden p-1 relative shadow-sm">
                     <Image src="/logo.png" alt="APT Logo" fill sizes="48px" className="object-contain p-1" priority />
                   </div>
-                  <span className="font-black tracking-widest text-lg uppercase hidden sm:block">ATLANTIC PADEL TEAM</span>
+                  <span className="font-black tracking-widest text-lg uppercase hidden sm:block text-club-green">ATLANTIC PADEL TEAM</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="text-sm text-blue-200 flex items-center gap-1">
+                  <span className="text-sm text-slate-500 flex items-center gap-1">
                     <span className="hidden sm:inline">Connecté :</span>
-                    <strong className="text-white max-w-[100px] sm:max-w-none truncate flex items-center gap-1" title={user.nickname || user.name.split(' ')[0]}>
-                      {(user.stars || 0) > 0 && <span className="text-yellow-400">{'⭐'.repeat(user.stars)}</span>}
+                    <strong className="text-slate-800 max-w-[100px] sm:max-w-none truncate flex items-center gap-1" title={user.nickname || user.name.split(' ')[0]}>
+                      {(user.stars || 0) > 0 && <span className="text-club-gold drop-shadow-sm">{'⭐'.repeat(user.stars)}</span>}
                       {user.nickname || user.name.split(' ')[0]}
                     </strong>
                     <ProfileSettingsModal user={user} />
                   </span>
                   <form action={logout}>
-                    <SubmitButton pendingText="Déconnexion..." className="text-xs bg-blue-800 hover:bg-orange-500 text-white px-3 py-1.5 rounded-full transition-colors font-medium">
+                    <SubmitButton pendingText="..." className="text-xs bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-600 px-3 py-1.5 rounded-full transition-all duration-300 font-medium">
                       Déconnexion
                     </SubmitButton>
                   </form>
@@ -84,7 +83,7 @@ export default async function RootLayout({
               <NavButton href="/directory" icon={<Users size={20} />} label="Annuaire" />
               <NavButton href="/rules" icon={<ScrollText size={20} />} label="APT" hasNotification={hasUnreadNews} />
               {['PRESIDENT', 'ORGA', 'TRESORIER'].includes(user.role) && (
-                <NavButton href="/admin" icon={<Settings size={20} />} label="Admin" className="text-orange-300" />
+                <NavButton href="/admin" icon={<Settings size={20} />} label="Admin" className="text-club-clay" />
               )}
             </nav>
           </header>
@@ -92,14 +91,14 @@ export default async function RootLayout({
         
         {/* Nav Mobile Bottom Bar */}
         {user && (
-          <nav className="sm:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-50 flex justify-around items-center h-16 pb-[env(safe-area-inset-bottom)] text-gray-500">
+          <nav className="sm:hidden fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50 flex justify-around items-center h-16 pb-[env(safe-area-inset-bottom)] text-slate-500">
             <NavButton href="/" icon={<Home size={24} />} label="Accueil" isMobile={true} />
             <NavButton href="/ranking" icon={<Trophy size={24} />} label="Classement" isMobile={true} />
             <NavButton href="/history" icon={<CalendarDays size={24} />} label="Historique" isMobile={true} />
             <NavButton href="/directory" icon={<Users size={24} />} label="Annuaire" isMobile={true} />
             <NavButton href="/rules" icon={<ScrollText size={24} />} label="APT" hasNotification={hasUnreadNews} isMobile={true} />
             {['PRESIDENT', 'ORGA', 'TRESORIER'].includes(user.role) && (
-              <NavButton href="/admin" icon={<Settings size={24} />} label="Admin" isMobile={true} className="text-orange-500" />
+              <NavButton href="/admin" icon={<Settings size={24} />} label="Admin" isMobile={true} className="text-club-clay" />
             )}
           </nav>
         )}
@@ -111,9 +110,9 @@ export default async function RootLayout({
           {user && sponsors.length > 0 && (
              <footer className="mt-16 pt-4 pb-8">
                <div className="flex items-center gap-4 mb-6">
-                 <div className="flex-1 h-px bg-gray-200"></div>
-                 <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Nos Fiers Partenaires</h2>
-                 <div className="flex-1 h-px bg-gray-200"></div>
+                 <div className="flex-1 h-px bg-slate-200"></div>
+                 <h2 className="text-xs font-black uppercase tracking-widest text-slate-400">Nos Fiers Partenaires</h2>
+                 <div className="flex-1 h-px bg-slate-200"></div>
                </div>
                
                <div className="flex flex-wrap justify-center gap-8">
@@ -127,9 +126,9 @@ export default async function RootLayout({
                          <span className="text-2xl mb-1 opacity-50">🤝</span>
                        )}
                        {sp.website ? (
-                         <a href={sp.website} target="_blank" className="font-bold text-gray-500 hover:text-blue-600 text-[10px] uppercase">{sp.name}</a>
+                         <a href={sp.website} target="_blank" className="font-bold text-slate-500 hover:text-club-green text-[10px] uppercase">{sp.name}</a>
                        ) : (
-                         <span className="font-bold text-gray-400 text-[10px] uppercase">{sp.name}</span>
+                         <span className="font-bold text-slate-400 text-[10px] uppercase">{sp.name}</span>
                        )}
                     </div>
                  ))}

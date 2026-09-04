@@ -118,25 +118,25 @@ export default async function Dashboard() {
           ))}
         </div>
       ) : (
-        <section className="bg-white border border-gray-100 p-12 rounded-3xl shadow-sm text-center">
+        <section className="card-club p-12 rounded-3xl text-center">
           <div className="mb-4 flex justify-center">
-             <Moon size={48} className="text-gray-300" />
+             <Moon size={48} className="text-slate-300" />
           </div>
-          <p className="text-gray-500 font-bold text-lg">Aucune session n'est planifiée par le Board pour le moment.</p>
+          <p className="text-slate-500 font-bold text-lg">Aucune session n'est planifiée par le Board pour le moment.</p>
         </section>
       )}
       
       {/* Quick stats / info */}
-      <section className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex items-center justify-between mt-6">
-         <div className="flex bg-orange-50 rounded-full w-12 h-12 items-center justify-center">
-            <AlertTriangle size={24} className="text-orange-500" />
+      <section className="card-club rounded-3xl p-6 flex items-center justify-between mt-6">
+         <div className="flex bg-yellow-50 border border-yellow-200 shadow-sm rounded-full w-12 h-12 items-center justify-center">
+            <AlertTriangle size={24} className="text-yellow-600" />
          </div>
          <div className="flex-1 ml-4">
-            <h3 className="text-gray-800 font-bold">Cartons Jaunes</h3>
-            <p className="text-gray-500 text-sm">Vous avez {user.yellowCards} carton(s) jaune(s)</p>
+            <h3 className="text-slate-800 font-bold">Cartons Jaunes</h3>
+            <p className="text-slate-500 text-sm">Vous avez {user.yellowCards} carton(s) jaune(s)</p>
          </div>
          {user.yellowCards > 0 && (
-           <div className="text-red-500 font-bold">Attention !</div>
+           <div className="text-red-600 font-bold">Attention !</div>
          )}
       </section>
     </div>
