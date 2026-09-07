@@ -534,7 +534,12 @@ export async function finishSessionAndCalculatePoints(sessionId: string, formDat
           const histStats = user.historicalStats ? (typeof user.historicalStats === 'object' ? user.historicalStats : JSON.parse(user.historicalStats as string)) : {};
           const keys = Object.keys(histStats).sort();
           if (keys.length > 0) {
-            ghostAverage = Number(histStats[keys[keys.length - 1]]) || 0;
+            const lastStat = histStats[keys[keys.length - 1]];
+            if (typeof lastStat === 'object' && lastStat !== null && 'averagePoints' in lastStat) {
+              ghostAverage = Number(lastStat.averagePoints) || 0;
+            } else {
+              ghostAverage = Number(lastStat) || 0;
+            }
           }
           if (ghostAverage > 0) {
             newAverage = (ghostAverage + newTotalPoints) / (1 + realSessionsPlayed);
