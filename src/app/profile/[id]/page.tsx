@@ -138,7 +138,20 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
   const histStats = player.historicalStats ? (typeof player.historicalStats === 'object' ? player.historicalStats : JSON.parse(player.historicalStats as string)) : {};
   const keys = Object.keys(histStats).sort();
   if (keys.length > 0) {
-     ghostAverage = Number(histStats[keys[keys.length - 1]]) || 0;
+     const lastStat = histStats[keys[keys.length - 1]];
+     ghostAverage = typeof lastStat === 'object' && lastStat !== null ? Number(lastStat.averagePoints) || 0 : Number(lastStat) || 0;
+  }
+
+  const cleanHist = new Map<string, number>();
+  if (typeof player.historicalStats === 'object' && player.historicalStats !== null && !Array.isArray(player.historicalStats)) {
+    Object.entries(player.historicalStats as Record<string, any>).forEach(([key, val]) => {
+      if (key.includes('_Final')) return;
+      const cleanKey = key.replace(/^Saison\s+/i, '');
+      const pts = typeof val === 'object' && val !== null ? val.averagePoints : val;
+      if (pts && !isNaN(Number(pts))) {
+        cleanHist.set(cleanKey, Number(pts));
+      }
+    });
   }
 
   const chartData: {name: string, average: number}[] = [];
@@ -368,11 +381,11 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
                        <span title="Bouclier de classement actif (Moyenne lissée avec la saison précédente)" className="cursor-help">🛡️</span>
                    )}
                  </span>
-                 {typeof player.historicalStats === 'object' && player.historicalStats !== null && !Array.isArray(player.historicalStats) && Object.entries(player.historicalStats as Record<string, number>).map(([season, pts]) => (
-                    <span key={season} className="bg-gray-50 border border-gray-200 text-gray-600 font-bold px-3 py-1 rounded-full text-sm flex items-center gap-1 shadow-sm" title={`Ancienne moyenne enregistrée pour ${season}`}>
-                      <span className="text-xs opacity-50">📜</span> {season} : {Number(pts).toFixed(2).replace('.', ',')} pts
-                    </span>
-                 ))}
+                   {Array.from(cleanHist.entries()).map(([season, pts]) => (
+                      <span key={season} className="bg-gray-50 border border-gray-200 text-gray-600 font-bold px-3 py-1 rounded-full text-sm flex items-center gap-1 shadow-sm" title={`Ancienne moyenne enregistrée pour ${season}`}>
+                        <span className="text-xs opacity-50">📜</span> {season} : {pts.toFixed(2).replace('.', ',')} pts
+                      </span>
+                   ))}
                  <span className="bg-purple-50 text-purple-800 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-purple-200">
                     Membre depuis {new Date(player.createdAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
                  </span>
