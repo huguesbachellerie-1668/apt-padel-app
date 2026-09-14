@@ -274,49 +274,52 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
      // Since all users have their true Final stats saved for 2025-2026, and since the app's first season was 2025-2026,
      // their "Base Imported Stats" (before any app session) = Final 2025-2026 Stats - 2025-2026 DB matches.
      // To make this robust, let's look up their Final stats.
-     const u = allUsers.find(x => x.id === uid);
-     let final2526 = null;
-     if (u && u.historicalStats) {
-         const hist = typeof u.historicalStats === 'string' ? JSON.parse(u.historicalStats) : u.historicalStats;
-         final2526 = hist['Saison 2025-2026_Final'];
-     }
-
-     if (final2526) {
-         // Count db matches for this user only for 2025-2026 season to deduce their true imported base
-         let dbPoints2526 = 0;
-         let dbMatches2526 = 0;
-         for (const session of allSessions) {
-             if (session.season?.name !== 'Saison 2025-2026') continue;
-             for (const pool of session.pools) {
-                 for (const match of pool.matches) {
-                     const isTeam1 = match.team1Player1Id === uid || match.team1Player2Id === uid;
-                     const isTeam2 = match.team2Player1Id === uid || match.team2Player2Id === uid;
-                     if (isTeam1 || isTeam2) {
-                         const myGames = isTeam1 ? match.team1Games : match.team2Games;
-                         const theirGames = isTeam1 ? match.team2Games : match.team1Games;
-                         if (myGames !== null && theirGames !== null) {
-                             dbMatches2526++;
-                             let pts = myGames;
-                             if (myGames > theirGames) pts += 30;
-                             else if (myGames === theirGames) pts += 20;
-                             else pts += 10;
-                             dbPoints2526 += (pts / 3);
-                         }
-                     }
-                 }
-             }
-         }
-         
-         stats.startPoints = Math.max(0, final2526.points - dbPoints2526);
-         stats.startSessions = Math.max(0, final2526.sessionsCount - Math.floor(dbMatches2526 / 3));
-     } else {
-         stats.startPoints = 0;
-         stats.startSessions = 0;
-     }
-     
-     stats.trackingPoints = stats.startPoints;
-     stats.trackingSessions = stats.startSessions;
-     stats.trackingAverage = stats.trackingSessions > 0 ? stats.trackingPoints / stats.trackingSessions : 0;
+      const u = allUsers.find(x => x.id === uid);
+      const hist = u?.historicalStats ? (typeof u.historicalStats === 'string' ? JSON.parse(u.historicalStats) : u.historicalStats) : {};
+      
+      if (latestSeasonName === 'Saison 2026-2027') {
+          stats.startPoints = 0;
+          stats.startSessions = 0;
+          stats.ghostAverage = Number(hist['Saison 2025-2026_Final']?.averagePoints) || Number(hist['Saison 2025-2026']) || 0;
+      } else {
+          const final2526 = hist['Saison 2025-2026_Final'];
+          if (final2526) {
+              let dbPoints2526 = 0;
+              let dbMatches2526 = 0;
+              for (const session of allSessions) {
+                  if (session.season?.name !== 'Saison 2025-2026') continue;
+                  for (const pool of session.pools) {
+                      for (const match of pool.matches) {
+                          const isTeam1 = match.team1Player1Id === uid || match.team1Player2Id === uid;
+                          const isTeam2 = match.team2Player1Id === uid || match.team2Player2Id === uid;
+                          if (isTeam1 || isTeam2) {
+                              const myGames = isTeam1 ? match.team1Games : match.team2Games;
+                              const theirGames = isTeam1 ? match.team2Games : match.team1Games;
+                              if (myGames !== null && theirGames !== null) {
+                                  dbMatches2526++;
+                                  let pts = myGames;
+                                  if (myGames > theirGames) pts += 30;
+                                  else if (myGames === theirGames) pts += 20;
+                                  else pts += 10;
+                                  dbPoints2526 += (pts / 3);
+                              }
+                          }
+                      }
+                  }
+              }
+              stats.startPoints = Math.max(0, final2526.points - dbPoints2526);
+              stats.startSessions = Math.max(0, final2526.sessionsCount - Math.floor(dbMatches2526 / 3));
+              stats.ghostAverage = 0;
+          } else {
+              stats.startPoints = 0;
+              stats.startSessions = 0;
+              stats.ghostAverage = 0;
+          }
+      }
+      
+      stats.trackingPoints = stats.startPoints;
+      stats.trackingSessions = stats.startSessions;
+      stats.trackingAverage = stats.trackingSessions > 0 ? stats.trackingPoints / stats.trackingSessions : stats.ghostAverage;
   }
 
   const playerTotalSessions = Math.floor((player.totalMatches || 0) / 3);
