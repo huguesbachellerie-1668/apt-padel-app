@@ -326,7 +326,8 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
   const rankChartData: {name: string, rank: number}[] = [];
   
   if (historicalSessions > 0) {
-      const sortedUsers = Array.from(userStats.values()).sort((a, b) => b.trackingAverage - a.trackingAverage);
+      const activeUsersStart = Array.from(userStats.values()).filter(u => u.trackingSessions > 0 || u.trackingAverage > 0);
+      const sortedUsers = activeUsersStart.sort((a, b) => b.trackingAverage - a.trackingAverage);
       const startRank = sortedUsers.findIndex(u => u.id === player.id) + 1;
       rankChartData.push({
          name: "Départ",
@@ -335,6 +336,8 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
   }
 
   for (const session of allSessions) {
+     if (session.season?.name !== latestSeasonName) continue;
+     
      for (const pool of session.pools) {
         for (const match of pool.matches) {
            const team1Ids = [match.team1Player1Id, match.team1Player2Id].filter(Boolean);
@@ -378,10 +381,19 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
      }
      
      for (const st of userStats.values()) {
-         st.trackingAverage = st.trackingSessions > 0 ? st.trackingPoints / st.trackingSessions : 0;
+         if (st.trackingSessions > 0) {
+             if (st.trackingSessions < 4 && st.ghostAverage > 0) {
+                 st.trackingAverage = (st.ghostAverage + st.trackingPoints) / (1 + st.trackingSessions);
+             } else {
+                 st.trackingAverage = st.trackingPoints / st.trackingSessions;
+             }
+         } else {
+             st.trackingAverage = st.ghostAverage;
+         }
      }
      
-     const sortedUsers = Array.from(userStats.values()).sort((a, b) => b.trackingAverage - a.trackingAverage);
+     const activeUsers = Array.from(userStats.values()).filter(u => u.trackingSessions > 0 || u.trackingAverage > 0);
+     const sortedUsers = activeUsers.sort((a, b) => b.trackingAverage - a.trackingAverage);
      const rank = sortedUsers.findIndex(u => u.id === player.id) + 1;
      
      const playedInSession = session.pools.some(p => p.matches.some(m => m.team1Player1Id === player.id || m.team1Player2Id === player.id || m.team2Player1Id === player.id || m.team2Player2Id === player.id));

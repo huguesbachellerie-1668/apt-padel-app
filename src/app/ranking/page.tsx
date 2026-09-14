@@ -11,7 +11,11 @@ export default async function RankingPage() {
   // Fetch players with at least 1 match played OR an existing average points (from previous season)
   const players = await prisma.user.findMany({
     where: { 
-      totalMatches: { gt: 0 }
+      OR: [
+        { totalMatches: { gt: 0 } },
+        { averagePoints: { gt: 0 } }
+      ],
+      role: 'JOUEUR'
     },
     orderBy: { averagePoints: 'desc' }
   });
