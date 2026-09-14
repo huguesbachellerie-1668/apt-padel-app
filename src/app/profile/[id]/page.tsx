@@ -17,11 +17,12 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
   // Fetch the target user and all others for ranking
   const [player, allUsers, allSessions] = await Promise.all([
     prisma.user.findUnique({ where: { id: p.id } }),
-    prisma.user.findMany({ select: { id: true, points: true, totalMatches: true } }),
+    prisma.user.findMany({ select: { id: true, points: true, totalMatches: true, historicalStats: true } }),
     prisma.session.findMany({
       where: { status: 'TERMINEE', isCounted: true },
       orderBy: { date: 'asc' },
       include: {
+        season: true,
         pools: {
           include: {
             matches: {
@@ -44,6 +45,9 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
       userId: player.id,
       pool: { session: { status: 'TERMINEE' } }
     },
+    orderBy: {
+      pool: { session: { date: 'desc' } }
+    },
     include: {
       pool: {
         include: {
@@ -58,9 +62,6 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
           }
         }
       }
-    },
-    orderBy: {
-      pool: { session: { date: 'desc' } }
     }
   });
 
@@ -133,13 +134,28 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
 
   const winRate = totalMatchesPlayed > 0 ? Math.round((wins / totalMatchesPlayed) * 100) : 0;
   
-  // Calculate historical chart data
+  // Determine the season we are plotting
+  const latestSeasonId = countedPoolPlayers.length > 0 ? countedPoolPlayers[0].pool.session.seasonId : null;
+  const latestSeasonName = allSessions.find(s => s.seasonId === latestSeasonId)?.season?.name || "Saison 2026-2027";
+
   let ghostAverage = 0;
   const histStats = player.historicalStats ? (typeof player.historicalStats === 'object' ? player.historicalStats : JSON.parse(player.historicalStats as string)) : {};
-  const keys = Object.keys(histStats).sort();
-  if (keys.length > 0) {
-     const lastStat = histStats[keys[keys.length - 1]];
-     ghostAverage = typeof lastStat === 'object' && lastStat !== null ? Number(lastStat.averagePoints) || 0 : Number(lastStat) || 0;
+  
+  if (latestSeasonName === 'Saison 2026-2027') {
+      const finalLastSeason = histStats['Saison 2025-2026_Final'];
+      if (finalLastSeason) {
+          ghostAverage = Number(finalLastSeason.averagePoints) || 0;
+      } else {
+          ghostAverage = Number(histStats['Saison 2025-2026']) || 0;
+      }
+  } else if (latestSeasonName === 'Saison 2025-2026') {
+      ghostAverage = Number(histStats['Saison 2025-2026']) || Number(histStats['2025-2026']) || 0;
+  } else {
+      const keys = Object.keys(histStats).sort();
+      if (keys.length > 0) {
+         const lastStat = histStats[keys[keys.length - 1]];
+         ghostAverage = typeof lastStat === 'object' && lastStat !== null ? Number(lastStat.averagePoints) || 0 : Number(lastStat) || 0;
+      }
   }
 
   const cleanHist = new Map<string, number>();
@@ -162,7 +178,11 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
     });
   }
 
-  const chronologicalPools = [...countedPoolPlayers].reverse();
+  const latestSessionWithPools = countedPoolPlayers.length > 0 ? countedPoolPlayers[0].pool.session.seasonId : null;
+  
+  const chronologicalPools = [...countedPoolPlayers]
+    .filter(pp => pp.pool.session.seasonId === latestSessionWithPools)
+    .reverse();
   let cumulativeSessionPoints = 0;
   let realSessions = 0;
 
@@ -249,9 +269,50 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
   }
 
   for (const [uid, stats] of userStats.entries()) {
-     const sessionDbPoints = stats.dbPoints / 3;
-     stats.startPoints = Math.max(0, stats.currentPoints - sessionDbPoints);
-     stats.startSessions = Math.max(0, Math.floor(stats.currentMatches / 3) - Math.floor(stats.dbMatches / 3));
+     // We compute the total DB points generated during the 2025-2026 season specifically
+     // But wait, the loop above calculated dbPoints across ALL sessions.
+     // Since all users have their true Final stats saved for 2025-2026, and since the app's first season was 2025-2026,
+     // their "Base Imported Stats" (before any app session) = Final 2025-2026 Stats - 2025-2026 DB matches.
+     // To make this robust, let's look up their Final stats.
+     const u = allUsers.find(x => x.id === uid);
+     let final2526 = null;
+     if (u && u.historicalStats) {
+         const hist = typeof u.historicalStats === 'string' ? JSON.parse(u.historicalStats) : u.historicalStats;
+         final2526 = hist['Saison 2025-2026_Final'];
+     }
+
+     if (final2526) {
+         // Count db matches for this user only for 2025-2026 season to deduce their true imported base
+         let dbPoints2526 = 0;
+         let dbMatches2526 = 0;
+         for (const session of allSessions) {
+             if (session.season?.name !== 'Saison 2025-2026') continue;
+             for (const pool of session.pools) {
+                 for (const match of pool.matches) {
+                     const isTeam1 = match.team1Player1Id === uid || match.team1Player2Id === uid;
+                     const isTeam2 = match.team2Player1Id === uid || match.team2Player2Id === uid;
+                     if (isTeam1 || isTeam2) {
+                         const myGames = isTeam1 ? match.team1Games : match.team2Games;
+                         const theirGames = isTeam1 ? match.team2Games : match.team1Games;
+                         if (myGames !== null && theirGames !== null) {
+                             dbMatches2526++;
+                             let pts = myGames;
+                             if (myGames > theirGames) pts += 30;
+                             else if (myGames === theirGames) pts += 20;
+                             else pts += 10;
+                             dbPoints2526 += (pts / 3);
+                         }
+                     }
+                 }
+             }
+         }
+         
+         stats.startPoints = Math.max(0, final2526.points - dbPoints2526);
+         stats.startSessions = Math.max(0, final2526.sessionsCount - Math.floor(dbMatches2526 / 3));
+     } else {
+         stats.startPoints = 0;
+         stats.startSessions = 0;
+     }
      
      stats.trackingPoints = stats.startPoints;
      stats.trackingSessions = stats.startSessions;
