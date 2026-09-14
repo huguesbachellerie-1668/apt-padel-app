@@ -326,13 +326,17 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
   const rankChartData: {name: string, rank: number}[] = [];
   
   if (historicalSessions > 0) {
-      const activeUsersStart = Array.from(userStats.values()).filter(u => u.trackingSessions > 0 || u.trackingAverage > 0);
-      const sortedUsers = activeUsersStart.sort((a, b) => b.trackingAverage - a.trackingAverage);
-      const startRank = sortedUsers.findIndex(u => u.id === player.id) + 1;
-      rankChartData.push({
-         name: "Départ",
-         rank: startRank
-      });
+      const activeUsersStart = Array.from(userStats.values()).filter(u => u.trackingSessions > 0);
+      if (activeUsersStart.length > 0) {
+          const sortedUsers = activeUsersStart.sort((a, b) => b.trackingAverage - a.trackingAverage);
+          const startRank = sortedUsers.findIndex(u => u.id === player.id) + 1;
+          if (startRank > 0) {
+              rankChartData.push({
+                 name: "Départ",
+                 rank: startRank
+              });
+          }
+      }
   }
 
   for (const session of allSessions) {
@@ -392,7 +396,7 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
          }
      }
      
-     const activeUsers = Array.from(userStats.values()).filter(u => u.trackingSessions > 0 || u.trackingAverage > 0);
+     const activeUsers = Array.from(userStats.values()).filter(u => u.trackingSessions > 0);
      const sortedUsers = activeUsers.sort((a, b) => b.trackingAverage - a.trackingAverage);
      const rank = sortedUsers.findIndex(u => u.id === player.id) + 1;
      
