@@ -325,10 +325,11 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
 
   const rankChartData: {name: string, rank: number}[] = [];
   
-  if (historicalSessions > 0) {
-      const activeUsersStart = Array.from(userStats.values()).filter(u => u.trackingSessions > 0);
+  if (historicalSessions > 0 || latestSeasonName === 'Saison 2026-2027') {
+      // Pour le point de départ, on classe tous les joueurs qui ont un historique
+      const activeUsersStart = Array.from(userStats.values()).filter(u => u.ghostAverage > 0);
       if (activeUsersStart.length > 0) {
-          const sortedUsers = activeUsersStart.sort((a, b) => b.trackingAverage - a.trackingAverage);
+          const sortedUsers = activeUsersStart.sort((a, b) => b.ghostAverage - a.ghostAverage);
           const startRank = sortedUsers.findIndex(u => u.id === player.id) + 1;
           if (startRank > 0) {
               rankChartData.push({
