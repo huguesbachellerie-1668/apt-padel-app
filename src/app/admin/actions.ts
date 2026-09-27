@@ -243,20 +243,40 @@ export async function generatePools(formData: FormData) {
 
              if (theoreticalLevel < minLevelAllowed) { // Trop haut -> doit descendre
                const targetPlace = Math.floor(((minLevelAllowed - 1) * N) / 10) + 1;
-               const targetIndex = Math.min(N - 1, targetPlace - 1);
-               if (targetIndex > i) {
-                 finalUsers.splice(i, 1);
-                 finalUsers.splice(targetIndex, 0, u);
+               const startIndex = Math.min(N - 1, targetPlace - 1);
+               let targetIndex = -1;
+               for (let j = startIndex; j < N; j++) {
+                   const uJ = finalUsers[j];
+                   const dbLvlJ = uJ.lastCalculatedLevel;
+                   const minJ = (dbLvlJ !== null && dbLvlJ !== undefined && dbLvlJ !== 0) ? Math.max(1, dbLvlJ - 3) : 1;
+                   if (minJ <= theoreticalLevel) {
+                       targetIndex = j;
+                       break;
+                   }
+               }
+               if (targetIndex !== -1 && targetIndex > i) {
+                 finalUsers[i] = finalUsers[targetIndex];
+                 finalUsers[targetIndex] = u;
                  hasMoved = true;
                  break; 
                }
              } 
              else if (theoreticalLevel > maxLevelAllowed) { // Trop bas -> doit monter
-               const targetPlace = Math.max(1, Math.floor((maxLevelAllowed * N) / 10)); // Pire place pour le maxLevel autorisé
-               const targetIndex = Math.max(0, targetPlace - 1);
-               if (targetIndex < i) {
-                 finalUsers.splice(i, 1);
-                 finalUsers.splice(targetIndex, 0, u);
+               const targetPlace = Math.max(1, Math.floor((maxLevelAllowed * N) / 10));
+               const startIndex = Math.max(0, targetPlace - 1);
+               let targetIndex = -1;
+               for (let j = startIndex; j >= 0; j--) {
+                   const uJ = finalUsers[j];
+                   const dbLvlJ = uJ.lastCalculatedLevel;
+                   const maxJ = (dbLvlJ !== null && dbLvlJ !== undefined && dbLvlJ !== 0) ? Math.min(10, dbLvlJ + 3) : 10;
+                   if (maxJ >= theoreticalLevel) {
+                       targetIndex = j;
+                       break;
+                   }
+               }
+               if (targetIndex !== -1 && targetIndex < i) {
+                 finalUsers[i] = finalUsers[targetIndex];
+                 finalUsers[targetIndex] = u;
                  hasMoved = true;
                  break;
                }
@@ -288,21 +308,39 @@ export async function generatePools(formData: FormData) {
              const maxPoolAllowed = Math.min(actualPoolsCount, lastPool + 3);
 
              if (currentPool < minPoolAllowed) { // Trop haut -> doit descendre
-               // Target index is the best seed of the minimum allowed pool
-               const targetIndex = Math.min(N - 1, (minPoolAllowed - 1) * 4);
-               if (targetIndex > i) {
-                 finalUsers.splice(i, 1);
-                 finalUsers.splice(targetIndex, 0, u);
+               const startIndex = Math.min(N - 1, (minPoolAllowed - 1) * 4);
+               let targetIndex = -1;
+               for (let j = startIndex; j < N; j++) {
+                   const uJ = finalUsers[j];
+                   const lpJ = userLastPoolMap.get(uJ.id);
+                   const minJ = lpJ !== undefined ? Math.max(1, lpJ - 3) : 1;
+                   if (minJ <= currentPool) {
+                       targetIndex = j;
+                       break;
+                   }
+               }
+               if (targetIndex !== -1 && targetIndex > i) {
+                 finalUsers[i] = finalUsers[targetIndex];
+                 finalUsers[targetIndex] = u;
                  hasMoved = true;
                  break; 
                }
              } 
              else if (currentPool > maxPoolAllowed) { // Trop bas -> doit monter
-               // Target index is the worst seed of the maximum allowed pool
-               const targetIndex = Math.max(0, (maxPoolAllowed * 4) - 1);
-               if (targetIndex < i) {
-                 finalUsers.splice(i, 1);
-                 finalUsers.splice(targetIndex, 0, u);
+               const startIndex = Math.max(0, (maxPoolAllowed * 4) - 1);
+               let targetIndex = -1;
+               for (let j = startIndex; j >= 0; j--) {
+                   const uJ = finalUsers[j];
+                   const lpJ = userLastPoolMap.get(uJ.id);
+                   const maxJ = lpJ !== undefined ? Math.min(actualPoolsCount, lpJ + 3) : actualPoolsCount;
+                   if (maxJ >= currentPool) {
+                       targetIndex = j;
+                       break;
+                   }
+               }
+               if (targetIndex !== -1 && targetIndex < i) {
+                 finalUsers[i] = finalUsers[targetIndex];
+                 finalUsers[targetIndex] = u;
                  hasMoved = true;
                  break;
                }
