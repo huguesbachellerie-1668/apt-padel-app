@@ -34,18 +34,18 @@ export default async function RankingPage() {
       </div>
 
       <div className="bg-white shadow-sm rounded-2xl overflow-hidden border border-slate-200">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overflow-y-auto max-h-[75vh]">
           <table className="min-w-full divide-y divide-slate-200">
-            <thead className="bg-slate-50">
+            <thead className="bg-slate-50 sticky top-0 z-20 shadow-sm">
               <tr>
-                <th scope="col" className="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Rang</th>
-                <th scope="col" className="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Joueur</th>
-                <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-club-green uppercase tracking-wider">Moyenne pts</th>
-                <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-emerald-600 uppercase tracking-wider hidden sm:table-cell">Tops</th>
-                <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-red-600 uppercase tracking-wider hidden sm:table-cell">Flops</th>
-                <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Sessions</th>
-                <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Matchs</th>
-                <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Points Totaux</th>
+                <th scope="col" className="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider bg-slate-50">Rang</th>
+                <th scope="col" className="px-4 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider bg-slate-50">Joueur</th>
+                <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-club-green uppercase tracking-wider bg-slate-50">Moyenne pts</th>
+                <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-emerald-600 uppercase tracking-wider bg-slate-50">Tops</th>
+                <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-red-600 uppercase tracking-wider bg-slate-50">Flops</th>
+                <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider bg-slate-50">Sessions</th>
+                <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider bg-slate-50">Matchs</th>
+                <th scope="col" className="px-4 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider bg-slate-50">Points Totaux</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-slate-100">
@@ -100,19 +100,19 @@ export default async function RankingPage() {
                     <td className="px-4 py-4 whitespace-nowrap text-center">
                       <div className="text-xl font-black text-club-green tabular-nums">{player.averagePoints.toFixed(2).replace('.', ',')}</div>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-center text-sm font-bold hidden sm:table-cell">
+                    <td className="px-4 py-4 whitespace-nowrap text-center text-sm font-bold">
                       {player.tops > 0 ? <span className="text-emerald-600">{player.tops}</span> : <span className="text-slate-300">-</span>}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-center text-sm font-bold hidden sm:table-cell">
+                    <td className="px-4 py-4 whitespace-nowrap text-center text-sm font-bold">
                       {player.flops > 0 ? <span className="text-red-600">{player.flops}</span> : <span className="text-slate-300">-</span>}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-slate-500 font-bold hidden md:table-cell tabular-nums">
+                    <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-slate-500 font-bold tabular-nums">
                       {Math.round(player.totalMatches / 3)}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-slate-500 font-bold hidden md:table-cell tabular-nums">
+                    <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-slate-500 font-bold tabular-nums">
                       {player.totalMatches}
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-slate-500 font-bold hidden md:table-cell tabular-nums">
+                    <td className="px-4 py-4 whitespace-nowrap text-center text-sm text-slate-500 font-bold tabular-nums">
                       {Math.floor(player.points)}
                     </td>
                   </tr>

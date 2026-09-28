@@ -46,6 +46,12 @@ export default function StatsCard({ user, rank }: StatsCardProps) {
           <span className="text-xs text-slate-600 uppercase font-black tracking-widest text-center mt-1">Stats Complètes</span>
         </a>
       </div>
+
+      <div className="mt-6 flex justify-end relative z-10">
+        <a href="/session/latest-summary" className="bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 px-6 rounded-2xl transition-colors shadow-sm flex items-center gap-2">
+          <BarChart2 size={18} /> Stats de la session
+        </a>
+      </div>
     </section>
   );
 }
