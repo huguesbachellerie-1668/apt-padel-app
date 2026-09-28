@@ -75,9 +75,12 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
   const registrations = session.registrations as RegistrationWithPriority[];
 
   registrations.forEach(reg => {
+     const histStats = reg.user.historicalStats ? (typeof reg.user.historicalStats === 'object' ? reg.user.historicalStats : JSON.parse(reg.user.historicalStats as string)) : {};
+     const hasHistory = Object.keys(histStats).length > 0;
+
      if (lastSessionUserIds.has(reg.userId)) {
          reg.priorityType = 1;
-     } else if (reg.user.totalMatches && reg.user.totalMatches > 0) {
+     } else if ((reg.user.totalMatches && reg.user.totalMatches > 0) || hasHistory) {
          reg.priorityType = 2;
      } else {
          reg.priorityType = 3;
