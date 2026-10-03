@@ -222,10 +222,22 @@ export async function generatePools(formData: FormData) {
      }
   }
 
+  // --- Initial Injury Shift
+  for (const u of [...finalUsers]) {
+     const reg = userToReg.get(u.id);
+     if (reg && reg.isReturningFromInjury) {
+        const idx = finalUsers.findIndex(fu => fu.id === u.id);
+        const target = Math.min(finalUsers.length - 1, idx + 4);
+        const [rem] = finalUsers.splice(idx, 1);
+        finalUsers.splice(target, 0, rem);
+     }
+  }
+
   if (actualPoolsCount < 8) {
       let hasMoved = true;
       let iterations = 0;
-      const MAX_ITERATIONS = 1000;
+      const MAX_ITERATIONS = 100;
+      const injuryOffset = Math.ceil(10 / actualPoolsCount);
 
       while (hasMoved && iterations < MAX_ITERATIONS) {
         hasMoved = false;
@@ -238,45 +250,51 @@ export async function generatePools(formData: FormData) {
            const dbLevel = u.lastCalculatedLevel;
 
            if (dbLevel !== null && dbLevel !== undefined && dbLevel !== 0) {
-             const minLevelAllowed = Math.max(1, dbLevel - 3);
-             const maxLevelAllowed = Math.min(10, dbLevel + 3);
+             const isInj = userToReg.get(u.id)?.isReturningFromInjury;
+             const injOff = isInj ? injuryOffset : 0;
+             const minLevelAllowed = Math.max(1, dbLevel - 3) + injOff;
+             const maxLevelAllowed = Math.min(10, dbLevel + 3) + injOff;
 
              if (theoreticalLevel < minLevelAllowed) { // Trop haut -> doit descendre
-               const targetPlace = Math.floor(((minLevelAllowed - 1) * N) / 10) + 1;
-               const startIndex = Math.min(N - 1, targetPlace - 1);
-               let targetIndex = -1;
-               for (let j = startIndex; j < N; j++) {
+               let target = -1;
+               for (let j = i + 1; j < N; j++) {
                    const uJ = finalUsers[j];
                    const dbLvlJ = uJ.lastCalculatedLevel;
-                   const minJ = (dbLvlJ !== null && dbLvlJ !== undefined && dbLvlJ !== 0) ? Math.max(1, dbLvlJ - 3) : 1;
-                   if (minJ <= theoreticalLevel) {
-                       targetIndex = j;
+                   const isInjJ = userToReg.get(uJ.id)?.isReturningFromInjury;
+                   const injOffJ = isInjJ ? injuryOffset : 0;
+                   const minJ = (dbLvlJ !== null && dbLvlJ !== undefined && dbLvlJ !== 0) ? Math.max(1, dbLvlJ - 3) + injOffJ : 1 + injOffJ;
+                   const maxJ = (dbLvlJ !== null && dbLvlJ !== undefined && dbLvlJ !== 0) ? Math.min(10, dbLvlJ + 3) + injOffJ : 10;
+                   const newLevelForJ = Math.ceil(((i + 1) * 10) / N);
+                   if (minJ <= newLevelForJ && maxJ >= newLevelForJ) {
+                       target = j;
                        break;
                    }
                }
-               if (targetIndex !== -1 && targetIndex > i) {
-                 finalUsers[i] = finalUsers[targetIndex];
-                 finalUsers[targetIndex] = u;
+               if (target !== -1) {
+                 const [shiftedUser] = finalUsers.splice(target, 1);
+                 finalUsers.splice(i, 0, shiftedUser);
                  hasMoved = true;
                  break; 
                }
              } 
              else if (theoreticalLevel > maxLevelAllowed) { // Trop bas -> doit monter
-               const targetPlace = Math.max(1, Math.floor((maxLevelAllowed * N) / 10));
-               const startIndex = Math.max(0, targetPlace - 1);
-               let targetIndex = -1;
-               for (let j = startIndex; j >= 0; j--) {
+               let target = -1;
+               for (let j = i - 1; j >= 0; j--) {
                    const uJ = finalUsers[j];
                    const dbLvlJ = uJ.lastCalculatedLevel;
-                   const maxJ = (dbLvlJ !== null && dbLvlJ !== undefined && dbLvlJ !== 0) ? Math.min(10, dbLvlJ + 3) : 10;
-                   if (maxJ >= theoreticalLevel) {
-                       targetIndex = j;
+                   const isInjJ = userToReg.get(uJ.id)?.isReturningFromInjury;
+                   const injOffJ = isInjJ ? injuryOffset : 0;
+                   const minJ = (dbLvlJ !== null && dbLvlJ !== undefined && dbLvlJ !== 0) ? Math.max(1, dbLvlJ - 3) + injOffJ : 1 + injOffJ;
+                   const maxJ = (dbLvlJ !== null && dbLvlJ !== undefined && dbLvlJ !== 0) ? Math.min(10, dbLvlJ + 3) + injOffJ : 10;
+                   const newLevelForJ = Math.ceil(((i + 1) * 10) / N);
+                   if (minJ <= newLevelForJ && maxJ >= newLevelForJ) {
+                       target = j;
                        break;
                    }
                }
-               if (targetIndex !== -1 && targetIndex < i) {
-                 finalUsers[i] = finalUsers[targetIndex];
-                 finalUsers[targetIndex] = u;
+               if (target !== -1) {
+                 const [shiftedUser] = finalUsers.splice(target, 1);
+                 finalUsers.splice(i, 0, shiftedUser);
                  hasMoved = true;
                  break;
                }
@@ -292,7 +310,7 @@ export async function generatePools(formData: FormData) {
       // >= 8 pools : Plafonnement forfaitaire +/- 3 poules
       let hasMoved = true;
       let iterations = 0;
-      const MAX_ITERATIONS = 1000;
+      const MAX_ITERATIONS = 100;
 
       while (hasMoved && iterations < MAX_ITERATIONS) {
         hasMoved = false;
@@ -304,43 +322,51 @@ export async function generatePools(formData: FormData) {
            const lastPool = userLastPoolMap.get(u.id);
 
            if (lastPool !== undefined) {
-             const minPoolAllowed = Math.max(1, lastPool - 3);
-             const maxPoolAllowed = Math.min(actualPoolsCount, lastPool + 3);
+             const isInj = userToReg.get(u.id)?.isReturningFromInjury;
+             const injOff = isInj ? 1 : 0;
+             const minPoolAllowed = Math.max(1, lastPool - 3) + injOff;
+             const maxPoolAllowed = Math.min(actualPoolsCount, lastPool + 3) + injOff;
 
              if (currentPool < minPoolAllowed) { // Trop haut -> doit descendre
-               const startIndex = Math.min(N - 1, (minPoolAllowed - 1) * 4);
-               let targetIndex = -1;
-               for (let j = startIndex; j < N; j++) {
+               let target = -1;
+               for (let j = i + 1; j < N; j++) {
                    const uJ = finalUsers[j];
                    const lpJ = userLastPoolMap.get(uJ.id);
-                   const minJ = lpJ !== undefined ? Math.max(1, lpJ - 3) : 1;
-                   if (minJ <= currentPool) {
-                       targetIndex = j;
+                   const isInjJ = userToReg.get(uJ.id)?.isReturningFromInjury;
+                   const injOffJ = isInjJ ? 1 : 0;
+                   const minJ = lpJ !== undefined ? Math.max(1, lpJ - 3) + injOffJ : 1 + injOffJ;
+                   const maxJ = lpJ !== undefined ? Math.min(actualPoolsCount, lpJ + 3) + injOffJ : actualPoolsCount;
+                   const newPoolForJ = Math.floor(i / 4) + 1;
+                   if (minJ <= newPoolForJ && maxJ >= newPoolForJ) {
+                       target = j;
                        break;
                    }
                }
-               if (targetIndex !== -1 && targetIndex > i) {
-                 finalUsers[i] = finalUsers[targetIndex];
-                 finalUsers[targetIndex] = u;
+               if (target !== -1) {
+                 const [shiftedUser] = finalUsers.splice(target, 1);
+                 finalUsers.splice(i, 0, shiftedUser);
                  hasMoved = true;
                  break; 
                }
              } 
              else if (currentPool > maxPoolAllowed) { // Trop bas -> doit monter
-               const startIndex = Math.max(0, (maxPoolAllowed * 4) - 1);
-               let targetIndex = -1;
-               for (let j = startIndex; j >= 0; j--) {
+               let target = -1;
+               for (let j = i - 1; j >= 0; j--) {
                    const uJ = finalUsers[j];
                    const lpJ = userLastPoolMap.get(uJ.id);
-                   const maxJ = lpJ !== undefined ? Math.min(actualPoolsCount, lpJ + 3) : actualPoolsCount;
-                   if (maxJ >= currentPool) {
-                       targetIndex = j;
+                   const isInjJ = userToReg.get(uJ.id)?.isReturningFromInjury;
+                   const injOffJ = isInjJ ? 1 : 0;
+                   const minJ = lpJ !== undefined ? Math.max(1, lpJ - 3) + injOffJ : 1 + injOffJ;
+                   const maxJ = lpJ !== undefined ? Math.min(actualPoolsCount, lpJ + 3) + injOffJ : actualPoolsCount;
+                   const newPoolForJ = Math.floor(i / 4) + 1;
+                   if (minJ <= newPoolForJ && maxJ >= newPoolForJ) {
+                       target = j;
                        break;
                    }
                }
-               if (targetIndex !== -1 && targetIndex < i) {
-                 finalUsers[i] = finalUsers[targetIndex];
-                 finalUsers[targetIndex] = u;
+               if (target !== -1) {
+                 const [shiftedUser] = finalUsers.splice(target, 1);
+                 finalUsers.splice(i, 0, shiftedUser);
                  hasMoved = true;
                  break;
                }
@@ -352,40 +378,6 @@ export async function generatePools(formData: FormData) {
       if (iterations >= MAX_ITERATIONS) {
         console.warn("Max iterations reached in Pool Plafond (>= 8 pools).");
       }
-  }
-
-  // --- Injury logic (Retour Blessure)
-  for (const u of [...finalUsers]) {
-     const reg = userToReg.get(u.id);
-     if (reg && reg.isReturningFromInjury) {
-        const currentIndex = finalUsers.findIndex(fu => fu.id === u.id);
-        if (currentIndex === -1) continue;
-        const currentPool = Math.floor(currentIndex / 4);
-        if (currentPool < actualPoolsCount - 1) {
-           const targetPool = currentPool + 1;
-           let targetIndex = targetPool * 4;
-           
-           while (targetIndex < finalUsers.length) {
-              const occUser = finalUsers[targetIndex];
-              const occDbLvl = occUser.lastCalculatedLevel;
-              if (occDbLvl !== null && occDbLvl !== undefined && occDbLvl !== 0) {
-                  const occMaxLvl = Math.min(10, occDbLvl + 3);
-                  const occThLvlIfPushed = Math.ceil(((targetIndex + 2) * 10) / N); 
-                  if (occThLvlIfPushed > occMaxLvl) {
-                     targetIndex++; // Le joueur est plafonné, on cherche la place d'après
-                     continue;
-                  }
-              }
-              break; 
-           }
-           if (targetIndex < finalUsers.length) {
-              const removedUser = finalUsers.splice(currentIndex, 1)[0];
-              // Insérer précisément à l'index `targetIndex` garanti qu'il tombe dans la bonne poule
-              // (Puisque l'élément original "targetIndex" a glissé à "targetIndex-1" lors du splice).
-              finalUsers.splice(targetIndex, 0, removedUser);
-           }
-        }
-     }
   }
 
   // --- Fetch Session Reservations for Auto-Assignment
