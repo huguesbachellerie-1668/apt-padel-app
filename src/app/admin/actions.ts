@@ -203,6 +203,14 @@ export async function generatePools(formData: FormData) {
   }
 
   // --- Step 11: Top-Down Cascade & Pool Plafond
+  // Compute natural positions for injury logic
+  const naturalLevelMap = new Map<string, number>();
+  const naturalPoolMap = new Map<string, number>();
+  electedUsers.forEach((u, i) => {
+    naturalLevelMap.set(u.id, Math.ceil(((i + 1) * 10) / N));
+    naturalPoolMap.set(u.id, Math.floor(i / 4) + 1);
+  });
+
   const finalUsers = [...electedUsers];
 
   // Fetch last pool level for all elected users
@@ -252,7 +260,12 @@ export async function generatePools(formData: FormData) {
            if (dbLevel !== null && dbLevel !== undefined && dbLevel !== 0) {
              const isInj = userToReg.get(u.id)?.isReturningFromInjury;
              const injOff = isInj ? injuryOffset : 0;
-             const minLevelAllowed = Math.max(1, dbLevel - 3) + injOff;
+             const baseMin = Math.max(1, dbLevel - 3);
+             let minLevelAllowed = baseMin + injOff;
+             if (isInj) {
+               const natLvl = naturalLevelMap.get(u.id) || 1;
+               minLevelAllowed = Math.max(minLevelAllowed, natLvl + injOff);
+             }
              const maxLevelAllowed = Math.min(10, dbLevel + 3) + injOff;
 
              if (theoreticalLevel < minLevelAllowed) { // Trop haut -> doit descendre
@@ -262,7 +275,12 @@ export async function generatePools(formData: FormData) {
                    const dbLvlJ = uJ.lastCalculatedLevel;
                    const isInjJ = userToReg.get(uJ.id)?.isReturningFromInjury;
                    const injOffJ = isInjJ ? injuryOffset : 0;
-                   const minJ = (dbLvlJ !== null && dbLvlJ !== undefined && dbLvlJ !== 0) ? Math.max(1, dbLvlJ - 3) + injOffJ : 1 + injOffJ;
+                   const baseMinJ = (dbLvlJ !== null && dbLvlJ !== undefined && dbLvlJ !== 0) ? Math.max(1, dbLvlJ - 3) : 1;
+                   let minJ = baseMinJ + injOffJ;
+                   if (isInjJ) {
+                     const natLvlJ = naturalLevelMap.get(uJ.id) || 1;
+                     minJ = Math.max(minJ, natLvlJ + injOffJ);
+                   }
                    const maxJ = (dbLvlJ !== null && dbLvlJ !== undefined && dbLvlJ !== 0) ? Math.min(10, dbLvlJ + 3) + injOffJ : 10;
                    const newLevelForJ = Math.ceil(((i + 1) * 10) / N);
                    if (minJ <= newLevelForJ && maxJ >= newLevelForJ) {
@@ -284,7 +302,12 @@ export async function generatePools(formData: FormData) {
                    const dbLvlJ = uJ.lastCalculatedLevel;
                    const isInjJ = userToReg.get(uJ.id)?.isReturningFromInjury;
                    const injOffJ = isInjJ ? injuryOffset : 0;
-                   const minJ = (dbLvlJ !== null && dbLvlJ !== undefined && dbLvlJ !== 0) ? Math.max(1, dbLvlJ - 3) + injOffJ : 1 + injOffJ;
+                   const baseMinJ = (dbLvlJ !== null && dbLvlJ !== undefined && dbLvlJ !== 0) ? Math.max(1, dbLvlJ - 3) : 1;
+                   let minJ = baseMinJ + injOffJ;
+                   if (isInjJ) {
+                     const natLvlJ = naturalLevelMap.get(uJ.id) || 1;
+                     minJ = Math.max(minJ, natLvlJ + injOffJ);
+                   }
                    const maxJ = (dbLvlJ !== null && dbLvlJ !== undefined && dbLvlJ !== 0) ? Math.min(10, dbLvlJ + 3) + injOffJ : 10;
                    const newLevelForJ = Math.ceil(((i + 1) * 10) / N);
                    if (minJ <= newLevelForJ && maxJ >= newLevelForJ) {
@@ -324,7 +347,12 @@ export async function generatePools(formData: FormData) {
            if (lastPool !== undefined) {
              const isInj = userToReg.get(u.id)?.isReturningFromInjury;
              const injOff = isInj ? 1 : 0;
-             const minPoolAllowed = Math.max(1, lastPool - 3) + injOff;
+             const baseMin = Math.max(1, lastPool - 3);
+             let minPoolAllowed = baseMin + injOff;
+             if (isInj) {
+               const natPool = naturalPoolMap.get(u.id) || 1;
+               minPoolAllowed = Math.max(minPoolAllowed, natPool + injOff);
+             }
              const maxPoolAllowed = Math.min(actualPoolsCount, lastPool + 3) + injOff;
 
              if (currentPool < minPoolAllowed) { // Trop haut -> doit descendre
@@ -334,7 +362,12 @@ export async function generatePools(formData: FormData) {
                    const lpJ = userLastPoolMap.get(uJ.id);
                    const isInjJ = userToReg.get(uJ.id)?.isReturningFromInjury;
                    const injOffJ = isInjJ ? 1 : 0;
-                   const minJ = lpJ !== undefined ? Math.max(1, lpJ - 3) + injOffJ : 1 + injOffJ;
+                   const baseMinJ = lpJ !== undefined ? Math.max(1, lpJ - 3) : 1;
+                   let minJ = baseMinJ + injOffJ;
+                   if (isInjJ) {
+                     const natPoolJ = naturalPoolMap.get(uJ.id) || 1;
+                     minJ = Math.max(minJ, natPoolJ + injOffJ);
+                   }
                    const maxJ = lpJ !== undefined ? Math.min(actualPoolsCount, lpJ + 3) + injOffJ : actualPoolsCount;
                    const newPoolForJ = Math.floor(i / 4) + 1;
                    if (minJ <= newPoolForJ && maxJ >= newPoolForJ) {
@@ -346,7 +379,7 @@ export async function generatePools(formData: FormData) {
                  const [shiftedUser] = finalUsers.splice(target, 1);
                  finalUsers.splice(i, 0, shiftedUser);
                  hasMoved = true;
-                 break; 
+                 i--; 
                }
              } 
              else if (currentPool > maxPoolAllowed) { // Trop bas -> doit monter
@@ -356,7 +389,12 @@ export async function generatePools(formData: FormData) {
                    const lpJ = userLastPoolMap.get(uJ.id);
                    const isInjJ = userToReg.get(uJ.id)?.isReturningFromInjury;
                    const injOffJ = isInjJ ? 1 : 0;
-                   const minJ = lpJ !== undefined ? Math.max(1, lpJ - 3) + injOffJ : 1 + injOffJ;
+                   const baseMinJ = lpJ !== undefined ? Math.max(1, lpJ - 3) : 1;
+                   let minJ = baseMinJ + injOffJ;
+                   if (isInjJ) {
+                     const natPoolJ = naturalPoolMap.get(uJ.id) || 1;
+                     minJ = Math.max(minJ, natPoolJ + injOffJ);
+                   }
                    const maxJ = lpJ !== undefined ? Math.min(actualPoolsCount, lpJ + 3) + injOffJ : actualPoolsCount;
                    const newPoolForJ = Math.floor(i / 4) + 1;
                    if (minJ <= newPoolForJ && maxJ >= newPoolForJ) {
