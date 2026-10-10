@@ -57,17 +57,17 @@ export default async function HistoryPage() {
   histMatches = Math.round(histMatches / 4); // 4 joueurs par match
   
   const dbSessionsCount = await prisma.session.count({
-    where: { status: 'TERMINEE', isCounted: true }
+    where: { status: 'TERMINEE', isCounted: true, season: { name: { not: 'Saison 2025-2026' } } }
   });
   const totalSessions = dbSessionsCount + histSessions;
 
   const dbMatchesCount = await prisma.match.count({
-    where: { pool: { session: { status: 'TERMINEE', isCounted: true } } }
+    where: { pool: { session: { status: 'TERMINEE', isCounted: true, season: { name: { not: 'Saison 2025-2026' } } } } }
   });
   const totalMatches = dbMatchesCount + histMatches;
 
   const uniquePlayersRaw = await prisma.poolPlayer.findMany({
-    where: { pool: { session: { status: 'TERMINEE', isCounted: true } } },
+    where: { pool: { session: { status: 'TERMINEE', isCounted: true, season: { name: { not: 'Saison 2025-2026' } } } } },
     select: { userId: true },
     distinct: ['userId']
   });
@@ -76,7 +76,7 @@ export default async function HistoryPage() {
 
   // 3. Top 3 most active players
   const allPoolPlayers = await prisma.poolPlayer.findMany({
-    where: { pool: { session: { status: 'TERMINEE', isCounted: true } } },
+    where: { pool: { session: { status: 'TERMINEE', isCounted: true, season: { name: { not: 'Saison 2025-2026' } } } } },
     include: { user: true }
   });
 
@@ -173,12 +173,16 @@ export default async function HistoryPage() {
         </div>
       ) : (
         <div className="space-y-10">
-          {Object.entries(sessionsBySeason).map(([seasonName, sessionsForSeason]) => (
-            <div key={seasonName} className="space-y-6">
-              <h3 className="text-lg font-black text-club-green border-l-4 border-orange-500 pl-3">
-                 {seasonName}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Object.entries(sessionsBySeason).map(([seasonName, sessionsForSeason], index) => (
+            <details key={seasonName} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group" open={index === 0}>
+              <summary className="p-6 md:px-8 cursor-pointer list-none flex items-center justify-between font-bold text-xl text-club-green hover:bg-slate-50 transition-colors [&::-webkit-details-marker]:hidden border-l-4 border-orange-500">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">📅</span> {seasonName}
+                </div>
+                <span className="text-2xl group-open:rotate-180 transition-transform duration-300">🔽</span>
+              </summary>
+              <div className="px-6 pb-6 md:px-8 md:pb-8 pt-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {sessionsForSeason.map(session => (
                   <Link key={session.id} href={`/session/${session.id}/results`} className="block bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-slate-200 transition-all group relative overflow-hidden">
                      <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity text-6xl transform group-hover:scale-110 group-hover:rotate-12">
@@ -209,8 +213,9 @@ export default async function HistoryPage() {
                      </div>
                   </Link>
                 ))}
+                </div>
               </div>
-            </div>
+            </details>
           ))}
         </div>
       )}

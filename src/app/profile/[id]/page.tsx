@@ -65,7 +65,10 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
     }
   });
 
-  const totalSessions = poolPlayers.length;
+  const teammateStats = new Map<string, { user: Prisma.UserGetPayload<Record<string, never>>, totalPoints: number, matchesPlayed: number, winsTogether: number }>();
+  const opponentStats = new Map<string, { user: Prisma.UserGetPayload<Record<string, never>>, lossesAgainst: number, matchesAgainst: number }>();
+
+  let totalSessions = 0;
   let totalMatchesPlayed = 0;
   let wins = 0;
   let draws = 0;
@@ -73,10 +76,26 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
   let totalGamesWon = 0;
   let bestPoolReached = Infinity;
 
-  const teammateStats = new Map<string, { user: Prisma.UserGetPayload<Record<string, never>>, totalPoints: number, matchesPlayed: number, winsTogether: number }>();
-  const opponentStats = new Map<string, { user: Prisma.UserGetPayload<Record<string, never>>, lossesAgainst: number, matchesAgainst: number }>();
+  const s2025 = allSessions.find(s => s.season?.name === 'Saison 2025-2026');
+  const s2025Id = s2025 ? s2025.seasonId : null;
 
-  const countedPoolPlayers = poolPlayers.filter(pp => pp.pool.session.isCounted);
+  const histStats = player.historicalStats ? (typeof player.historicalStats === 'object' ? player.historicalStats : JSON.parse(player.historicalStats as string)) : {};
+  if (histStats['Saison 2025-2026_Final']) {
+      const final2526 = histStats['Saison 2025-2026_Final'];
+      totalSessions += final2526.sessionsCount || 0;
+      totalMatchesPlayed += final2526.totalMatches || 0;
+      wins += final2526.wins || 0;
+      // Pour les matchs nuls et perdus historiques, on estime à partir des victoires
+      const nonWins = (final2526.totalMatches || 0) - (final2526.wins || 0);
+      draws += Math.floor(nonWins / 2);
+      losses += Math.ceil(nonWins / 2);
+  }
+
+  // Filtrer les sessions de la DB pour exclure Saison 2025-2026 (déjà dans historicalStats)
+  const dbPoolPlayers = poolPlayers.filter(pp => pp.pool.session.seasonId !== s2025Id);
+  const countedPoolPlayers = dbPoolPlayers.filter(pp => pp.pool.session.isCounted);
+  
+  totalSessions += countedPoolPlayers.length;
 
   for (const pp of countedPoolPlayers) {
     if (pp.pool.level < bestPoolReached) bestPoolReached = pp.pool.level;
@@ -139,7 +158,6 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
   const latestSeasonName = allSessions.find(s => s.seasonId === latestSeasonId)?.season?.name || "Saison 2026-2027";
 
   let ghostAverage = 0;
-  const histStats = player.historicalStats ? (typeof player.historicalStats === 'object' ? player.historicalStats : JSON.parse(player.historicalStats as string)) : {};
   
   if (latestSeasonName === 'Saison 2026-2027') {
       const finalLastSeason = histStats['Saison 2025-2026_Final'];
