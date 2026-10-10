@@ -7,6 +7,7 @@ import SubmitButton from "@/components/SubmitButton";
 import BackButton from "@/components/BackButton";
 import WhatsAppShareButton from "@/components/WhatsAppShareButton";
 import WhatsAppShareTextButton from "@/components/WhatsAppShareTextButton";
+import PoolCourtSelect from "@/components/PoolCourtSelect";
 
 export default async function SessionDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const p = await params;
@@ -206,15 +207,10 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                    </div>
                    {isBoard ? (
                      <form action={updatePoolSettings.bind(null, pool.id, session.id)} className="flex items-center gap-2 bg-emerald-800/50 p-1.5 rounded-xl flex-wrap">
-                       <div className="flex items-center gap-1 pl-2">
-                         <select key={pool.courtReservationId || 'none'} name="reservationId" defaultValue={pool.courtReservationId || ""} className="bg-white text-gray-900 rounded px-2 py-1 text-xs font-bold w-64 border-0 focus:ring-2 focus:ring-orange-500 truncate">
-                           <option value="">A définir...</option>
-                           {session.reservations && session.reservations.map(res => (
-                             <option key={res.id} value={res.id}>{res.club.name} Terrain {res.name} ({res.startTime})</option>
-                           ))}
-                         </select>
-                       </div>
-                       <SubmitButton pendingText="..." className="bg-orange-500 hover:bg-orange-400 text-white px-2 py-1 rounded-lg text-xs font-bold ml-1">OK</SubmitButton>
+                       <PoolCourtSelect 
+                         currentReservationId={pool.courtReservationId} 
+                         reservations={session.reservations} 
+                       />
                      </form>
                    ) : (
                      <span className="text-sm font-bold text-orange-300">

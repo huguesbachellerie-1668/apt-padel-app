@@ -25,11 +25,15 @@ export default async function AdminPlayersPage() {
       </div>
 
       {/* CREATE FORM */}
-      <div className="bg-gradient-to-br from-green-50 to-white p-6 md:p-8 rounded-3xl shadow-sm border-2 border-green-200">
-        <h2 className="text-xl font-bold text-green-800 mb-4 flex items-center gap-2">
-          <span>➕</span> Inscrire un nouveau joueur
-        </h2>
-        <form action={createPlayer} className="flex flex-wrap gap-4 items-end bg-white p-4 rounded-xl shadow-inner border border-green-100">
+      <details className="bg-gradient-to-br from-green-50 to-white rounded-3xl shadow-sm border-2 border-green-200 overflow-hidden group">
+        <summary className="p-6 md:px-8 cursor-pointer list-none flex items-center justify-between font-bold text-xl text-green-800 hover:bg-green-100/50 transition-colors [&::-webkit-details-marker]:hidden">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">➕</span> Inscrire un nouveau joueur
+          </div>
+          <span className="text-2xl group-open:rotate-180 transition-transform duration-300">🔽</span>
+        </summary>
+        <div className="px-6 pb-6 md:px-8 md:pb-8">
+          <form action={createPlayer} className="flex flex-wrap gap-4 items-end bg-white p-4 rounded-xl shadow-inner border border-green-100">
           <div className="flex-1 min-w-[150px]">
              <label className="text-xs font-bold text-gray-600 block mb-1">Prénom & Nom</label>
              <input name="name" type="text" required className="w-full p-2.5 border-2 border-gray-200 rounded-lg focus:border-green-500 font-bold text-gray-800 focus:outline-none" />
@@ -71,7 +75,8 @@ export default async function AdminPlayersPage() {
             Créer
           </SubmitButton>
         </form>
-      </div>
+        </div>
+      </details>
 
       <AdminPlayerList initialPlayers={players} initialClubs={[]} />
     </div>

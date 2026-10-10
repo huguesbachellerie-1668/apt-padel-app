@@ -16,23 +16,38 @@ export default function AdminPlayerList({ initialPlayers, initialClubs }: { init
   );
 
   return (
-    <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-200 mt-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-        <span>✏️</span> Joueurs existants ({filteredPlayers.length} / {players.length})
-      </h2>
+    <div className="space-y-6 mt-6">
+      {/* SEARCH FIELD */}
+      <details className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden group">
+        <summary className="p-6 md:px-8 cursor-pointer list-none flex items-center justify-between font-bold text-xl text-gray-800 hover:bg-gray-50 transition-colors [&::-webkit-details-marker]:hidden">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🔍</span> Rechercher un joueur
+          </div>
+          <span className="text-2xl group-open:rotate-180 transition-transform duration-300">🔽</span>
+        </summary>
+        <div className="px-6 pb-6 md:px-8 md:pb-8">
+          <div className="relative">
+            <span className="absolute left-4 top-3 text-xl">🔍</span>
+            <input 
+              type="text" 
+              value={search} 
+              onChange={e => setSearch(e.target.value)} 
+              placeholder="Rechercher un joueur..." 
+              className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none shadow-sm text-lg font-medium"
+            />
+          </div>
+        </div>
+      </details>
 
-      <div className="relative mb-6">
-        <span className="absolute left-4 top-3 text-xl">🔍</span>
-        <input 
-          type="text" 
-          value={search} 
-          onChange={e => setSearch(e.target.value)} 
-          placeholder="Rechercher un joueur..." 
-          className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none shadow-sm text-lg font-medium"
-        />
-      </div>
-
-      <div className="space-y-4">
+      {/* PLAYERS LIST */}
+      <details className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden group" open>
+        <summary className="p-6 md:px-8 cursor-pointer list-none flex items-center justify-between font-bold text-xl text-gray-800 hover:bg-gray-50 transition-colors [&::-webkit-details-marker]:hidden">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">👥</span> Tous les joueurs ({filteredPlayers.length} / {players.length})
+          </div>
+          <span className="text-2xl group-open:rotate-180 transition-transform duration-300">🔽</span>
+        </summary>
+        <div className="px-6 pb-6 md:px-8 md:pb-8 space-y-4">
         {filteredPlayers.map(player => {
           const isTargetPresident = player.role === 'PRESIDENT';
           const canEdit = user.role === 'PRESIDENT' || !isTargetPresident;
@@ -115,7 +130,8 @@ export default function AdminPlayerList({ initialPlayers, initialClubs }: { init
             </form>
           );
         })}  
-      </div>
+        </div>
+      </details>
     </div>
   );
 }

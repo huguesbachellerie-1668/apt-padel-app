@@ -26,19 +26,53 @@ export default async function HistoryPage() {
      return acc;
   }, {} as Record<string, Prisma.SessionGetPayload<Record<string, never>>[]>);
 
-  // 2. Compute Global Stats
-  const totalSessions = pastSessions.length;
+  // 2. Compute Global Stats including history
+  let histSessions = 0;
+  let histMatches = 0;
+  const histPlayers = new Set<string>();
   
-  const totalMatches = await prisma.match.count({
+  const allUsers = await prisma.user.findMany();
+  const seasonMaxSessions: Record<string, number> = {};
+
+  allUsers.forEach(u => {
+    let playedHistorically = false;
+    if (u.historicalStats && typeof u.historicalStats === 'object') {
+      Object.entries(u.historicalStats).forEach(([key, val]) => {
+        if (val && typeof val === 'object' && (val as any).totalMatches) {
+          histMatches += (val as any).totalMatches;
+          playedHistorically = true;
+          
+          if ((val as any).sessionsCount) {
+             seasonMaxSessions[key] = Math.max(seasonMaxSessions[key] || 0, (val as any).sessionsCount);
+          }
+        }
+      });
+    }
+    if (playedHistorically) {
+      histPlayers.add(u.id);
+    }
+  });
+
+  histSessions = Object.values(seasonMaxSessions).reduce((a, b) => a + b, 0);
+  histMatches = Math.round(histMatches / 4); // 4 joueurs par match
+  
+  const dbSessionsCount = await prisma.session.count({
+    where: { status: 'TERMINEE', isCounted: true }
+  });
+  const totalSessions = dbSessionsCount + histSessions;
+
+  const dbMatchesCount = await prisma.match.count({
     where: { pool: { session: { status: 'TERMINEE', isCounted: true } } }
   });
+  const totalMatches = dbMatchesCount + histMatches;
 
   const uniquePlayersRaw = await prisma.poolPlayer.findMany({
     where: { pool: { session: { status: 'TERMINEE', isCounted: true } } },
     select: { userId: true },
     distinct: ['userId']
   });
-  const totalUniquePlayers = uniquePlayersRaw.length;
+  uniquePlayersRaw.forEach(p => histPlayers.add(p.userId));
+  const totalUniquePlayers = histPlayers.size;
 
   // 3. Top 3 most active players
   const allPoolPlayers = await prisma.poolPlayer.findMany({
@@ -47,6 +81,23 @@ export default async function HistoryPage() {
   });
 
   const participationCount = new Map<string, { count: number, user: Prisma.UserGetPayload<Record<string, never>> }>();
+  
+  // Historical participations
+  for (const u of allUsers) {
+    if (u.historicalStats && typeof u.historicalStats === 'object') {
+       let histCount = 0;
+       Object.values(u.historicalStats).forEach(val => {
+          if (val && typeof val === 'object' && (val as any).sessionsCount) {
+             histCount += (val as any).sessionsCount;
+          }
+       });
+       if (histCount > 0) {
+          participationCount.set(u.id, { count: histCount, user: u });
+       }
+    }
+  }
+
+  // Current DB participations
   for (const pp of allPoolPlayers) {
     const existing = participationCount.get(pp.userId) || { count: 0, user: pp.user };
     existing.count++;

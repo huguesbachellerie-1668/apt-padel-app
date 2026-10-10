@@ -22,11 +22,17 @@ export default async function CommunicationAdmin() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="space-y-6">
         
         {/* SECTION NEWS */}
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-          <h2 className="text-xl font-bold mb-4 flex items-center gap-2">📰 Gestion des News</h2>
+        <details className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group">
+          <summary className="p-6 md:px-8 cursor-pointer list-none flex items-center justify-between font-bold text-xl text-gray-800 hover:bg-gray-50 transition-colors [&::-webkit-details-marker]:hidden">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">📰</span> Gestion des News
+            </div>
+            <span className="text-2xl group-open:rotate-180 transition-transform duration-300">🔽</span>
+          </summary>
+          <div className="px-6 pb-6 md:px-8 md:pb-8">
           <form action={createNews} className="bg-slate-50 p-4 md:p-5 rounded-2xl mb-6 flex flex-col gap-3 border border-slate-200">
             <input type="text" name="title" placeholder="Titre de la news (ex: Inscription Tournoi)" required className="p-3 rounded-xl border border-gray-300 w-full font-bold focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
             <textarea name="content" placeholder="Texte de votre annonce..." required className="p-3 rounded-xl border border-gray-300 w-full h-28 resize-y focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
@@ -61,11 +67,17 @@ export default async function CommunicationAdmin() {
              {news.length === 0 && <p className="text-sm text-gray-400 italic text-center p-4">La liste des actualités est vide.</p>}
           </div>
         </div>
+        </details>
 
-        <div className="space-y-8">
-          {/* SECTION SPONSORS */}
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">🤝 Partenaires & Sponsors</h2>
+        {/* SECTION SPONSORS */}
+        <details className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group">
+          <summary className="p-6 md:px-8 cursor-pointer list-none flex items-center justify-between font-bold text-xl text-gray-800 hover:bg-gray-50 transition-colors [&::-webkit-details-marker]:hidden">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🤝</span> Partenaires & Sponsors
+            </div>
+            <span className="text-2xl group-open:rotate-180 transition-transform duration-300">🔽</span>
+          </summary>
+          <div className="px-6 pb-6 md:px-8 md:pb-8">
             <form action={createSponsor} className="bg-orange-50 p-4 md:p-5 rounded-2xl mb-6 flex flex-col gap-3 border border-orange-100">
               <input type="text" name="name" placeholder="Nom du Sponsor" required className="p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-500" />
               <input type="url" name="website" placeholder="Site web (https://... - optionnel)" className="p-3 rounded-xl border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-500" />
@@ -96,10 +108,17 @@ export default async function CommunicationAdmin() {
                {sponsors.length === 0 && <p className="text-sm text-gray-400 italic text-center p-4">Aucun partenaire enregistré.</p>}
             </div>
           </div>
+        </details>
 
-          {/* SECTION GOODIES */}
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">👕 Boutique (Goodies)</h2>
+        {/* SECTION GOODIES */}
+        <details className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group">
+          <summary className="p-6 md:px-8 cursor-pointer list-none flex items-center justify-between font-bold text-xl text-gray-800 hover:bg-gray-50 transition-colors [&::-webkit-details-marker]:hidden">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">👕</span> Boutique (Goodies)
+            </div>
+            <span className="text-2xl group-open:rotate-180 transition-transform duration-300">🔽</span>
+          </summary>
+          <div className="px-6 pb-6 md:px-8 md:pb-8">
             <form action={createGoodie} className="bg-green-50 p-4 md:p-5 rounded-2xl mb-6 flex flex-col gap-3 border border-green-100">
               <input type="text" name="name" placeholder="Nom du Goodie (ex: T-Shirt APT)" required className="p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-100 focus:border-green-500" />
               <div className="flex gap-3">
@@ -134,7 +153,7 @@ export default async function CommunicationAdmin() {
                {goodies.length === 0 && <p className="text-sm text-gray-400 italic text-center p-4">La liste des goodies est vide.</p>}
             </div>
           </div>
-        </div>
+        </details>
 
       </div>
     </div>
