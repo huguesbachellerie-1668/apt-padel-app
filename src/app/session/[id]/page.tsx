@@ -155,12 +155,33 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
               <div data-html2canvas-ignore>
                 <WhatsAppShareButton 
                   elementIds={session.pools.map(p => `capture-pool-${p.id}`)}
-                  text="🎾 Les Poules de la session sont prêtes !" 
+                  text={`🎾 Les Poules de la session sont prêtes !${
+                    registrations.filter(r => !session.pools.some(p => p.players.some(pp => pp.userId === r.userId))).length > 0
+                    ? "\n\n❌ Ne peuvent pas jouer cette session : " + registrations.filter(r => !session.pools.some(p => p.players.some(pp => pp.userId === r.userId))).map(r => r.user.nickname || r.user.name).join(", ")
+                    : ""
+                  }`} 
                   fileName="poules.png" 
                 />
               </div>
             )}
           </div>
+          
+          {(() => {
+             const unselected = registrations.filter(r => !session.pools.some(p => p.players.some(pp => pp.userId === r.userId)));
+             if (unselected.length > 0) {
+               return (
+                 <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-xl flex items-center gap-3 text-orange-800 shadow-sm">
+                   <div className="text-2xl">ℹ️</div>
+                   <div>
+                     <p className="font-bold text-sm">Ne peuvent pas jouer cette session (sur liste d'attente) :</p>
+                     <p className="text-sm mt-1 font-medium">{unselected.map(r => r.user.nickname || r.user.name).join(', ')}</p>
+                   </div>
+                 </div>
+               );
+             }
+             return null;
+          })()}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {session.pools.map(pool => {
               const allMatchesFinished = pool.matches && pool.matches.length === 3 && pool.matches.every(m => m.team1Games !== null && m.team2Games !== null);

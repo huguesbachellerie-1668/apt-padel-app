@@ -179,8 +179,11 @@ export async function generatePools(formData: FormData) {
     const bLast = lastSessionUserIds.has(b.userId) ? 1 : 0;
     if (aLast !== bLast) return bLast - aLast;
 
-    const aMem = (a.user.totalMatches && a.user.totalMatches > 0) ? 1 : 0;
-    const bMem = (b.user.totalMatches && b.user.totalMatches > 0) ? 1 : 0;
+    const aHistStats = a.user.historicalStats ? (typeof a.user.historicalStats === 'object' ? a.user.historicalStats : JSON.parse(a.user.historicalStats as string)) : {};
+    const bHistStats = b.user.historicalStats ? (typeof b.user.historicalStats === 'object' ? b.user.historicalStats : JSON.parse(b.user.historicalStats as string)) : {};
+
+    const aMem = ((a.user.totalMatches && a.user.totalMatches > 0) || Object.keys(aHistStats).length > 0) ? 1 : 0;
+    const bMem = ((b.user.totalMatches && b.user.totalMatches > 0) || Object.keys(bHistStats).length > 0) ? 1 : 0;
     if (aMem !== bMem) return bMem - aMem;
 
     return a.createdAt.getTime() - b.createdAt.getTime();
