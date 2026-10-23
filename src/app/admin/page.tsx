@@ -19,7 +19,8 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
         orderBy: { createdAt: 'desc' }
       },
       reservations: {
-        include: { club: true }
+        include: { club: true },
+        orderBy: { id: 'asc' }
       }
     }
   }) : [];
@@ -289,28 +290,50 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                           </div>
                         )}
 
-                        <form action={createCourtReservation.bind(null, session.id)} className="flex flex-col sm:flex-row items-end gap-2 bg-gray-50/50 p-3 rounded-xl border border-gray-100">
-                          <div className="w-full sm:flex-[2] flex flex-col gap-1">
-                            <label className="text-[10px] font-bold text-gray-500 uppercase">Club</label>
-                            <select name="clubId" required className="w-full p-2 rounded-lg border border-gray-200 text-xs focus:outline-none bg-white">
-                              <option value="">Sélectionner...</option>
-                              {allClubs.map(c => (
-                                <option key={c.id} value={c.id}>{c.name}</option>
-                              ))}
-                            </select>
-                          </div>
-                          <div className="w-full sm:flex-1 flex flex-col gap-1">
-                            <label className="text-[10px] font-bold text-gray-500 uppercase">Piste</label>
-                            <input type="text" name="name" required placeholder="Ex: T1" className="w-full p-2 rounded-lg border border-gray-200 text-xs focus:outline-none bg-white" />
-                          </div>
-                          <div className="w-full sm:w-20 flex flex-col gap-1">
-                            <label className="text-[10px] font-bold text-gray-500 uppercase">Heure</label>
-                            <input type="time" name="startTime" required className="w-full p-2 rounded-lg border border-gray-200 text-xs font-bold focus:outline-none bg-white" />
-                          </div>
-                          <SubmitButton pendingText="..." className="bg-gray-800 hover:bg-gray-900 text-white font-bold p-2 text-xs rounded-lg w-full sm:w-auto h-[34px]">
-                            +
-                          </SubmitButton>
-                        </form>
+                        {(() => {
+                          const lastRes = session.reservations && session.reservations.length > 0
+                            ? session.reservations[session.reservations.length - 1]
+                            : null;
+                          return (
+                            <form
+                              key={`res-form-${session.id}-${session.reservations?.length || 0}`}
+                              action={createCourtReservation.bind(null, session.id)}
+                              className="flex flex-col sm:flex-row items-end gap-2 bg-gray-50/50 p-3 rounded-xl border border-gray-100"
+                            >
+                              <div className="w-full sm:flex-[2] flex flex-col gap-1">
+                                <label className="text-[10px] font-bold text-gray-500 uppercase">Club</label>
+                                <select
+                                  name="clubId"
+                                  required
+                                  defaultValue={lastRes?.clubId || ""}
+                                  className="w-full p-2 rounded-lg border border-gray-200 text-xs focus:outline-none bg-white"
+                                >
+                                  <option value="">Sélectionner...</option>
+                                  {allClubs.map(c => (
+                                    <option key={c.id} value={c.id}>{c.name}</option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div className="w-full sm:flex-1 flex flex-col gap-1">
+                                <label className="text-[10px] font-bold text-gray-500 uppercase">Piste</label>
+                                <input type="text" name="name" required placeholder="Ex: T1" className="w-full p-2 rounded-lg border border-gray-200 text-xs focus:outline-none bg-white" />
+                              </div>
+                              <div className="w-full sm:w-20 flex flex-col gap-1">
+                                <label className="text-[10px] font-bold text-gray-500 uppercase">Heure</label>
+                                <input
+                                  type="time"
+                                  name="startTime"
+                                  required
+                                  defaultValue={lastRes?.startTime || ""}
+                                  className="w-full p-2 rounded-lg border border-gray-200 text-xs font-bold focus:outline-none bg-white"
+                                />
+                              </div>
+                              <SubmitButton pendingText="..." className="bg-gray-800 hover:bg-gray-900 text-white font-bold p-2 text-xs rounded-lg w-full sm:w-auto h-[34px]">
+                                +
+                              </SubmitButton>
+                            </form>
+                          );
+                        })()}
                       </div>
                     </details>
                   </div>
