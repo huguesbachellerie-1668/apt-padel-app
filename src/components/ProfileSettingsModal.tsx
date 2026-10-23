@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { updateMyProfile, updateMyPassword } from '@/app/profileActions';
 import { Prisma } from '@prisma/client';
 import SubmitButton from '@/components/SubmitButton';
@@ -44,9 +45,9 @@ export default function ProfileSettingsModal({ user }: { user: Prisma.UserGetPay
         <span className="text-xl leading-none" style={{ position: 'relative', top: '-1px' }}>👤</span>
       </button>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm px-4">
-          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col text-gray-800 max-h-[90vh]">
+      {isOpen && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 pt-12 pb-20 sm:p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col text-gray-800 max-h-[80dvh] sm:max-h-[90vh]">
             <div className="bg-club-green text-white p-5 flex justify-between items-center shrink-0">
                 <h2 className="font-black text-xl flex items-center gap-2">👤 Mon Espace Joueur</h2>
                 <button onClick={() => setIsOpen(false)} className="text-blue-300 hover:text-white text-3xl leading-none">&times;</button>
@@ -119,7 +120,8 @@ export default function ProfileSettingsModal({ user }: { user: Prisma.UserGetPay
                 )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
