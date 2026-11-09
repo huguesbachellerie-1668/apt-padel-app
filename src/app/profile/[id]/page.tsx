@@ -15,7 +15,7 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
   if (!currentUser) redirect("/login");
 
   // Fetch the target user and all others for ranking
-  const [player, allUsers, allSessions] = await Promise.all([
+  const [player, allUsers, allSessions, activeSeason] = await Promise.all([
     prisma.user.findUnique({ where: { id: p.id } }),
     prisma.user.findMany({ select: { id: true, points: true, totalMatches: true, historicalStats: true } }),
     prisma.session.findMany({
@@ -34,7 +34,8 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
           }
         }
       }
-    })
+    }),
+    prisma.season.findFirst({ where: { isActive: true } })
   ]);
 
   if (!player) return <div className="text-center p-10 font-bold text-gray-500">Joueur introuvable</div>;
@@ -76,28 +77,15 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
   let totalGamesWon = 0;
   let bestPoolReached = Infinity;
 
-  const s2025 = allSessions.find(s => s.season?.name === 'Saison 2025-2026');
-  const s2025Id = s2025 ? s2025.seasonId : null;
+  const countedPoolPlayers = poolPlayers.filter(pp => pp.pool.session.isCounted);
+  const currentSeasonPoolPlayers = activeSeason
+    ? countedPoolPlayers.filter(pp => pp.pool.session.seasonId === activeSeason.id)
+    : countedPoolPlayers;
 
   const histStats = player.historicalStats ? (typeof player.historicalStats === 'object' ? player.historicalStats : JSON.parse(player.historicalStats as string)) : {};
-  if (histStats['Saison 2025-2026_Final']) {
-      const final2526 = histStats['Saison 2025-2026_Final'];
-      totalSessions += final2526.sessionsCount || 0;
-      totalMatchesPlayed += final2526.totalMatches || 0;
-      wins += final2526.wins || 0;
-      // Pour les matchs nuls et perdus historiques, on estime à partir des victoires
-      const nonWins = (final2526.totalMatches || 0) - (final2526.wins || 0);
-      draws += Math.floor(nonWins / 2);
-      losses += Math.ceil(nonWins / 2);
-  }
+  totalSessions = currentSeasonPoolPlayers.length;
 
-  // Filtrer les sessions de la DB pour exclure Saison 2025-2026 (déjà dans historicalStats)
-  const dbPoolPlayers = poolPlayers.filter(pp => pp.pool.session.seasonId !== s2025Id);
-  const countedPoolPlayers = dbPoolPlayers.filter(pp => pp.pool.session.isCounted);
-  
-  totalSessions += countedPoolPlayers.length;
-
-  for (const pp of countedPoolPlayers) {
+  for (const pp of currentSeasonPoolPlayers) {
     if (pp.pool.level < bestPoolReached) bestPoolReached = pp.pool.level;
 
     for (const match of pp.pool.matches) {
@@ -108,6 +96,7 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
       const myGames = isTeam1 ? match.team1Games : match.team2Games;
       const theirGames = isTeam1 ? match.team2Games : match.team1Games;
       if (myGames === null || theirGames === null) continue;
+      if (myGames === 0 && theirGames === 0) continue;
 
       totalMatchesPlayed++;
       totalGamesWon += myGames;
@@ -154,8 +143,8 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
   const winRate = totalMatchesPlayed > 0 ? Math.round((wins / totalMatchesPlayed) * 100) : 0;
   
   // Determine the season we are plotting
-  const latestSeasonId = countedPoolPlayers.length > 0 ? countedPoolPlayers[0].pool.session.seasonId : null;
-  const latestSeasonName = allSessions.find(s => s.seasonId === latestSeasonId)?.season?.name || "Saison 2026-2027";
+  const latestSeasonId = activeSeason?.id || (countedPoolPlayers.length > 0 ? countedPoolPlayers[0].pool.session.seasonId : null);
+  const latestSeasonName = activeSeason?.name || allSessions.find(s => s.seasonId === latestSeasonId)?.season?.name || "Saison 2026-2027";
 
   let ghostAverage = 0;
   
@@ -196,11 +185,7 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
     });
   }
 
-  const latestSessionWithPools = countedPoolPlayers.length > 0 ? countedPoolPlayers[0].pool.session.seasonId : null;
-  
-  const chronologicalPools = [...countedPoolPlayers]
-    .filter(pp => pp.pool.session.seasonId === latestSessionWithPools)
-    .reverse();
+  const chronologicalPools = [...currentSeasonPoolPlayers].reverse();
   let cumulativeSessionPoints = 0;
   let realSessions = 0;
 
@@ -471,8 +456,8 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
               </h1>
               {player.nickname && <p className="text-xl text-gray-400 italic font-medium mt-1">"{player.nickname}"</p>}
               <div className="flex flex-wrap gap-2 mt-3">
-                 <span className="bg-orange-100 text-orange-800 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-orange-200">
-                   {totalSessions} Sessions
+                 <span className="bg-orange-100 text-orange-800 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-orange-200 flex items-center gap-1">
+                   {totalSessions} Sessions <span className="text-[11px] font-medium opacity-75">({latestSeasonName.replace(/^Saison\s+/i, '')})</span>
                  </span>
                  <span className="bg-slate-100 text-emerald-800 font-bold px-3 py-1 rounded-full text-sm shadow-sm border border-slate-200 flex items-center gap-1">
                    Actuelle : {(player.averagePoints || 0).toFixed(2).replace('.', ',')} pts
@@ -496,7 +481,9 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Win Rate */}
         <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center">
-            <h3 className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-2">Taux de Victoire</h3>
+            <h3 className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-2">
+              Taux de Victoire - <span className="text-[10px] font-medium normal-case tracking-normal">{latestSeasonName}</span>
+            </h3>
             <div className="text-4xl font-black text-gray-800 flex items-end gap-1">
               {winRate}<span className="text-xl text-gray-400">%</span>
             </div>
@@ -505,7 +492,9 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
         
         {/* Best Rule Reached */}
         <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center">
-            <h3 className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-2">Meilleure Poule</h3>
+            <h3 className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-2">
+              Meilleure Poule - <span className="text-[10px] font-medium normal-case tracking-normal">{latestSeasonName}</span>
+            </h3>
             {bestPoolReached !== Infinity ? (
               <>
                 <div className="text-4xl font-black text-club-green flex items-end gap-1">
@@ -520,7 +509,9 @@ export default async function PlayerProfilePage({ params }: { params: Promise<{ 
 
         {/* Total Matches */}
         <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center">
-            <h3 className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-2">Matchs Joués</h3>
+            <h3 className="text-gray-400 font-bold text-xs uppercase tracking-widest mb-2">
+              Matchs Joués - <span className="text-[10px] font-medium normal-case tracking-normal">{latestSeasonName}</span>
+            </h3>
             <div className="text-4xl font-black text-gray-800">
               {totalMatchesPlayed}
             </div>
