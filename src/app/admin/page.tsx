@@ -96,6 +96,18 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
             <span>Gérer la vitrine 👉</span>
           </a>
         </div>
+
+        <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-emerald-100 flex flex-col justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+              🏆 Module Tournoi
+            </h2>
+            <p className="text-gray-500 mb-5 font-medium">Testez le format Tournoi à paires fixes (poules groupées 2 par 2) et simulez les rotations et points.</p>
+          </div>
+          <a href="/admin/tournoi" className="inline-flex bg-club-green text-white font-bold py-3 px-6 rounded-2xl hover:bg-emerald-800 transition-colors shadow-sm border-b-4 border-emerald-950 active:border-b-0 active:mt-[4px] items-center justify-center gap-2 text-sm w-fit">
+            <span>Ouvrir le simulateur 👉</span>
+          </a>
+        </div>
       </div>
 
       {!activeSeason ? (
