@@ -1,7 +1,7 @@
 import { getSessionUser } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import { createSeason, archiveSeason, createSession, updateSessionStatus, generatePools, finishSessionAndCalculatePoints, reopenSession, deleteSession, updateSessionCourtsAction, updateGlobalSettings, createCourtReservation, deleteCourtReservation, updateReservationDefaultLevel } from "./actions";
+import { createSeason, archiveSeason, createSession, updateSessionStatus, generatePools, finishSessionAndCalculatePoints, reopenSession, deleteSession, updateSessionCourtsAction, updateGlobalSettings, createCourtReservation, deleteCourtReservation, updateReservationDefaultLevel, toggleSessionTournamentAction } from "./actions";
 import SubmitButton from "@/components/SubmitButton";
 import DeleteSessionButton from "./DeleteSessionButton";
 
@@ -159,6 +159,13 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                 <label className="block text-sm font-bold text-club-green mb-2">Terrains</label>
                 <input name="courts" type="number" min="1" max="20" defaultValue="1" className="border-2 border-gray-200 p-3 rounded-xl w-full text-gray-700 bg-white focus:border-blue-500 focus:ring-0" required />
               </div>
+              <label className="flex items-center gap-2.5 bg-blue-50 hover:bg-blue-100/70 transition-colors border-2 border-blue-200 px-4 py-3 rounded-xl cursor-pointer select-none">
+                <input type="checkbox" name="isTournament" value="true" className="w-5 h-5 text-blue-700 rounded focus:ring-blue-500" />
+                <div className="flex flex-col">
+                  <span className="text-xs font-black text-blue-800 uppercase tracking-wider">🏆 Mode Tournoi</span>
+                  <span className="text-[10px] font-bold text-blue-600">Paires fixes (poules 2 par 2)</span>
+                </div>
+              </label>
               <SubmitButton pendingText="Création..." className="bg-club-green text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-700 shadow-md transition-colors whitespace-nowrap">
                 + Créer la session
               </SubmitButton>
@@ -168,7 +175,7 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
               {activeSessions.map(session => (
                 <div key={session.id} className={`border-2 rounded-2xl p-6 flex flex-col w-full transition-all ${
                   session.status === 'PREVUE' ? 'border-gray-200 bg-gray-50' : 
-                  session.status === 'INSCRIPTIONS_OUVERTES' ? 'border-green-400 bg-green-50 shadow-md transform scale-[1.01]' : 
+                  session.status === 'INSCRIPTIONS_OUVERTES' ? (session.isTournament ? 'border-blue-400 bg-blue-50/60 shadow-md transform scale-[1.01]' : 'border-green-400 bg-green-50 shadow-md transform scale-[1.01]') : 
                   session.status === 'POULES_GENEREES' ? 'border-orange-400 bg-orange-50' : 
                   session.status === 'POULES_EN_ATTENTE' ? 'border-red-400 bg-red-50 shadow-md animate-pulse' : 
                   'border-gray-100 opacity-70'
@@ -176,10 +183,15 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                   {/* Ligne du haut : Infos & Boutons d'action */}
                   <div className="flex flex-col sm:flex-row gap-4 justify-between items-center w-full">
                   <div>
-                    <div className="font-black text-xl text-gray-800">
-                      {new Date(session.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit' }).replace(':', 'h')}
+                    <div className="font-black text-xl text-gray-800 flex flex-wrap items-center gap-2">
+                      <span>{new Date(session.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit' }).replace(':', 'h')}</span>
+                      {session.isTournament && (
+                        <span className="bg-blue-700 text-white text-xs font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                          🏆 Tournoi (Paires Fixes)
+                        </span>
+                      )}
                     </div>
-                    <div className="mt-2 flex items-center gap-2">
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
                       <span className="text-sm text-gray-500 font-medium">Statut actuel :</span>
                       <a href={`/session/${session.id}`} className={`px-3 py-1 text-xs font-bold rounded-full hover:scale-105 hover:shadow-md transition-all ${
                         session.status === 'PREVUE' ? 'bg-gray-200 text-gray-700' : 
@@ -190,6 +202,17 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                       }`}>
                         {session.status.replace('_', ' ')} 🔗
                       </a>
+                      {(session.status === 'PREVUE' || session.status === 'INSCRIPTIONS_OUVERTES') && (
+                        <form action={toggleSessionTournamentAction.bind(null, session.id, !session.isTournament)}>
+                          <SubmitButton pendingText="..." className={`px-3 py-1 text-xs font-bold rounded-full border transition-all ${
+                            session.isTournament
+                              ? 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
+                              : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+                          }`}>
+                            {session.isTournament ? 'Passer en Session Classique 🎾' : 'Passer en Mode Tournoi 🏆'}
+                          </SubmitButton>
+                        </form>
+                      )}
                     </div>
                   </div>
                   

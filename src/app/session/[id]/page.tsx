@@ -105,8 +105,14 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
       <div className="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-6">
         <div>
           <BackButton fallback="/" />
-          <h1 className="text-3xl font-black text-club-green flex items-center gap-3">
-            <span className="text-4xl">📅</span> Détails Session
+          <h1 className={`text-3xl font-black flex flex-wrap items-center gap-3 ${session.isTournament ? 'text-blue-800' : 'text-club-green'}`}>
+            <span className="text-4xl">{session.isTournament ? '🏆' : '📅'}</span>
+            <span>{session.isTournament ? 'Détails Session — Mode Tournoi' : 'Détails Session'}</span>
+            {session.isTournament && (
+              <span className="bg-blue-100 text-blue-800 border border-blue-200 text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
+                Paires Fixes (Poules 2 par 2)
+              </span>
+            )}
           </h1>
           <p className="text-gray-500 mt-2 font-medium capitalize">
             {new Date(session.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Paris' })}
@@ -115,13 +121,13 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col items-center text-center">
-           <span className="text-sm font-bold text-club-green mb-1">Terrains Ouverts</span>
-           <span className="text-3xl font-black text-club-green">{session.courts}</span>
+        <div className={`${session.isTournament ? 'bg-blue-50 border-blue-200' : 'bg-slate-50 border-slate-200'} p-4 rounded-2xl border flex flex-col items-center text-center`}>
+           <span className={`text-sm font-bold mb-1 ${session.isTournament ? 'text-blue-700' : 'text-club-green'}`}>Terrains Ouverts</span>
+           <span className={`text-3xl font-black ${session.isTournament ? 'text-blue-900' : 'text-club-green'}`}>{session.courts}</span>
         </div>
-        <div className="bg-green-50 p-4 rounded-2xl border border-green-100 flex flex-col items-center text-center">
-           <span className="text-sm font-bold text-green-600 mb-1">Places Totales</span>
-           <span className="text-3xl font-black text-green-900">{totalPlaces}</span>
+        <div className={`${session.isTournament ? 'bg-indigo-50 border-indigo-100' : 'bg-green-50 border-green-100'} p-4 rounded-2xl border flex flex-col items-center text-center`}>
+           <span className={`text-sm font-bold mb-1 ${session.isTournament ? 'text-indigo-600' : 'text-green-600'}`}>Places Totales</span>
+           <span className={`text-3xl font-black ${session.isTournament ? 'text-indigo-900' : 'text-green-900'}`}>{totalPlaces}</span>
         </div>
         <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100 flex flex-col items-center text-center">
            <span className="text-sm font-bold text-orange-600 mb-1">Inscrits</span>
@@ -149,14 +155,14 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
       {(session.status === 'POULES_GENEREES' || session.status === 'TERMINEE') && session.pools && session.pools.length > 0 && (
         <div className="mt-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-            <h2 className="text-2xl font-black text-club-green flex items-center gap-3">
-              <span className="text-3xl">🎾</span> Composition des Poules
+            <h2 className={`text-2xl font-black flex items-center gap-3 ${session.isTournament ? 'text-blue-800' : 'text-club-green'}`}>
+              <span className="text-3xl">🎾</span> {session.isTournament ? 'Composition des Poules (Mode Tournoi)' : 'Composition des Poules'}
             </h2>
             {isBoard && (
               <div data-html2canvas-ignore>
                 <WhatsAppShareButton 
                   elementIds={session.pools.map(p => `capture-pool-${p.id}`)}
-                  text={`🎾 Les Poules de la session sont prêtes !${
+                  text={`🎾 Les Poules de la session ${session.isTournament ? '(Mode Tournoi) ' : ''}sont prêtes !${
                     registrations.filter(r => !session.pools.some(p => p.players.some(pp => pp.userId === r.userId))).length > 0
                     ? "\n\n❌ Ne peuvent pas jouer cette session : " + registrations.filter(r => !session.pools.some(p => p.players.some(pp => pp.userId === r.userId))).map(r => r.user.nickname || r.user.name).join(", ")
                     : ""
@@ -185,20 +191,35 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {session.pools.map(pool => {
-              const allMatchesFinished = pool.matches && pool.matches.length === 3 && pool.matches.every(m => m.team1Games !== null && m.team2Games !== null);
+              const pairBaseLevel = pool.level % 2 === 1 ? pool.level : pool.level - 1;
+              const partnerLevel = pool.level % 2 === 1 ? pool.level + 1 : pool.level - 1;
+              const partnerPool = session.isTournament ? session.pools.find(p => p.level === partnerLevel) : undefined;
+              const isPairedTournament = Boolean(session.isTournament && partnerPool);
+
+              const allMatchesFinished = isPairedTournament
+                ? (pool.matches?.length === 3 && partnerPool?.matches?.length === 3 &&
+                   pool.matches.every(m => m.team1Games !== null && m.team2Games !== null) &&
+                   partnerPool.matches.every(m => m.team1Games !== null && m.team2Games !== null))
+                : (pool.matches && pool.matches.length === 3 && pool.matches.every(m => m.team1Games !== null && m.team2Games !== null));
+
               return (
-              <div key={pool.id} id={`capture-pool-${pool.id}`} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                 <div className="bg-club-green px-5 py-3 flex flex-wrap justify-between items-center text-white gap-2">
-                   <div className="flex items-center gap-3">
+              <div key={pool.id} id={`capture-pool-${pool.id}`} className={`bg-white rounded-2xl border shadow-sm overflow-hidden ${session.isTournament ? 'border-blue-200' : 'border-gray-200'}`}>
+                 <div className={`${session.isTournament ? 'bg-blue-800' : 'bg-club-green'} px-5 py-3 flex flex-wrap justify-between items-center text-white gap-2`}>
+                   <div className="flex flex-wrap items-center gap-2">
                      <h3 className="font-bold text-lg">Poule #{pool.level}</h3>
+                     {isPairedTournament && (
+                       <span className="text-xs font-bold bg-indigo-950/70 text-blue-200 px-2.5 py-1 rounded-full border border-blue-600">
+                         Binôme {Math.ceil(pool.level / 2)} (Poules {pairBaseLevel} & {pairBaseLevel + 1})
+                       </span>
+                     )}
                      {!isBoard && (
                         pool.courtReservation ? (
-                          <span className="text-sm font-medium bg-emerald-800 px-3 py-1 rounded-full border border-emerald-700 flex items-center gap-1">
+                          <span className={`text-sm font-medium px-3 py-1 rounded-full border flex items-center gap-1 ${session.isTournament ? 'bg-blue-900 border-blue-700' : 'bg-emerald-800 border-emerald-700'}`}>
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5h16M4 19h16M4 5v14M20 5v14M12 5v14M4 12h16"></path></svg>
                             {pool.courtReservation.club.name} Terrain {pool.courtReservation.name}
                           </span>
                         ) : (
-                          <span className="text-sm font-medium bg-emerald-800 px-3 py-1 rounded-full border border-emerald-700 flex items-center gap-1">
+                          <span className={`text-sm font-medium px-3 py-1 rounded-full border flex items-center gap-1 ${session.isTournament ? 'bg-blue-900 border-blue-700' : 'bg-emerald-800 border-emerald-700'}`}>
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5h16M4 19h16M4 5v14M20 5v14M12 5v14M4 12h16"></path></svg>
                             Terrain {pool.courtNumber}
                           </span>
@@ -206,7 +227,7 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                      )}
                    </div>
                    {isBoard ? (
-                     <form action={updatePoolSettings.bind(null, pool.id, session.id)} className="flex items-center gap-2 bg-emerald-800/50 p-1.5 rounded-xl flex-wrap">
+                     <form action={updatePoolSettings.bind(null, pool.id, session.id)} className={`flex items-center gap-2 p-1.5 rounded-xl flex-wrap ${session.isTournament ? 'bg-blue-900/60' : 'bg-emerald-800/50'}`}>
                        <PoolCourtSelect 
                          currentReservationId={pool.courtReservationId} 
                          reservations={session.reservations} 
@@ -219,37 +240,59 @@ export default async function SessionDetailsPage({ params }: { params: Promise<{
                    )}
                 </div>
                 <div className="p-4 flex flex-col gap-3">
-                   {pool.players.map(pt => (
-                      <div key={pt.userId} className={`flex items-center gap-3 p-2 rounded-xl border ${pt.userId === user.id ? 'border-orange-400 bg-orange-50' : 'border-gray-100 bg-gray-50'}`}>
-                         <div className="w-8 h-8 rounded-full bg-slate-100 text-emerald-800 font-bold flex items-center justify-center flex-shrink-0 text-xs">
+                   {pool.players.map((pt, idx) => {
+                      let partnerInfo: { teamNumber: number; partnerName: string } | null = null;
+                      if (isPairedTournament && partnerPool) {
+                        const isOddPool = pool.level % 2 === 1;
+                        const teamNum = isOddPool ? idx + 1 : 4 - idx;
+                        const partnerIdx = 3 - idx;
+                        const partnerPlayer = partnerPool.players[partnerIdx];
+                        if (partnerPlayer) {
+                          partnerInfo = {
+                            teamNumber: teamNum,
+                            partnerName: partnerPlayer.user.nickname || partnerPlayer.user.name.split(' ')[0]
+                          };
+                        }
+                      }
+
+                      return (
+                      <div key={pt.userId} className={`flex items-center gap-3 p-2 rounded-xl border ${pt.userId === user.id ? 'border-orange-400 bg-orange-50' : (session.isTournament ? 'border-blue-100 bg-blue-50/40' : 'border-gray-100 bg-gray-50')}`}>
+                         <div className={`w-8 h-8 rounded-full font-bold flex items-center justify-center flex-shrink-0 text-xs ${session.isTournament ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-emerald-800'}`}>
                            {pt.seed}
                          </div>
-                         <div className="flex-1 flex items-baseline gap-2">
-                           <span className="font-bold text-gray-800 text-base flex items-center gap-1">
-                             {(pt.user.stars || 0) > 0 && <span className="text-yellow-400">{'⭐'.repeat(pt.user.stars)}</span>}
-                             {pt.user.nickname || pt.user.name}
-                           </span>
-                           {pt.user.nickname && <span className="text-xs font-medium text-gray-500">{pt.user.name}</span>}
+                         <div className="flex-1 flex flex-col">
+                           <div className="flex items-baseline gap-2 flex-wrap">
+                             <span className="font-bold text-gray-800 text-base flex items-center gap-1">
+                               {(pt.user.stars || 0) > 0 && <span className="text-yellow-400">{'⭐'.repeat(pt.user.stars)}</span>}
+                               {pt.user.nickname || pt.user.name}
+                             </span>
+                             {pt.user.nickname && <span className="text-xs font-medium text-gray-500">{pt.user.name}</span>}
+                           </div>
+                           {partnerInfo && (
+                             <span className="text-[11px] font-bold text-blue-700 mt-0.5">
+                               🤝 Équipe {partnerInfo.teamNumber} avec {partnerInfo.partnerName}
+                             </span>
+                           )}
                          </div>
-                         <div className="text-xs font-bold text-blue-500 bg-slate-100 px-2 py-1 rounded-lg">
+                         <div className={`text-xs font-bold px-2 py-1 rounded-lg ${session.isTournament ? 'text-blue-700 bg-white border border-blue-100' : 'text-blue-500 bg-slate-100'}`}>
                            {(pt.user.averagePoints || 0).toFixed(2).replace('.', ',')} pts
                          </div>
                       </div>
-                   ))}
+                   )})}
                    {allMatchesFinished ? (
                      <div className="mt-2 flex flex-col gap-2">
-                       <a href={`/session/${session.id}/results`} className="flex items-center justify-center gap-2 text-sm font-bold text-green-700 bg-green-50 hover:bg-green-100 py-2.5 rounded-xl transition-colors border border-green-200">
+                       <a href={`/session/${session.id}/results`} className={`flex items-center justify-center gap-2 text-sm font-bold py-2.5 rounded-xl transition-colors border ${session.isTournament ? 'text-blue-700 bg-blue-50 hover:bg-blue-100 border-blue-200' : 'text-green-700 bg-green-50 hover:bg-green-100 border-green-200'}`}>
                          ✅ Voir les résultats définitifs 👉
                        </a>
-                       {(isBoard || pool.players[0]?.userId === user.id) && (
+                       {(isBoard || pool.players[0]?.userId === user.id || (partnerPool && partnerPool.players[0]?.userId === user.id)) && (
                          <a href={`/pool/${pool.id}`} className="text-center text-xs font-bold text-orange-600 hover:text-orange-700 bg-white py-1.5 rounded-xl transition-colors border border-orange-100 shadow-sm">
                            ✏️ Modifier les scores
                          </a>
                        )}
                      </div>
                    ) : (
-                     <a href={`/pool/${pool.id}`} className="mt-2 text-center text-sm font-bold text-orange-600 hover:text-orange-700 bg-orange-50 hover:bg-orange-100 py-2.5 rounded-xl transition-colors border border-orange-100">
-                       Voir la poule et les matchs 👉
+                     <a href={`/pool/${pool.id}`} className={`mt-2 text-center text-sm font-bold py-2.5 rounded-xl transition-colors border ${session.isTournament ? 'text-blue-700 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border-blue-200' : 'text-orange-600 hover:text-orange-700 bg-orange-50 hover:bg-orange-100 border-orange-100'}`}>
+                       {isPairedTournament ? `Voir le binôme (Poules #${pairBaseLevel} & #${pairBaseLevel + 1}) et les matchs 👉` : 'Voir la poule et les matchs 👉'}
                      </a>
                    )}
                 </div>

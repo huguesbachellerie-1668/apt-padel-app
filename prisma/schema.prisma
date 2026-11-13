@@ -56,6 +56,7 @@ model Session {
   status            String             @default("PREVUE")
   courts            Int                @default(0)
   isCounted         Boolean            @default(true)
+  isTournament      Boolean            @default(false)
   activityLogs      ActivityLog[]
   reservations      CourtReservation[]
   pools             Pool[]

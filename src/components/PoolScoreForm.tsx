@@ -24,18 +24,73 @@ type PoolWithDetails = Prisma.PoolGetPayload<{
 
 type PoolScoreFormProps = {
   pool: PoolWithDetails;
+  partnerPool?: PoolWithDetails | null;
   nextSession: { id: string; date: Date } | null;
   canEditScores: boolean;
 };
 
-export default function PoolScoreForm({ pool, nextSession, canEditScores }: PoolScoreFormProps) {
-  const allMatchesFinishedInitial = pool.matches.length === 3 && pool.matches.every(m => m.team1Games !== null && m.team2Games !== null);
+export default function PoolScoreForm({ pool, partnerPool, nextSession, canEditScores }: PoolScoreFormProps) {
+  const isPairedTournament = Boolean(pool.session.isTournament && partnerPool);
+  const poolA = isPairedTournament && partnerPool
+    ? (pool.level < partnerPool.level ? pool : partnerPool)
+    : pool;
+  const poolB = isPairedTournament && partnerPool
+    ? (pool.level < partnerPool.level ? partnerPool : pool)
+    : null;
+
+  // Build ordered list of matches to display (3 for classic, 6 for paired tournament)
+  const displayMatches = (() => {
+    if (!isPairedTournament || !poolB) {
+      return pool.matches.map((m, idx) => ({
+        formIndex: idx + 1,
+        match: m,
+        label: `Match ${m.order}`,
+        subLabel: null as string | null,
+      }));
+    }
+    const items: {
+      formIndex: number;
+      match: PoolWithDetails['matches'][0];
+      label: string;
+      subLabel: string | null;
+    }[] = [];
+    for (let rot = 1; rot <= 3; rot++) {
+      const mA = poolA.matches.find(m => m.order === rot);
+      const mB = poolB.matches.find(m => m.order === rot);
+      if (mA) {
+        items.push({
+          formIndex: items.length + 1,
+          match: mA,
+          label: `Rotation ${rot} — Terrain ${poolA.level}`,
+          subLabel: rot === 1 ? 'Équipe 1 vs Équipe 2' : rot === 2 ? 'Équipe 1 vs Équipe 3' : 'Équipe 1 vs Équipe 4'
+        });
+      }
+      if (mB) {
+        items.push({
+          formIndex: items.length + 1,
+          match: mB,
+          label: `Rotation ${rot} — Terrain ${poolB.level}`,
+          subLabel: rot === 1 ? 'Équipe 3 vs Équipe 4' : rot === 2 ? 'Équipe 2 vs Équipe 4' : 'Équipe 2 vs Équipe 3'
+        });
+      }
+    }
+    return items;
+  })();
+
+  const allPlayers = isPairedTournament && poolB
+    ? [...poolA.players, ...poolB.players]
+    : pool.players;
+
+  const totalExpectedMatches = displayMatches.length;
+  const allMatchesFinishedInitial =
+    displayMatches.length === totalExpectedMatches &&
+    displayMatches.every(dm => dm.match.team1Games !== null && dm.match.team2Games !== null);
   
-  const [currentScores, setCurrentScores] = useState<Record<string, {t1: string, t2: string}>>(() => {
-     const init: Record<string, {t1: string, t2: string}> = {};
-     pool.matches.forEach(m => {
-         if (m.team1Games !== null && m.team2Games !== null) {
-             init[m.order] = { t1: String(m.team1Games), t2: String(m.team2Games) };
+  const [currentScores, setCurrentScores] = useState<Record<number, {t1: string, t2: string}>>(() => {
+     const init: Record<number, {t1: string, t2: string}> = {};
+     displayMatches.forEach(dm => {
+         if (dm.match.team1Games !== null && dm.match.team2Games !== null) {
+             init[dm.formIndex] = { t1: String(dm.match.team1Games), t2: String(dm.match.team2Games) };
          }
      });
      return init;
@@ -50,11 +105,12 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
   // Initialize checklist state securely
   useEffect(() => {
      const st: Record<string, boolean> = {};
-     pool.players.forEach(p => {
+     allPlayers.forEach(p => {
         st[p.userId] = true; // Par défaut: inscrits
      });
      setPlayersNextStatus(st);
-  }, [pool.players]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pool.id, partnerPool?.id]);
 
   // Listen to input changes dynamically without React formal state bindings
   const handleInputBlur = () => {
@@ -62,8 +118,8 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
      const formData = new FormData(formRef.current);
      
      let allFilled = true;
-     const newScores: Record<string, {t1: string, t2: string}> = {};
-     for (let i = 1; i <= 3; i++) {
+     const newScores: Record<number, {t1: string, t2: string}> = {};
+     for (let i = 1; i <= totalExpectedMatches; i++) {
         const t1 = formData.get(`m${i}_t1`) as string;
         const t2 = formData.get(`m${i}_t2`) as string;
         if (!t1 || !t2) {
@@ -82,9 +138,12 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
   };
 
   const generateWhatsAppText = () => {
-      let text = `🎾 *Scores Poule ${pool.level}*\n\n`;
-      pool.matches.forEach(m => {
-          const s = currentScores[m.order];
+      let text = isPairedTournament && poolB
+        ? `🏆 *Scores Tournoi — Poules ${poolA.level} & ${poolB.level}*\n\n`
+        : `🎾 *Scores Poule ${pool.level}*\n\n`;
+      displayMatches.forEach(dm => {
+          const m = dm.match;
+          const s = currentScores[dm.formIndex];
           if (s) {
               const p1 = m.team1Player1.nickname || m.team1Player1.name.split(' ')[0];
               const p2 = m.team1Player2.nickname || m.team1Player2.name.split(' ')[0];
@@ -93,14 +152,15 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
               text += `${p1} & ${p2}  *${s.t1} - ${s.t2}*  ${p3} & ${p4}\n`;
           }
       });
-      const standings = pool.players.map(pt => {
+      const standings = allPlayers.map(pt => {
           let sessionPoints = 0;
           let wins = 0;
           let draws = 0;
           let losses = 0;
           
-          pool.matches.forEach(m => {
-              const s = currentScores[m.order];
+          displayMatches.forEach(dm => {
+              const m = dm.match;
+              const s = currentScores[dm.formIndex];
               if (!s) return;
               
               const isTeam1 = m.team1Player1Id === pt.userId || m.team1Player2Id === pt.userId;
@@ -122,19 +182,23 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
       });
       
       standings.sort((a, b) => b.sessionPoints - a.sessionPoints);
-      const topPlayer = standings.find(s => s.wins === 3 || (s.wins === 2 && s.draws === 1));
-      const flopPlayer = [...standings].reverse().find(s => s.losses === 3);
+      const topPlayers = standings.filter(s => s.wins === 3 || (s.wins === 2 && s.draws === 1));
+      const flopPlayers = standings.filter(s => s.losses === 3);
       
-      if (topPlayer || flopPlayer) {
+      if (topPlayers.length > 0 || flopPlayers.length > 0) {
           text += `\n`;
-          if (topPlayer) text += `🏆 *TOP* : ${topPlayer.player.nickname || topPlayer.player.name.split(' ')[0]} (Moy: ${(topPlayer.sessionPoints / 3).toFixed(2).replace('.', ',')})\n`;
-          if (flopPlayer) text += `💩 *FLOP* : ${flopPlayer.player.nickname || flopPlayer.player.name.split(' ')[0]} (Moy: ${(flopPlayer.sessionPoints / 3).toFixed(2).replace('.', ',')})\n`;
+          if (topPlayers.length > 0) {
+              text += `🏆 *TOP* : ${topPlayers.map(tp => `${tp.player.nickname || tp.player.name.split(' ')[0]} (Moy: ${(tp.sessionPoints / 3).toFixed(2).replace('.', ',')})`).join(', ')}\n`;
+          }
+          if (flopPlayers.length > 0) {
+              text += `💩 *FLOP* : ${flopPlayers.map(fp => `${fp.player.nickname || fp.player.name.split(' ')[0]} (Moy: ${(fp.sessionPoints / 3).toFixed(2).replace('.', ',')})`).join(', ')}\n`;
+          }
       }
 
       if (nextSession) {
           text += `\n📅 *Présents prochaine session (${new Date(nextSession.date).toLocaleDateString('fr-FR')})* :\n`;
           let hasPresences = false;
-          pool.players.forEach(p => {
+          allPlayers.forEach(p => {
               if (playersNextStatus[p.userId]) {
                   text += `- ${p.user.nickname || p.user.name.split(' ')[0]}\n`;
                   hasPresences = true;
@@ -177,63 +241,75 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
     }
   };
 
+  const isTournamentStyle = Boolean(pool.session.isTournament);
+
   return (
     <>
       <form ref={formRef} action={saveScoresAction} className="space-y-8" onBlur={handleInputBlur}>
           <input type="hidden" name="poolId" value={pool.id} />
+          {partnerPool && <input type="hidden" name="partnerPoolId" value={partnerPool.id} />}
           <input type="hidden" name="sessionId" value={pool.sessionId} />
           
-          {pool.matches.map(m => (
-              <div key={m.id} className="border-2 border-gray-100 rounded-2xl overflow-hidden hover:border-orange-200 transition-colors">
-                  <div className="bg-gradient-to-r from-club-green to-emerald-800 px-5 py-3 font-bold text-white flex justify-between">
-                    <span>Match {m.order}</span>
-                    {m.team1Games !== null ? <span className="text-orange-300 text-sm">Terminé</span> : <span className="text-blue-300 text-sm">En attente</span>}
+          {displayMatches.map(dm => {
+              const m = dm.match;
+              return (
+              <div key={m.id} className={`border-2 rounded-2xl overflow-hidden transition-colors ${isTournamentStyle ? 'border-blue-100 hover:border-blue-300' : 'border-gray-100 hover:border-orange-200'}`}>
+                  <div className={`px-5 py-3 font-bold text-white flex flex-wrap justify-between items-center gap-2 ${isTournamentStyle ? 'bg-gradient-to-r from-blue-800 to-indigo-900' : 'bg-gradient-to-r from-club-green to-emerald-800'}`}>
+                    <div className="flex items-center gap-2">
+                      <span>{dm.label}</span>
+                      {dm.subLabel && (
+                        <span className="text-xs font-bold bg-blue-950/60 text-blue-200 px-2.5 py-0.5 rounded-full border border-blue-600">
+                          {dm.subLabel}
+                        </span>
+                      )}
+                    </div>
+                    {m.team1Games !== null ? <span className="text-orange-300 text-sm">Terminé</span> : <span className="text-blue-200 text-sm">En attente</span>}
                   </div>
                   <div className="flex flex-col md:flex-row p-6 gap-6 items-center justify-between bg-white">
-                      <input type="hidden" name={`m${m.order}_id`} value={m.id} />
+                      <input type="hidden" name={`m${dm.formIndex}_id`} value={m.id} />
                       
                       <div className="flex-1 text-center md:text-right">
-                          <div className="font-black text-xl text-orange-900 bg-orange-50 px-4 py-2 rounded-xl inline-block border border-orange-200 shadow-sm">
+                          <div className={`font-black text-xl px-4 py-2 rounded-xl inline-block border shadow-sm ${isTournamentStyle ? 'text-blue-900 bg-blue-50 border-blue-200' : 'text-orange-900 bg-orange-50 border-orange-200'}`}>
                             {m.team1Player1.nickname || m.team1Player1.name.split(' ')[0]} <span className="text-gray-400">&</span> {m.team1Player2.nickname || m.team1Player2.name.split(' ')[0]}
                           </div>
                       </div>
                       
                       {canEditScores && pool.session.status !== 'TERMINEE' ? (
                           <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-2xl border border-gray-200">
-                              <input type="number" name={`m${m.order}_t1`} defaultValue={m.team1Games ?? ''} min="0" max="20" placeholder="Jeux" required className="w-20 h-14 border-2 border-orange-300 rounded-xl text-center font-black text-2xl text-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-200" />
+                              <input type="number" name={`m${dm.formIndex}_t1`} defaultValue={m.team1Games ?? ''} min="0" max="20" placeholder="Jeux" required className={`w-20 h-14 border-2 rounded-xl text-center font-black text-2xl focus:outline-none focus:ring-4 ${isTournamentStyle ? 'border-blue-300 text-blue-700 focus:ring-blue-200' : 'border-orange-300 text-orange-600 focus:ring-orange-200'}`} />
                               <span className="font-black text-gray-400 text-2xl">-</span>
-                              <input type="number" name={`m${m.order}_t2`} defaultValue={m.team2Games ?? ''} min="0" max="20" placeholder="Jeux" required className="w-20 h-14 border-2 border-green-300 rounded-xl text-center font-black text-2xl text-green-600 focus:outline-none focus:ring-4 focus:ring-green-200" />
+                              <input type="number" name={`m${dm.formIndex}_t2`} defaultValue={m.team2Games ?? ''} min="0" max="20" placeholder="Jeux" required className={`w-20 h-14 border-2 rounded-xl text-center font-black text-2xl focus:outline-none focus:ring-4 ${isTournamentStyle ? 'border-indigo-300 text-indigo-700 focus:ring-indigo-200' : 'border-green-300 text-green-600 focus:ring-green-200'}`} />
                           </div>
                       ) : (
                           <div className="flex items-center gap-6 font-black text-4xl">
-                              <span className={m.winningTeam === 1 ? 'text-orange-500' : m.team1Games !== null ? 'text-gray-800' : 'text-gray-300'}>{m.team1Games ?? '-'}</span>
+                              <span className={m.winningTeam === 1 ? (isTournamentStyle ? 'text-blue-600' : 'text-orange-500') : m.team1Games !== null ? 'text-gray-800' : 'text-gray-300'}>{m.team1Games ?? '-'}</span>
                               <span className="text-gray-200 text-2xl">-</span>
-                              <span className={m.winningTeam === 2 ? 'text-green-500' : m.team2Games !== null ? 'text-gray-800' : 'text-gray-300'}>{m.team2Games ?? '-'}</span>
+                              <span className={m.winningTeam === 2 ? (isTournamentStyle ? 'text-indigo-600' : 'text-green-500') : m.team2Games !== null ? 'text-gray-800' : 'text-gray-300'}>{m.team2Games ?? '-'}</span>
                           </div>
                       )}
 
                       <div className="flex-1 text-center md:text-left">
-                          <div className="font-black text-xl text-green-900 bg-green-50 px-4 py-2 rounded-xl inline-block border border-green-100">
+                          <div className={`font-black text-xl px-4 py-2 rounded-xl inline-block border ${isTournamentStyle ? 'text-indigo-900 bg-indigo-50 border-indigo-200' : 'text-green-900 bg-green-50 border-green-100'}`}>
                             {m.team2Player1.nickname || m.team2Player1.name.split(' ')[0]} <span className="text-gray-400">&</span> {m.team2Player2.nickname || m.team2Player2.name.split(' ')[0]}
                           </div>
                       </div>
                   </div>
               </div>
-          ))}
+          )})}
           
           {canEditScores && pool.session.status !== 'TERMINEE' && (
               <div className="text-center pt-8 border-t border-gray-200">
                   {allMatchesFinishedInitial || hasPromptedModal ? (
                       <div className="flex flex-col items-center gap-4">
-                        <button type="button" onClick={() => setShowModal(true)} className="bg-green-500 hover:bg-green-600 text-white font-black py-4 px-10 rounded-2xl shadow-xl transition-transform transform hover:scale-[1.02] text-lg w-full md:w-auto animate-bounce-short">
+                        <button type="button" onClick={() => setShowModal(true)} className={`${isTournamentStyle ? 'bg-blue-700 hover:bg-blue-800' : 'bg-green-500 hover:bg-green-600'} text-white font-black py-4 px-10 rounded-2xl shadow-xl transition-transform transform hover:scale-[1.02] text-lg w-full md:w-auto animate-bounce-short`}>
                             ✅ Finaliser la session 👉
                         </button>
                       </div>
                   ) : (
                       <>
-                        <p className="text-gray-500 mb-4 text-sm font-medium">Assurez-vous que les scores des {pool.matches.length} matchs sont saisis.</p>
+                        <p className="text-gray-500 mb-4 text-sm font-medium">Assurez-vous que les scores des {totalExpectedMatches} matchs sont saisis.</p>
                         <input type="hidden" name="redirect" value="false" />
-                        <SubmitButton pendingText="Sauvegarde..." formAction={saveScoresAction} className="bg-orange-500 hover:bg-orange-600 text-white font-black py-4 px-10 rounded-2xl shadow-xl transition-transform transform hover:scale-[1.02] text-lg w-full md:w-auto">
+                        <SubmitButton pendingText="Sauvegarde..." formAction={saveScoresAction} className={`${isTournamentStyle ? 'bg-blue-700 hover:bg-blue-800' : 'bg-orange-500 hover:bg-orange-600'} text-white font-black py-4 px-10 rounded-2xl shadow-xl transition-transform transform hover:scale-[1.02] text-lg w-full md:w-auto`}>
                             💾 Enregistrer les scores provisoires
                         </SubmitButton>
                       </>
@@ -246,7 +322,7 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
       {showModal && (
         <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl animate-fade-in-up max-h-[90vh] flex flex-col">
-               <div className="bg-gradient-to-r from-club-green to-emerald-800 p-6 text-white text-center relative shrink-0">
+               <div className={`${isTournamentStyle ? 'bg-gradient-to-r from-blue-800 to-indigo-900' : 'bg-gradient-to-r from-club-green to-emerald-800'} p-6 text-white text-center relative shrink-0`}>
                   <button onClick={() => setShowModal(false)} type="button" className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors">
                       <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                   </button>
@@ -258,7 +334,7 @@ export default function PoolScoreForm({ pool, nextSession, canEditScores }: Pool
                </div>
                
                <div className="p-6 space-y-4 overflow-y-auto">
-                  {nextSession && pool.players.map(p => {
+                  {nextSession && allPlayers.map(p => {
                      const isYes = playersNextStatus[p.userId] === true;
                      return (
                         <div key={p.userId} className="flex justify-between items-center p-3 sm:p-4 border border-gray-100 rounded-2xl bg-gray-50">

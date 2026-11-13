@@ -62,18 +62,24 @@ export default function SessionCard({
       {/* Card 1: Inscription & Présence */}
       <section className="card-club rounded-3xl p-6 relative overflow-hidden">
         <div className="flex flex-wrap justify-between items-center mb-5 gap-4">
-          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span className="text-2xl">📋</span> {sessionTitle}
+          <h2 className="text-xl font-bold text-slate-800 flex flex-wrap items-center gap-2">
+            <span className="text-2xl">{activeSession.isTournament ? '🏆' : '📋'}</span>
+            <span>{sessionTitle}</span>
+            {activeSession.isTournament && (
+              <span className="bg-blue-700 text-white text-xs font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                Mode Tournoi (Paires Fixes)
+              </span>
+            )}
           </h2>
           {activeSession.status !== 'POULES_GENEREES' && (
-            <span className={`px-3 py-1 text-xs font-bold rounded-full ${activeSession.status === 'INSCRIPTIONS_OUVERTES' ? 'bg-club-green text-white shadow-sm' : activeSession.status === 'POULES_EN_ATTENTE' ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
+            <span className={`px-3 py-1 text-xs font-bold rounded-full ${activeSession.status === 'INSCRIPTIONS_OUVERTES' ? (activeSession.isTournament ? 'bg-blue-700 text-white shadow-sm' : 'bg-club-green text-white shadow-sm') : activeSession.status === 'POULES_EN_ATTENTE' ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
               {activeSession.status.replace(/_/g, ' ')}
             </span>
           )}
         </div>
         
         <div className="flex flex-wrap items-center gap-3 mb-5">
-          <p className="text-md text-club-green font-black capitalize bg-club-green-light/50 p-3 rounded-xl border border-club-green-light inline-block m-0">
+          <p className={`text-md font-black capitalize p-3 rounded-xl border inline-block m-0 ${activeSession.isTournament ? 'text-blue-800 bg-blue-50 border-blue-200' : 'text-club-green bg-club-green-light/50 border-club-green-light'}`}>
              Dimanche {new Date(activeSession.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit' }).replace(':', 'h').replace(' à ', ' à partir de ')}
           </p>
         </div>
@@ -155,8 +161,8 @@ export default function SessionCard({
           </div>
         )}
         
-        <a href={`/session/${activeSession.id}`} className="block text-center text-lg font-black text-white bg-club-green hover:bg-emerald-700 shadow-md py-4 rounded-xl transition-all hover:scale-[1.02]">
-            🔎  Voir la Session 👉
+        <a href={`/session/${activeSession.id}`} className={`block text-center text-lg font-black text-white shadow-md py-4 rounded-xl transition-all hover:scale-[1.02] ${activeSession.isTournament ? 'bg-blue-700 hover:bg-blue-800' : 'bg-club-green hover:bg-emerald-700'}`}>
+            🔎  Voir la Session {activeSession.isTournament ? '(Mode Tournoi) ' : ''}👉
         </a>
       </section>
 
@@ -165,30 +171,30 @@ export default function SessionCard({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* Card 2: My Matches Input */}
-          <section className="bg-emerald-50 border border-emerald-100 rounded-3xl shadow-sm p-6 text-slate-800 relative overflow-hidden group flex flex-col">
-              <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-200 opacity-20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
-              <h2 className="text-xl font-black mb-6 flex items-center gap-2 relative z-10 text-emerald-800">
+          <section className={`${activeSession.isTournament ? 'bg-blue-50 border-blue-200' : 'bg-emerald-50 border-emerald-100'} border rounded-3xl shadow-sm p-6 text-slate-800 relative overflow-hidden group flex flex-col`}>
+              <div className={`absolute -top-10 -right-10 w-32 h-32 opacity-20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700 ${activeSession.isTournament ? 'bg-blue-300' : 'bg-emerald-200'}`}></div>
+              <h2 className={`text-xl font-black mb-6 flex items-center gap-2 relative z-10 ${activeSession.isTournament ? 'text-blue-800' : 'text-emerald-800'}`}>
                 <span className="text-2xl">🎾</span> Saisie des Scores
               </h2>
               {userPoolPlayer ? (
                 <div className="space-y-4 relative z-10 flex flex-col h-full justify-between">
-                  <div className="bg-white/60 p-5 border border-emerald-100 rounded-2xl backdrop-blur-sm flex flex-col gap-1">
-                    <p className="text-3xl font-black text-emerald-800 mb-2">Poule #{userPoolPlayer.pool.level}</p>
+                  <div className={`bg-white/60 p-5 border rounded-2xl backdrop-blur-sm flex flex-col gap-1 ${activeSession.isTournament ? 'border-blue-200' : 'border-emerald-100'}`}>
+                    <p className={`text-3xl font-black mb-2 ${activeSession.isTournament ? 'text-blue-800' : 'text-emerald-800'}`}>Poule #{userPoolPlayer.pool.level}</p>
                     {userPoolPlayer.pool.courtReservation && (
                       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-1">
-                          <div className="bg-white text-emerald-700 px-4 py-3 rounded-xl border border-emerald-100 shadow-sm flex items-center justify-center gap-2 text-xl font-black">
+                          <div className={`bg-white px-4 py-3 rounded-xl border shadow-sm flex items-center justify-center gap-2 text-xl font-black ${activeSession.isTournament ? 'text-blue-700 border-blue-100' : 'text-emerald-700 border-emerald-100'}`}>
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 5h16M4 19h16M4 5v14M20 5v14M12 5v14M4 12h16"></path></svg> 
                             {userPoolPlayer.pool.courtReservation.name}
                           </div>
-                          <div className="bg-white text-emerald-700 px-4 py-3 rounded-xl border border-emerald-100 shadow-sm flex items-center justify-center gap-2 text-xl font-black">
+                          <div className={`bg-white px-4 py-3 rounded-xl border shadow-sm flex items-center justify-center gap-2 text-xl font-black ${activeSession.isTournament ? 'text-blue-700 border-blue-100' : 'text-emerald-700 border-emerald-100'}`}>
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 
                             {userPoolPlayer.pool.courtReservation.startTime}
                           </div>
                       </div>
                     )}
                   </div>
-                  <a href={`/pool/${userPoolPlayer.poolId}`} className="block text-center bg-club-green text-white font-black py-4 px-6 rounded-xl transition-all transform hover:scale-105 shadow-md hover:bg-emerald-700">
-                    Voir Ma Poule 👉
+                  <a href={`/pool/${userPoolPlayer.poolId}`} className={`block text-center text-white font-black py-4 px-6 rounded-xl transition-all transform hover:scale-105 shadow-md ${activeSession.isTournament ? 'bg-blue-700 hover:bg-blue-800' : 'bg-club-green hover:bg-emerald-700'}`}>
+                    Voir Ma Poule {activeSession.isTournament ? '(Binôme) ' : ''}👉
                   </a>
                 </div>
               ) : (

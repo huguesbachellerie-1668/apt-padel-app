@@ -98,6 +98,7 @@ export async function createSession(formData: FormData) {
   const dateStr = `${datePart}T${timePart}`;
   const seasonId = formData.get('seasonId') as string;
   const courts = parseInt(formData.get('courts') as string) || 0;
+  const isTournament = formData.get('isTournament') === 'true';
   
   const targetDate = new Date(dateStr);
   
@@ -127,11 +128,22 @@ export async function createSession(formData: FormData) {
       seasonId,
       date: targetDate,
       status: 'PREVUE',
-      courts
+      courts,
+      isTournament
     }
   });
   revalidatePath('/admin');
   revalidatePath('/');
+}
+
+export async function toggleSessionTournamentAction(sessionId: string, isTournament: boolean) {
+  await prisma.session.update({
+    where: { id: sessionId },
+    data: { isTournament }
+  });
+  revalidatePath('/admin');
+  revalidatePath('/');
+  revalidatePath(`/session/${sessionId}`);
 }
 
 export async function updateSessionStatus(sessionId: string, status: string) {
@@ -150,6 +162,13 @@ export async function generatePools(formData: FormData) {
 
   if (courtsCount < 1) return;
 
+  const session = await prisma.session.findUnique({ where: { id: sessionId } });
+  if (!session) return;
+
+  const isTournament = formData.get('isTournament') !== null
+    ? formData.get('isTournament') === 'true'
+    : Boolean(session.isTournament);
+
   const registrations = await prisma.registration.findMany({
     where: { sessionId },
     include: { user: true },
@@ -157,7 +176,9 @@ export async function generatePools(formData: FormData) {
   });
 
   const totalPossiblePools = Math.floor(registrations.length / 4);
-  const actualPoolsCount = Math.min(totalPossiblePools, courtsCount);
+  const actualPoolsCount = isTournament
+    ? Math.min(totalPossiblePools, courtsCount, 10)
+    : Math.min(totalPossiblePools, courtsCount);
 
   if (actualPoolsCount < 1) return;
 
@@ -427,6 +448,8 @@ export async function generatePools(formData: FormData) {
   });
 
   // --- Save to DB
+  const createdPools: { pool: { id: string; level: number }; poolUsers: typeof finalUsers }[] = [];
+
   for (let level = 1; level <= actualPoolsCount; level++) {
     const poolUsers = finalUsers.slice((level - 1) * 4, level * 4);
     
@@ -450,19 +473,65 @@ export async function generatePools(formData: FormData) {
       });
     }));
 
-    const pU = poolUsers;
-    await prisma.match.create({ data: { poolId: pool.id, order: 1, team1Player1Id: pU[0].id, team1Player2Id: pU[3].id, team2Player1Id: pU[1].id, team2Player2Id: pU[2].id } });
-    await prisma.match.create({ data: { poolId: pool.id, order: 2, team1Player1Id: pU[0].id, team1Player2Id: pU[2].id, team2Player1Id: pU[1].id, team2Player2Id: pU[3].id } });
-    await prisma.match.create({ data: { poolId: pool.id, order: 3, team1Player1Id: pU[0].id, team1Player2Id: pU[1].id, team2Player1Id: pU[2].id, team2Player2Id: pU[3].id } });
+    createdPools.push({ pool, poolUsers });
+  }
+
+  if (!isTournament) {
+    for (const { pool, poolUsers: pU } of createdPools) {
+      await prisma.match.create({ data: { poolId: pool.id, order: 1, team1Player1Id: pU[0].id, team1Player2Id: pU[3].id, team2Player1Id: pU[1].id, team2Player2Id: pU[2].id } });
+      await prisma.match.create({ data: { poolId: pool.id, order: 2, team1Player1Id: pU[0].id, team1Player2Id: pU[2].id, team2Player1Id: pU[1].id, team2Player2Id: pU[3].id } });
+      await prisma.match.create({ data: { poolId: pool.id, order: 3, team1Player1Id: pU[0].id, team1Player2Id: pU[1].id, team2Player1Id: pU[2].id, team2Player2Id: pU[3].id } });
+    }
+  } else {
+    // Mode Tournoi : Poules couplées 2 par 2 avec paires fixes
+    const pairsCount = Math.floor(createdPools.length / 2);
+    for (let k = 0; k < pairsCount; k++) {
+      const { pool: poolA, poolUsers: pA } = createdPools[2 * k];
+      const { pool: poolB, poolUsers: pB } = createdPools[2 * k + 1];
+
+      // 4 Équipes fixes croisées :
+      // Éq.1: #1 Poule A (pA[0]) + #4 Poule B (pB[3])
+      // Éq.2: #2 Poule A (pA[1]) + #3 Poule B (pB[2])
+      // Éq.3: #3 Poule A (pA[2]) + #2 Poule B (pB[1])
+      // Éq.4: #4 Poule A (pA[3]) + #1 Poule B (pB[0])
+      const eq1 = { p1: pA[0].id, p2: pB[3].id };
+      const eq2 = { p1: pA[1].id, p2: pB[2].id };
+      const eq3 = { p1: pA[2].id, p2: pB[1].id };
+      const eq4 = { p1: pA[3].id, p2: pB[0].id };
+
+      // Terrain impair (poolA) :
+      // Rotation 1 : Éq.1 vs Éq.2
+      await prisma.match.create({ data: { poolId: poolA.id, order: 1, team1Player1Id: eq1.p1, team1Player2Id: eq1.p2, team2Player1Id: eq2.p1, team2Player2Id: eq2.p2 } });
+      // Rotation 2 : Éq.1 vs Éq.3
+      await prisma.match.create({ data: { poolId: poolA.id, order: 2, team1Player1Id: eq1.p1, team1Player2Id: eq1.p2, team2Player1Id: eq3.p1, team2Player2Id: eq3.p2 } });
+      // Rotation 3 : Éq.1 vs Éq.4
+      await prisma.match.create({ data: { poolId: poolA.id, order: 3, team1Player1Id: eq1.p1, team1Player2Id: eq1.p2, team2Player1Id: eq4.p1, team2Player2Id: eq4.p2 } });
+
+      // Terrain pair (poolB) :
+      // Rotation 1 : Éq.3 vs Éq.4
+      await prisma.match.create({ data: { poolId: poolB.id, order: 1, team1Player1Id: eq3.p1, team1Player2Id: eq3.p2, team2Player1Id: eq4.p1, team2Player2Id: eq4.p2 } });
+      // Rotation 2 : Éq.2 vs Éq.4
+      await prisma.match.create({ data: { poolId: poolB.id, order: 2, team1Player1Id: eq2.p1, team1Player2Id: eq2.p2, team2Player1Id: eq4.p1, team2Player2Id: eq4.p2 } });
+      // Rotation 3 : Éq.2 vs Éq.3
+      await prisma.match.create({ data: { poolId: poolB.id, order: 3, team1Player1Id: eq2.p1, team1Player2Id: eq2.p2, team2Player1Id: eq3.p1, team2Player2Id: eq3.p2 } });
+    }
+
+    // Option A : Si nombre impair de poules, la dernière poule isolée joue en format classique
+    if (createdPools.length % 2 === 1) {
+      const { pool: orphanPool, poolUsers: pU } = createdPools[createdPools.length - 1];
+      await prisma.match.create({ data: { poolId: orphanPool.id, order: 1, team1Player1Id: pU[0].id, team1Player2Id: pU[3].id, team2Player1Id: pU[1].id, team2Player2Id: pU[2].id } });
+      await prisma.match.create({ data: { poolId: orphanPool.id, order: 2, team1Player1Id: pU[0].id, team1Player2Id: pU[2].id, team2Player1Id: pU[1].id, team2Player2Id: pU[3].id } });
+      await prisma.match.create({ data: { poolId: orphanPool.id, order: 3, team1Player1Id: pU[0].id, team1Player2Id: pU[1].id, team2Player1Id: pU[2].id, team2Player2Id: pU[3].id } });
+    }
   }
 
   await prisma.session.update({
     where: { id: sessionId },
-    data: { status: 'POULES_GENEREES', courts: actualPoolsCount }
+    data: { status: 'POULES_GENEREES', courts: actualPoolsCount, isTournament }
   });
 
   await prisma.activityLog.create({
-    data: { sessionId, message: `Admin - Génération des poules (x${actualPoolsCount})` }
+    data: { sessionId, message: `Admin - Génération des poules ${isTournament ? 'Mode Tournoi ' : ''}(x${actualPoolsCount})` }
   });
 
   revalidatePath('/admin');
@@ -549,6 +618,7 @@ export async function finishSessionAndCalculatePoints(sessionId: string, formDat
   });
 
   const N = pools.length * 4;
+  const allSessionMatches = pools.flatMap(p => p.matches);
 
   for (const pool of pools) {
     for (const poolPlayer of pool.players) {
@@ -561,7 +631,7 @@ export async function finishSessionAndCalculatePoints(sessionId: string, formDat
       let losses = 0;
       let validMatches = 0;
 
-      for (const match of pool.matches) {
+      for (const match of allSessionMatches) {
         const isTeam1 = match.team1Player1Id === poolPlayer.userId || match.team1Player2Id === poolPlayer.userId;
         const isTeam2 = match.team2Player1Id === poolPlayer.userId || match.team2Player2Id === poolPlayer.userId;
 

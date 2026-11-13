@@ -6,9 +6,10 @@ import { redirect } from "next/navigation";
 
 export async function saveScoresAction(formData: FormData) {
   const poolId = formData.get('poolId') as string;
+  const partnerPoolId = formData.get('partnerPoolId') as string | null;
   const sessionId = formData.get('sessionId') as string;
 
-  for (let i = 1; i <= 3; i++) {
+  for (let i = 1; i <= 6; i++) {
     const t1 = formData.get(`m${i}_t1`) as string;
     const t2 = formData.get(`m${i}_t2`) as string;
     const matchId = formData.get(`m${i}_id`) as string;
@@ -31,6 +32,12 @@ export async function saveScoresAction(formData: FormData) {
   }
 
   revalidatePath(`/pool/${poolId}`);
+  if (partnerPoolId) {
+    revalidatePath(`/pool/${partnerPoolId}`);
+  }
+  if (sessionId) {
+    revalidatePath(`/session/${sessionId}`);
+  }
   revalidatePath(`/`);
   
   if (formData.get('redirect') === 'true' && sessionId) {
