@@ -749,6 +749,34 @@ export async function updateGlobalSettings(formData: FormData) {
 
 // --- Gestion des terrains / Réservations (déplacé de Session Detail -> Admin) ---
 
+async function syncSessionStartTimeWithReservations(sessionId: string) {
+  const session = await prisma.session.findUnique({
+    where: { id: sessionId },
+    include: { reservations: true }
+  });
+  if (!session || session.reservations.length === 0) return;
+
+  const sortedTimes = session.reservations
+    .map(r => r.startTime)
+    .filter(Boolean)
+    .sort();
+
+  if (sortedTimes.length === 0) return;
+
+  const [hoursStr, minutesStr] = sortedTimes[0].split(':');
+  const hours = parseInt(hoursStr, 10);
+  const minutes = parseInt(minutesStr, 10);
+  if (isNaN(hours) || isNaN(minutes)) return;
+
+  const updatedDate = new Date(session.date);
+  updatedDate.setHours(hours, minutes, 0, 0);
+
+  await prisma.session.update({
+    where: { id: sessionId },
+    data: { date: updatedDate }
+  });
+}
+
 export async function createCourtReservation(sessionId: string, formData: FormData) {
   const currUser = await getSessionUser();
   if (!currUser || !['PRESIDENT', 'ORGA', 'TRESORIER'].includes(currUser.role)) throw new Error("Unauthorized");
@@ -769,6 +797,9 @@ export async function createCourtReservation(sessionId: string, formData: FormDa
     }
   });
 
+  await syncSessionStartTimeWithReservations(sessionId);
+
+  revalidatePath(`/`);
   revalidatePath(`/admin`);
   revalidatePath(`/session/${sessionId}`);
 }
@@ -807,6 +838,9 @@ export async function deleteCourtReservation(sessionId: string, formData: FormDa
     where: { id: reservationId }
   });
 
+  await syncSessionStartTimeWithReservations(sessionId);
+
+  revalidatePath(`/`);
   revalidatePath(`/admin`);
   revalidatePath(`/session/${sessionId}`);
 }

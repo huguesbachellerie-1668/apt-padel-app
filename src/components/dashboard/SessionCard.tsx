@@ -8,7 +8,8 @@ type SessionWithPools = Prisma.SessionGetPayload<{
   include: {
     pools: {
       include: { matches: true, courtReservation: true }
-    }
+    },
+    reservations: true
   }
 }>;
 
@@ -80,7 +81,16 @@ export default function SessionCard({
         
         <div className="flex flex-wrap items-center gap-3 mb-5">
           <p className={`text-md font-black capitalize p-3 rounded-xl border inline-block m-0 ${activeSession.isTournament ? 'text-blue-800 bg-blue-50 border-blue-200' : 'text-club-green bg-club-green-light/50 border-club-green-light'}`}>
-             Dimanche {new Date(activeSession.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit' }).replace(':', 'h').replace(' à ', ' à partir de ')}
+             {(() => {
+               const datePart = new Date(activeSession.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+               const earliestResTime = activeSession.reservations && activeSession.reservations.length > 0
+                 ? [...activeSession.reservations].map(r => r.startTime).filter(Boolean).sort()[0]
+                 : null;
+               const timePart = earliestResTime
+                 ? earliestResTime.replace(':', 'h')
+                 : new Date(activeSession.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', 'h');
+               return `${datePart} à partir de ${timePart}`;
+             })()}
           </p>
         </div>
 

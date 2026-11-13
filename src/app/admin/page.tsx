@@ -184,16 +184,27 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                   <div className="flex flex-col sm:flex-row gap-4 justify-between items-center w-full">
                   <div>
                     <div className="font-black text-xl text-gray-800 flex flex-wrap items-center gap-2">
-                      <span>{new Date(session.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit' }).replace(':', 'h')}</span>
+                      <span>
+                        {(() => {
+                          const dateStr = new Date(session.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+                          const earliestResTime = session.reservations && session.reservations.length > 0
+                            ? [...session.reservations].map(r => r.startTime).filter(Boolean).sort()[0]
+                            : null;
+                          const timeStr = earliestResTime
+                            ? earliestResTime.replace(':', 'h')
+                            : new Date(session.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', 'h');
+                          return `${dateStr} à ${timeStr}`;
+                        })()}
+                      </span>
                       {session.isTournament && (
                         <span className="bg-blue-700 text-white text-xs font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">
                           🏆 Tournoi (Paires Fixes)
                         </span>
                       )}
                     </div>
-                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
                       <span className="text-sm text-gray-500 font-medium">Statut actuel :</span>
-                      <a href={`/session/${session.id}`} className={`px-3 py-1 text-xs font-bold rounded-full hover:scale-105 hover:shadow-md transition-all ${
+                      <a href={`/session/${session.id}`} className={`px-5 py-3 text-sm font-bold rounded-xl shadow-sm hover:scale-[1.02] hover:shadow-md transition-all inline-flex items-center justify-center ${
                         session.status === 'PREVUE' ? 'bg-gray-200 text-gray-700' : 
                         session.status === 'INSCRIPTIONS_OUVERTES' ? 'bg-green-500 text-white animate-pulse' : 
                         session.status === 'POULES_GENEREES' ? 'bg-orange-500 text-white' : 
@@ -204,10 +215,10 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                       </a>
                       {(session.status === 'PREVUE' || session.status === 'INSCRIPTIONS_OUVERTES') && (
                         <form action={toggleSessionTournamentAction.bind(null, session.id, !session.isTournament)}>
-                          <SubmitButton pendingText="..." className={`px-3 py-1 text-xs font-bold rounded-full border transition-all ${
+                          <SubmitButton pendingText="..." className={`px-5 py-3 text-sm font-bold rounded-xl shadow-sm border transition-all ${
                             session.isTournament
-                              ? 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
-                              : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+                              ? 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                              : 'bg-blue-600 text-white border-blue-700 hover:bg-blue-700'
                           }`}>
                             {session.isTournament ? 'Passer en Session Classique 🎾' : 'Passer en Mode Tournoi 🏆'}
                           </SubmitButton>
@@ -329,6 +340,8 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                           const lastRes = session.reservations && session.reservations.length > 0
                             ? session.reservations[session.reservations.length - 1]
                             : null;
+                          const sessionTimeHHMM = new Date(session.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', hour12: false });
+                          const defaultStartTime = lastRes?.startTime || (sessionTimeHHMM !== '01:01' && sessionTimeHHMM !== '00:00' ? sessionTimeHHMM : '18:30');
                           return (
                             <form
                               key={`res-form-${session.id}-${session.reservations?.length || 0}`}
@@ -359,7 +372,7 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
                                   type="time"
                                   name="startTime"
                                   required
-                                  defaultValue={lastRes?.startTime || ""}
+                                  defaultValue={defaultStartTime}
                                   className="w-full p-2 rounded-lg border border-gray-200 text-xs font-bold focus:outline-none bg-white"
                                 />
                               </div>

@@ -27,7 +27,8 @@ export default async function Dashboard() {
       include: {
         pools: {
           include: { matches: true, courtReservation: true }
-        }
+        },
+        reservations: true
       }
     })
   ]);
